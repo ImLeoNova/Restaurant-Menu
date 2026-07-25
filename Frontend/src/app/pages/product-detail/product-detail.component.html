@@ -1,0 +1,575 @@
+<main class="relative min-h-screen bg-[#0b0f19] overflow-x-hidden" dir="rtl">
+  <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+    <div
+      class="absolute top-0 right-0 w-[30rem] h-[30rem] bg-amber-500/10 blur-[120px] rounded-full"
+    ></div>
+    <div
+      class="absolute top-[25%] left-[8%] w-[22rem] h-[22rem] bg-orange-500/10 blur-[120px] rounded-full"
+    ></div>
+    <div
+      class="absolute bottom-0 left-0 w-[26rem] h-[26rem] bg-yellow-500/10 blur-[120px] rounded-full"
+    ></div>
+  </div>
+
+  <div class="pattern-b absolute inset-0 opacity-30 pointer-events-none"></div>
+
+  <div class="relative z-10">
+    <div class="flex justify-center items-center p-3 sm:p-5 sticky top-0 z-30">
+      <div class="w-full max-w-[90rem]">
+        <app-header class="block w-full"></app-header>
+      </div>
+    </div>
+
+    @if (isLoading) {
+      <div class="min-h-[70vh] flex flex-col items-center justify-center gap-4">
+        <div
+          class="w-14 h-14 rounded-full border-4 border-amber-500/20 border-t-amber-400 animate-spin"
+        ></div>
+        <p class="yekan text-white/70">در حال بارگذاری جزئیات محصول...</p>
+      </div>
+    } @else if (notFound) {
+      <div
+        class="min-h-[70vh] flex flex-col items-center justify-center gap-5 px-4 text-center"
+      >
+        <div
+          class="w-24 h-24 rounded-[2rem] border border-white/10 bg-white/5 flex items-center justify-center"
+        >
+          <svg class="w-10 h-10 text-amber-400" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h1 class="yekan text-white text-2xl font-extrabold">محصول پیدا نشد</h1>
+        <p class="yekan text-white/60 max-w-md">
+          این محصول وجود ندارد یا از منو حذف شده است.
+        </p>
+        <button
+          type="button"
+          (click)="goBack()"
+          class="yekan rounded-2xl px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold"
+        >
+          بازگشت به منو
+        </button>
+      </div>
+    } @else if (product) {
+      <div class="detail-enter max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <!-- Breadcrumb -->
+        <div class="flex flex-wrap items-center gap-2 mb-6 sm:mb-8 text-[0.85rem]">
+          <button
+            type="button"
+            routerLink="/restaurant-menu"
+            class="yekan text-white/50 hover:text-amber-300 transition-colors"
+          >
+            منو
+          </button>
+          <span class="text-white/25">/</span>
+          <span class="yekan text-white/50">{{ categoryTitle }}</span>
+          <span class="text-white/25">/</span>
+          <span class="yekan text-amber-300 font-bold">{{ product.title }}</span>
+        </div>
+
+        <!-- Hero -->
+        <section
+          class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 mb-10 lg:mb-14"
+        >
+          <div
+            class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 min-h-[22rem] sm:min-h-[28rem] flex items-center justify-center"
+          >
+            <div
+              class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.18),transparent_45%)]"
+            ></div>
+            <div
+              class="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-orange-500/10 blur-3xl"
+            ></div>
+            <img
+              [src]="product.image"
+              [alt]="product.title"
+              class="relative z-10 w-[14rem] sm:w-[18rem] lg:w-[20rem] object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.45)] transition-transform duration-700 hover:scale-105"
+            />
+            <div
+              class="absolute top-5 right-5 rounded-2xl px-4 py-2 bg-black/35 border border-white/10 backdrop-blur-xl"
+            >
+              <span class="yekan text-amber-300 text-sm font-bold">{{
+                categoryTitle
+              }}</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center gap-5 sm:gap-6 min-w-0">
+            <div class="flex flex-wrap items-center gap-3">
+              <span
+                class="yekan rounded-full px-4 py-2 bg-amber-500/15 border border-amber-400/20 text-amber-300 text-[0.8rem] font-bold"
+              >
+                جزئیات محصول
+              </span>
+              <span
+                class="yekan rounded-full px-4 py-2 bg-white/5 border border-white/10 text-white/70 text-[0.8rem]"
+              >
+                کد محصول: {{ product.product_ID }}
+              </span>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <h1
+                class="yekan text-white text-[2rem] sm:text-[2.8rem] lg:text-[3.2rem] font-extrabold leading-tight"
+              >
+                {{ product.title }}
+              </h1>
+              <p
+                class="yekan text-white/70 text-[0.95rem] sm:text-[1.05rem] leading-8"
+              >
+                {{ product.description }}
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p class="yekan text-white/45 text-sm mb-1">قیمت</p>
+                <p
+                  class="yekan text-transparent bg-clip-text bg-gradient-to-l from-amber-300 via-amber-400 to-orange-500 text-[1.8rem] sm:text-[2.2rem] font-extrabold"
+                >
+                  {{ product.price }}
+                  <span class="text-[1rem] text-amber-300/80">هزار تومان</span>
+                </p>
+              </div>
+
+              <div
+                class="rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3 min-w-[10rem]"
+              >
+                <div class="flex items-center gap-2 mb-1">
+                  @for (filled of stars(stats.average_rating); track $index) {
+                    <svg
+                      class="w-4 h-4"
+                      [ngClass]="
+                        filled ? 'text-amber-400' : 'text-white/20'
+                      "
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path
+                        d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.77l-5.8 3.05 1.11-6.47-4.7-4.58 6.49-.94L12 2.5z"
+                      />
+                    </svg>
+                  }
+                </div>
+                <p class="yekan text-white font-bold text-sm">
+                  {{ stats.average_rating || 0 }} از ۵
+                  <span class="text-white/45 font-normal"
+                    >({{ stats.total }} نظر)</span
+                  >
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                (click)="scrollToComments()"
+                class="yekan flex-1 text-center rounded-2xl px-5 py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold shadow-[0_15px_40px_rgba(245,158,11,0.28)] hover:scale-[1.02] transition-all"
+              >
+                مشاهده نظرات
+              </button>
+              <button
+                type="button"
+                (click)="goBack()"
+                class="yekan flex-1 rounded-2xl px-5 py-4 bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all"
+              >
+                بازگشت به منو
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Highlights -->
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 lg:mb-14">
+          @for (item of highlights; track item.title) {
+            <div
+              class="rounded-[1.6rem] border border-white/10 bg-white/5 backdrop-blur-xl p-5 hover:bg-white/[0.07] transition-all"
+            >
+              <p class="yekan text-amber-300 text-sm font-bold mb-2">
+                {{ item.title }}
+              </p>
+              <p class="yekan text-white text-[1.05rem] font-extrabold">
+                {{ item.value }}
+              </p>
+            </div>
+          }
+        </section>
+
+        <!-- Description + Rating summary -->
+        <section class="grid grid-cols-1 lg:grid-cols-5 gap-5 mb-10 lg:mb-14">
+          <div
+            class="lg:col-span-3 rounded-[1.8rem] border border-white/10 bg-white/5 p-6 sm:p-8"
+          >
+            <h2 class="yekan text-white text-xl sm:text-2xl font-extrabold mb-4">
+              درباره این غذا
+            </h2>
+            <p class="yekan text-white/70 leading-8 text-[0.95rem] sm:text-[1rem]">
+              {{ product.description }}
+            </p>
+            <div
+              class="mt-6 pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4"
+            >
+              <div class="rounded-2xl bg-black/20 border border-white/10 p-4">
+                <p class="yekan text-white/45 text-sm mb-1">دسته‌بندی</p>
+                <p class="yekan text-white font-bold">{{ categoryTitle }}</p>
+              </div>
+              <div class="rounded-2xl bg-black/20 border border-white/10 p-4">
+                <p class="yekan text-white/45 text-sm mb-1">مناسب برای</p>
+                <p class="yekan text-white font-bold">ناهار، شام و سفارش آنلاین</p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="lg:col-span-2 rounded-[1.8rem] border border-white/10 bg-white/5 p-6 sm:p-8"
+          >
+            <h2 class="yekan text-white text-xl font-extrabold mb-5">
+              خلاصه امتیازها
+            </h2>
+            <div class="flex items-center gap-4 mb-6">
+              <div
+                class="w-20 h-20 rounded-[1.4rem] bg-gradient-to-br from-amber-400/20 to-orange-500/10 border border-amber-400/20 flex flex-col items-center justify-center"
+              >
+                <span class="yekan text-amber-300 text-2xl font-extrabold">{{
+                  stats.average_rating || 0
+                }}</span>
+                <span class="yekan text-white/50 text-[0.7rem]">از ۵</span>
+              </div>
+              <div>
+                <p class="yekan text-white font-bold">رضایت مشتریان</p>
+                <p class="yekan text-white/50 text-sm mt-1">
+                  بر اساس {{ stats.total }} دیدگاه ثبت‌شده
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              @for (row of ratingPercentages; track row.label) {
+                <div class="flex items-center gap-3">
+                  <span class="yekan text-white/60 text-sm w-6">{{
+                    row.label
+                  }}</span>
+                  <div
+                    class="flex-1 h-2.5 rounded-full bg-white/10 overflow-hidden"
+                  >
+                    <div
+                      class="h-full rounded-full bg-gradient-to-l from-amber-400 to-orange-500 transition-all duration-500"
+                      [style.width.%]="row.percent"
+                    ></div>
+                  </div>
+                  <span class="yekan text-white/45 text-sm w-8 text-left">{{
+                    row.count
+                  }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- Related -->
+        @if (relatedProducts.length) {
+          <section class="mb-10 lg:mb-14">
+            <div class="flex items-end justify-between gap-4 mb-5">
+              <div>
+                <h2 class="yekan text-white text-xl sm:text-2xl font-extrabold">
+                  محصولات مشابه
+                </h2>
+                <p class="yekan text-white/50 text-sm mt-1">
+                  پیشنهادهایی از دسته {{ categoryTitle }}
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              @for (item of relatedProducts; track item.product_ID) {
+                <a
+                  [routerLink]="['/restaurant-menu/product', item.product_ID]"
+                  class="group rounded-[1.7rem] border border-white/10 bg-white/5 overflow-hidden hover:bg-white/10 hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div
+                    class="h-44 bg-gradient-to-br from-amber-500/10 to-orange-500/5 flex items-center justify-center"
+                  >
+                    <img
+                      [src]="item.image"
+                      [alt]="item.title"
+                      class="w-28 object-contain group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div class="p-5 flex flex-col gap-2">
+                    <h3 class="yekan text-white font-extrabold text-lg">
+                      {{ item.title }}
+                    </h3>
+                    <p class="yekan text-amber-400 font-bold">
+                      {{ item.price }} هزار تومان
+                    </p>
+                  </div>
+                </a>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Comments -->
+        <section id="comments" class="scroll-mt-28">
+          <div
+            class="rounded-[1.8rem] border border-white/10 bg-white/5 overflow-hidden"
+          >
+            <div
+              class="p-6 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            >
+              <div>
+                <h2 class="yekan text-white text-xl sm:text-2xl font-extrabold">
+                  نظرات کاربران
+                </h2>
+                <p class="yekan text-white/50 text-sm mt-1">
+                  تجربه واقعی مشتری‌ها از این محصول
+                </p>
+              </div>
+              <div
+                class="yekan rounded-2xl px-4 py-3 bg-amber-500/10 border border-amber-400/20 text-amber-300 font-bold text-sm"
+              >
+                {{ stats.total }} دیدگاه
+              </div>
+            </div>
+
+            <div class="p-6 sm:p-8 border-b border-white/10">
+              @if (isLoggedIn) {
+                <div class="flex flex-col gap-4">
+                  <div>
+                    <p class="yekan text-white/70 text-sm mb-3">امتیاز شما</p>
+                    <div class="flex items-center gap-2">
+                      @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <button
+                          type="button"
+                          class="star-btn"
+                          (click)="setRating(star)"
+                        >
+                          <svg
+                            class="w-8 h-8"
+                            [ngClass]="
+                              star <= newRating
+                                ? 'text-amber-400'
+                                : 'text-white/20'
+                            "
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path
+                              d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.77l-5.8 3.05 1.11-6.47-4.7-4.58 6.49-.94L12 2.5z"
+                            />
+                          </svg>
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <textarea
+                    [(ngModel)]="newComment"
+                    rows="4"
+                    maxlength="1000"
+                    placeholder="نظر خودت رو درباره طعم، کیفیت و سرو این غذا بنویس..."
+                    class="yekan w-full rounded-[1.4rem] bg-black/25 border border-white/10 px-4 py-4 text-white placeholder:text-white/35 outline-none focus:border-amber-400/50 resize-none"
+                  ></textarea>
+
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <button
+                      type="button"
+                      (click)="submitComment()"
+                      [disabled]="submitLoading"
+                      class="yekan rounded-2xl px-6 py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold hover:scale-[1.02] transition-all disabled:opacity-50"
+                    >
+                      {{ submitLoading ? 'در حال ثبت...' : 'ثبت دیدگاه' }}
+                    </button>
+                    <span class="yekan text-white/40 text-sm"
+                      >{{ newComment.length }}/1000</span
+                    >
+                  </div>
+                </div>
+              } @else {
+                <div
+                  class="rounded-[1.4rem] border border-dashed border-white/15 bg-black/20 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div>
+                    <h3 class="yekan text-white font-extrabold text-lg">
+                      برای ثبت نظر وارد شوید
+                    </h3>
+                    <p class="yekan text-white/55 text-sm mt-1">
+                      بعد از ورود می‌توانید امتیاز و دیدگاه خود را ثبت کنید.
+                    </p>
+                  </div>
+                  <a
+                    routerLink="/authentication/login"
+                    class="yekan shrink-0 rounded-2xl px-5 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold text-center"
+                  >
+                    ورود / ثبت‌نام
+                  </a>
+                </div>
+              }
+
+              @if (errorMessage) {
+                <p
+                  class="yekan mt-4 text-red-300 text-sm bg-red-500/10 border border-red-400/20 rounded-xl px-4 py-3"
+                >
+                  {{ errorMessage }}
+                </p>
+              }
+              @if (successMessage) {
+                <p
+                  class="yekan mt-4 text-emerald-300 text-sm bg-emerald-500/10 border border-emerald-400/20 rounded-xl px-4 py-3"
+                >
+                  {{ successMessage }}
+                </p>
+              }
+            </div>
+
+            <div class="p-6 sm:p-8">
+              @if (commentsLoading) {
+                <div class="flex justify-center py-10">
+                  <div
+                    class="w-10 h-10 rounded-full border-4 border-amber-500/20 border-t-amber-400 animate-spin"
+                  ></div>
+                </div>
+              } @else if (!comments.length) {
+                <div class="text-center py-12">
+                  <p class="yekan text-white/60">
+                    هنوز نظری ثبت نشده. اولین نفر باشید!
+                  </p>
+                </div>
+              } @else {
+                <div class="flex flex-col gap-4">
+                  @for (comment of comments; track comment.comment_ID) {
+                    <article
+                      class="rounded-[1.5rem] border border-white/10 bg-black/20 p-5 sm:p-6"
+                    >
+                      <div
+                        class="flex flex-wrap items-start justify-between gap-3 mb-4"
+                      >
+                        <div class="flex items-center gap-3 min-w-0">
+                          <div
+                            class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400/30 to-orange-500/20 border border-white/10 flex items-center justify-center shrink-0"
+                          >
+                            <span class="yekan text-amber-300 font-extrabold">
+                              {{ comment.username?.charAt(0) || 'ک' }}
+                            </span>
+                          </div>
+                          <div class="min-w-0">
+                            <h3 class="yekan text-white font-bold truncate">
+                              {{ comment.username }}
+                            </h3>
+                            <p class="yekan text-white/40 text-xs mt-0.5">
+                              {{ formatDate(comment.created_at) }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                          @for (
+                            filled of stars(comment.rating);
+                            track $index
+                          ) {
+                            <svg
+                              class="w-4 h-4"
+                              [ngClass]="
+                                filled ? 'text-amber-400' : 'text-white/20'
+                              "
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path
+                                d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.77l-5.8 3.05 1.11-6.47-4.7-4.58 6.49-.94L12 2.5z"
+                              />
+                            </svg>
+                          }
+                        </div>
+                      </div>
+
+                      @if (editingCommentId === comment.comment_ID) {
+                        <div class="flex flex-col gap-3">
+                          <div class="flex items-center gap-2">
+                            @for (star of [1, 2, 3, 4, 5]; track star) {
+                              <button
+                                type="button"
+                                (click)="setEditRating(star)"
+                              >
+                                <svg
+                                  class="w-6 h-6"
+                                  [ngClass]="
+                                    star <= editRating
+                                      ? 'text-amber-400'
+                                      : 'text-white/20'
+                                  "
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.47L12 17.77l-5.8 3.05 1.11-6.47-4.7-4.58 6.49-.94L12 2.5z"
+                                  />
+                                </svg>
+                              </button>
+                            }
+                          </div>
+                          <textarea
+                            [(ngModel)]="editContent"
+                            rows="3"
+                            class="yekan w-full rounded-2xl bg-black/30 border border-white/10 px-4 py-3 text-white outline-none focus:border-amber-400/50 resize-none"
+                          ></textarea>
+                          <div class="flex gap-2">
+                            <button
+                              type="button"
+                              (click)="saveEdit(comment.comment_ID)"
+                              class="yekan rounded-xl px-4 py-2 bg-amber-400 text-black font-bold text-sm"
+                            >
+                              ذخیره
+                            </button>
+                            <button
+                              type="button"
+                              (click)="cancelEdit()"
+                              class="yekan rounded-xl px-4 py-2 bg-white/10 text-white font-bold text-sm"
+                            >
+                              انصراف
+                            </button>
+                          </div>
+                        </div>
+                      } @else {
+                        <p class="yekan text-white/80 leading-7">
+                          {{ comment.content }}
+                        </p>
+
+                        @if (canManage(comment)) {
+                          <div class="flex gap-2 mt-4">
+                            <button
+                              type="button"
+                              (click)="startEdit(comment)"
+                              class="yekan text-sm px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                            >
+                              ویرایش
+                            </button>
+                            <button
+                              type="button"
+                              (click)="deleteComment(comment.comment_ID)"
+                              class="yekan text-sm px-3 py-2 rounded-xl bg-red-500/10 border border-red-400/20 text-red-300 hover:bg-red-500/20 transition-all"
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        }
+                      }
+                    </article>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+
+    <app-footer class="hidden md:block mt-8"></app-footer>
+  </div>
+</main>

@@ -1,0 +1,7 @@
+Flask
+flask-cors
+mysql-connector-python
+PyJWT
+gevent
+Werkzeug
+python-dotenv

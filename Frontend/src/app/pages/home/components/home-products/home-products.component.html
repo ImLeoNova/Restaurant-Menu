@@ -1,0 +1,52 @@
+<section
+  class="relative z-10 px-4 sm:px-8 lg:px-16 xl:px-24 pb-12 sm:pb-16"
+  dir="rtl"
+>
+  <div class="max-w-[90rem] mx-auto">
+    @if (products.length == 0) {
+      <div
+        class="rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl py-16 sm:py-24 px-6 text-center shadow-xl"
+      >
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/10 flex items-center justify-center"
+          >
+            <svg
+              class="w-10 h-10 sm:w-12 sm:h-12 text-white/70"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M7 7h10l1 10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L7 7Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+              />
+              <path
+                d="M9 7a3 3 0 0 1 6 0"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <h1
+            class="text-white yekan text-[1.4rem] sm:text-[2rem] font-extrabold text-center w-full"
+          >
+            این محصول هنوز تعریف نشده است
+          </h1>
+          <p class="yekan text-white/60 text-[0.9rem] sm:text-[1rem]">
+            به زودی آیتم‌های این دسته‌بندی تکمیل می‌شوند.
+          </p>
+        </div>
+      </div>
+    }
+
+    @if (products.length !== 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+        @for (foodItem of products; track foodItem.product_ID) {
+          <app-home-food-card [foodItem]="foodItem" />
+        }
+      </div>
+    }
+  </div>
+</section>

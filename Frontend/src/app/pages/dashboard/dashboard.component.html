@@ -1,0 +1,177 @@
+<div class="min-h-screen bg-[#0b1020] text-white overflow-x-hidden">
+  <app-dashboard-background />
+
+  <main class="flex min-h-screen flex-col lg:flex-row-reverse">
+    <app-dashboard-sidebar
+      [user]="user"
+      [nowPage]="nowPage"
+      (pageChange)="setPage($event)"
+    />
+
+    <section class="flex-1 min-w-0">
+      <app-dashboard-welcome-header [user]="user" />
+
+      <div class="px-3 sm:px-4 md:px-6 pb-6 sm:pb-8">
+        @switch (nowPage) {
+          @case ("home") {
+            <app-dashboard-home
+              [productsCount]="products.length"
+              [categoryProductsCount]="getProductsByCurrentCategory().length"
+              [activeCategory]="categoryService.nowCategory"
+              [userRole]="user.role"
+            />
+          }
+
+          @case ("products") {
+            <app-dashboard-products
+              [products]="getProductsByCurrentCategory()"
+              [categories]="categoryService.getCategories()"
+              [nowCategory]="categoryService.nowCategory"
+              [getProductImageUrl]="getProductImageUrl"
+              (addProduct)="openModal('add')"
+              (searchProduct)="openModal('search')"
+              (categoryChange)="onCategoryChange($event)"
+              (editProduct)="selectProductForUpdate($event)"
+              (deleteProduct)="selectProductForDelete($event)"
+            />
+          }
+
+          @case ("users") {
+            <app-dashboard-users
+              [users]="filteredUsers"
+              [isLoading]="isLoadingUsers"
+              [searchKeyword]="searchUserKeyword"
+              (searchKeywordChange)="searchUserKeyword = $event"
+              (search)="searchUsers()"
+              (editUser)="openEditUserModal($event)"
+              (deleteUser)="openModal('delete_user', $event)"
+            />
+          }
+          @case ("categories") {
+            <app-dashboard-categories
+              [categories]="categoryService.categorys"
+              [isLoading]="categoryService.isLoadingCategories"
+              [selectedCategory]="selectedCategoryItem"
+              [categoryProducts]="selectedCategoryProducts"
+              [isLoadingProducts]="isLoadingCategoryProducts"
+              (addCategory)="openModal('add_category')"
+              (editCategory)="openModal('update_category', $event)"
+              (deleteCategory)="openModal('delete_category', $event)"
+              (viewCategory)="viewCategoryProducts($event)"
+              (clearSelection)="clearCategorySelection()"
+            />
+          }
+        }
+      </div>
+    </section>
+  </main>
+</div>
+
+@if (nowModal !== undefined) {
+  <div
+    class="fixed inset-0 z-[999] bg-black/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+  >
+    @switch (nowModal) {
+      @case ("add") {
+        <app-add-product-modal
+          [form]="addFoodFORM"
+          [categories]="categoryService.categorys"
+          [imgSRC]="imgSRC"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (imageSelected)="input($event)"
+          (submitForm)="addFood()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("search") {
+        <app-search-product-modal
+          [searchKeyword]="searchKeyword"
+          (searchKeywordChange)="searchKeyword = $event"
+          (search)="searchProducts()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("update") {
+        <app-update-product-modal
+          [form]="updateFoodFORM"
+          [categories]="categoryService.categorys"
+          [updateImgSRC]="updateImgSRC"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (imageSelected)="updateInput($event)"
+          (submitForm)="updateFood()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("remove") {
+        <app-delete-product-modal
+          [selectedProduct]="selectedProduct"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (confirm)="deleteSelectedProduct()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("delete_user") {
+        <app-delete-user-modal
+          [selectedUser]="selectedUser"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (confirm)="deleteAdminUser($event)"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("edit_user") {
+        <app-edit-user-modal
+          [form]="updateUserFORM"
+          [selectedUser]="selectedUser"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (submitForm)="updateAdminUser()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("add_category") {
+        <app-add-category-modal
+          [form]="addCategoryFORM"
+          [imgSRC]="categoryImgSRC"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (imageSelected)="categoryInput($event)"
+          (submitForm)="addCategory()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("update_category") {
+        <app-update-category-modal
+          [form]="updateCategoryFORM"
+          [selectedCategory]="selectedCategoryItem"
+          [imgSRC]="updateCategoryImgSRC"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (imageSelected)="updateCategoryInput($event)"
+          (submitForm)="updateCategory()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("delete_category") {
+        <app-delete-category-modal
+          [selectedCategory]="selectedCategoryItem"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (confirm)="deleteSelectedCategory()"
+          (close)="closeModal()"
+        />
+      }
+    }
+  </div>
+}

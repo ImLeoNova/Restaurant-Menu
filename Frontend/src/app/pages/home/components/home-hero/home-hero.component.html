@@ -1,0 +1,239 @@
+<section
+  class="relative z-10 px-4 sm:px-8 lg:px-16 xl:px-24 pt-6 sm:pt-10 pb-10 sm:pb-16"
+  id="landing"
+  dir="rtl"
+>
+  <div class="max-w-[90rem] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div
+        class="flex flex-col gap-5 sm:gap-6 text-white min-w-0 order-2 lg:order-1"
+      >
+        <div class="flex flex-wrap items-center gap-3">
+          <span
+            class="yekan px-4 py-2 rounded-full bg-amber-500/15 border border-amber-400/20 text-amber-300 text-[0.8rem] sm:text-[0.9rem] font-bold"
+          >
+            طعمی متفاوت، تجربه‌ای خاص
+          </span>
+          <span
+            class="yekan px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/70 text-[0.75rem] sm:text-[0.85rem]"
+          >
+            کیفیت بالا • ارسال سریع • منوی متنوع
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <h1
+            class="yekan text-[2rem] sm:text-[2.8rem] lg:text-[3.7rem] font-extrabold leading-[1.4] sm:leading-[1.5]"
+          >
+            فست فود
+            <span
+              class="text-transparent bg-clip-text bg-gradient-to-l from-amber-300 via-amber-400 to-orange-500"
+            >
+              آرین
+            </span>
+          </h1>
+
+          <p
+            class="yekan text-white/70 text-[0.95rem] sm:text-[1.05rem] leading-8 max-w-[42rem]"
+          >
+            سلام! به فست فود آرین خوش اومدی. ما اینجاییم تا با استفاده از بهترین
+            مواد اولیه، غذاهای سریع، خوشمزه و باکیفیت رو با یک تجربه متفاوت بهت
+            ارائه بدیم. از برگرهای جذاب و پیتزاهای خوش‌عطر گرفته تا ساندویچ‌های
+            ویژه و نوشیدنی‌های خوشمزه، همه‌چیز با عشق و دقت آماده میشه تا لحظه‌ای
+            لذت‌بخش برات بسازه.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mt-2">
+          <a
+            routerLink="/restaurant-menu/products"
+            class="cursor-pointer p-3.5 sm:p-4 px-6 sm:px-8 rounded-2xl z-10 bg-gradient-to-r from-amber-400 to-orange-500 text-black yekan font-bold transition-all duration-300 hover:scale-[1.02] shadow-[0_15px_40px_rgba(245,158,11,0.35)] text-center"
+          >
+            مشاهده محصولات
+          </a>
+
+          <button
+            type="button"
+            (click)="scrollToAbout()"
+            class="cursor-pointer p-3.5 sm:p-4 px-6 sm:px-8 rounded-2xl z-10 bg-white/5 border border-white/10 text-white yekan font-bold transition-all duration-300 hover:bg-white/10"
+          >
+            درباره ما
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-4">
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 text-center"
+          >
+            <h2
+              class="yekan text-[1.3rem] sm:text-[1.6rem] font-extrabold text-amber-300"
+            >
+              {{ categoriesCount }}
+            </h2>
+            <p class="yekan text-white/60 text-[0.75rem] sm:text-[0.85rem] mt-1">
+              دسته‌بندی
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 text-center"
+          >
+            <h2
+              class="yekan text-[1.3rem] sm:text-[1.6rem] font-extrabold text-amber-300"
+            >
+              {{ activeProductsCount }}
+            </h2>
+            <p class="yekan text-white/60 text-[0.75rem] sm:text-[0.85rem] mt-1">
+              محصول فعال
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 text-center"
+          >
+            <h2
+              class="yekan text-[1.3rem] sm:text-[1.6rem] font-extrabold text-amber-300"
+            >
+              100%
+            </h2>
+            <p class="yekan text-white/60 text-[0.75rem] sm:text-[0.85rem] mt-1">
+              کیفیت مواد
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 text-center"
+          >
+            <h2
+              class="yekan text-[1.3rem] sm:text-[1.6rem] font-extrabold text-amber-300"
+            >
+              24/7
+            </h2>
+            <p class="yekan text-white/60 text-[0.75rem] sm:text-[0.85rem] mt-1">
+              پشتیبانی
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative order-1 lg:order-2 flex justify-center items-center">
+        <div class="relative w-full max-w-[38rem]">
+          <div
+            class="absolute inset-0 bg-amber-500/20 blur-[100px] rounded-full"
+          ></div>
+
+          <div
+            class="relative rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 bg-white/5 backdrop-blur-2xl p-5 sm:p-8 shadow-2xl overflow-hidden"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.16),transparent_35%)]"
+            ></div>
+
+            <div class="relative flex flex-col items-center">
+              <img
+                class="w-[16rem] sm:w-[24rem] lg:w-[28rem] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
+                src="assets/web/logo.png"
+                alt="logo"
+              />
+
+              <div class="grid grid-cols-2 gap-3 sm:gap-4 w-full mt-4 sm:mt-6">
+                <div class="rounded-2xl bg-black/20 border border-white/10 p-4">
+                  <div class="flex items-center gap-3" dir="rtl">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-400/20 flex items-center justify-center shrink-0"
+                    >
+                      <svg
+                        class="w-5 h-5 text-amber-300"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M7 7h10l1 10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L7 7Z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        />
+                        <path
+                          d="M9 7a3 3 0 0 1 6 0"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <h3
+                        class="yekan text-white font-bold text-[0.9rem] sm:text-[1rem]"
+                      >
+                        منوی متنوع
+                      </h3>
+                      <p class="yekan text-white/50 text-[0.75rem]">
+                        برای هر سلیقه
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-black/20 border border-white/10 p-4">
+                  <div class="flex items-center gap-3" dir="rtl">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-green-500/15 border border-green-400/20 flex items-center justify-center shrink-0"
+                    >
+                      <svg
+                        class="w-5 h-5 text-green-300"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="m5 13 4 4L19 7"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <h3
+                        class="yekan text-white font-bold text-[0.9rem] sm:text-[1rem]"
+                      >
+                        تازه و باکیفیت
+                      </h3>
+                      <p class="yekan text-white/50 text-[0.75rem]">
+                        مواد اولیه درجه یک
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="hidden md:flex absolute top-6 -right-6 rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 shadow-2xl items-center gap-3"
+          >
+            <div
+              class="w-11 h-11 rounded-xl bg-red-500/15 flex items-center justify-center"
+            >
+              <svg class="w-5 h-5 text-red-300" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div>
+              <h4 class="yekan text-white font-bold text-[0.95rem]">
+                محبوب مشتری‌ها
+              </h4>
+              <p class="yekan text-white/50 text-[0.75rem]">
+                طعم‌هایی فراموش‌نشدنی
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,51 @@
+<section
+  class="relative z-10 px-4 sm:px-8 lg:px-16 xl:px-24 pb-6"
+  dir="rtl"
+>
+  <div class="max-w-[90rem] mx-auto">
+    <div
+      class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 shadow-xl"
+    >
+      <div class="flex items-center gap-4 min-w-0">
+        <div
+          class="w-16 h-16 sm:w-20 sm:h-20 rounded-[1.5rem] bg-white/10 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden"
+        >
+          <img
+            class="w-[3.5rem] h-[3.5rem] sm:w-[4.5rem] sm:h-[4.5rem] object-contain"
+            [src]="categoryImage"
+            [alt]="categoryTitle"
+          />
+        </div>
+        <div class="min-w-0">
+          <h1
+            class="yekan text-white font-extrabold text-[1.5rem] sm:text-[2rem] break-words"
+          >
+            {{ categoryTitle }}
+          </h1>
+          <p class="yekan text-white/60 text-[0.85rem] sm:text-[0.95rem] mt-1">
+            لیست کامل آیتم‌های این دسته‌بندی
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <div
+          class="rounded-2xl bg-amber-500/10 border border-amber-400/20 px-4 py-3"
+        >
+          <span
+            class="yekan text-amber-300 font-bold text-[0.85rem] sm:text-[0.95rem]"
+          >
+            {{ productsCount }} محصول
+          </span>
+        </div>
+
+        <a
+          routerLink="/restaurant-menu/products"
+          class="yekan rounded-2xl px-4 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold text-[0.85rem] sm:text-[0.95rem] hover:scale-[1.02] transition-transform"
+        >
+          مشاهده همه
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,146 @@
+<div class="flex flex-col gap-6" dir="rtl">
+  <div
+    class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-l from-amber-500/10 via-orange-500/5 to-transparent backdrop-blur-xl p-5 sm:p-6 shadow-xl"
+  >
+    <div
+      class="absolute top-0 left-0 w-[20rem] h-[20rem] bg-amber-500/10 blur-[80px] rounded-full -translate-x-1/2 -translate-y-1/2"
+    ></div>
+    <div
+      class="absolute bottom-0 right-0 w-[15rem] h-[15rem] bg-orange-500/10 blur-[60px] rounded-full translate-x-1/3 translate-y-1/3"
+    ></div>
+
+    <div
+      class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5"
+    >
+      <div class="flex items-center gap-4 min-w-0">
+        <div
+          class="w-16 h-16 rounded-[1.4rem] bg-gradient-to-br from-amber-400/30 to-orange-600/20 border border-amber-400/40 flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(245,158,11,0.15)]"
+        >
+          <svg
+            class="w-8 h-8 text-amber-300"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="9"
+              cy="7"
+              r="4"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h1 class="yekan text-white font-extrabold text-[1.6rem] sm:text-[2rem]">
+            مدیریت کاربران
+          </h1>
+          <div class="flex items-center gap-2 mt-1">
+            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <p class="yekan text-white/50 text-[0.85rem]">
+              {{ users.length }} کاربر فعال در سیستم
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative w-full sm:w-auto">
+        <svg
+          class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <circle
+            cx="11"
+            cy="11"
+            r="8"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+          <path
+            d="m21 21-4.35-4.35"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+        <input
+          type="text"
+          [ngModel]="searchKeyword"
+          (ngModelChange)="onSearchInput($event)"
+          placeholder="جستجو بر اساس نام یا ایمیل..."
+          class="yekan w-full sm:w-[22rem] bg-white/10 border border-white/20 rounded-2xl pr-11 pl-4 py-3.5 text-white placeholder:text-white/50 text-[0.9rem] outline-none focus:border-amber-400/70 focus:bg-white/15 transition-all"
+        />
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div
+      class="rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl py-24 flex items-center justify-center"
+    >
+      <div class="flex flex-col items-center gap-4">
+        <div
+          class="w-12 h-12 border-2 border-amber-400/20 border-t-amber-400 rounded-full animate-spin"
+        ></div>
+        <p class="yekan text-white/40 text-[0.9rem]">
+          در حال بارگذاری کاربران...
+        </p>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && users.length === 0) {
+    <div
+      class="rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl py-24 text-center"
+    >
+      <div class="flex flex-col items-center gap-4">
+        <div
+          class="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center"
+        >
+          <svg class="w-9 h-9 text-white/20" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="9"
+              cy="7"
+              r="4"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+        </div>
+        <h2 class="yekan text-white/60 font-bold text-[1.2rem]">
+          کاربری یافت نشد
+        </h2>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && users.length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+      @for (u of users; track u.user_ID) {
+        <app-dashboard-user-card
+          [user]="u"
+          (edit)="editUser.emit($event)"
+          (remove)="deleteUser.emit($event)"
+        />
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,268 @@
+<header class="w-full relative z-40" dir="rtl">
+  <div
+    class="relative z-50 w-full rounded-[1.5rem] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.25)] overflow-hidden"
+  >
+    <div
+      class="flex items-center justify-between gap-4 sm:gap-6 px-4 sm:px-6 py-3 sm:py-4"
+    >
+      <!-- Logo -->
+      <div class="flex items-center gap-3 shrink-0">
+        <a
+          routerLink="/restaurant-menu"
+          (click)="closeMenu()"
+          class="cursor-pointer group flex items-center gap-3"
+        >
+          <div
+            class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 border border-white/10 flex items-center justify-center shadow-lg overflow-hidden"
+          >
+            <img
+              src="assets/web/logo.png"
+              alt="logo"
+              class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition-all duration-500 group-hover:scale-110 group-hover:rotate-[12deg]"
+            />
+          </div>
+
+          <div class="hidden sm:flex flex-col leading-tight min-w-0">
+            <h1
+              class="yekan text-white font-extrabold text-[1rem] sm:text-[1.1rem]"
+            >
+              فست فود آرین
+            </h1>
+            <p class="yekan text-white/50 text-[0.75rem]">
+              طعمی متفاوت، تجربه‌ای خاص
+            </p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav
+        class="hidden md:flex items-center gap-2 lg:gap-3 rounded-2xl border border-white/10 bg-black/20 px-2 py-2"
+      >
+        @for (item of navItems; track item.title) {
+          <a
+            [routerLink]="item.route"
+            [fragment]="item.fragment"
+            [ngClass]="
+              isNavActive(item)
+                ? 'text-amber-300 bg-amber-500/10 border-amber-400/20'
+                : ''
+            "
+            (click)="onNavClick(item, $event)"
+            class="yekan px-4 py-2.5 rounded-xl border border-transparent text-white/75 hover:text-white hover:bg-white/5 transition-all duration-300 text-[0.9rem] font-bold"
+          >
+            {{ item.title }}
+          </a>
+        }
+      </nav>
+
+      <!-- Desktop Auth + Mobile Hamburger -->
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div class="hidden md:contents">
+          @switch (isLoggedIn) {
+            @case (true) {
+              <a
+                routerLink="/dashboard"
+                class="cursor-pointer group flex items-center gap-2 rounded-2xl border border-green-400/20 bg-green-500/10 px-2.5 py-2 hover:bg-green-500/15 transition-all duration-300"
+              >
+                <div
+                  class="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-green-400/50 bg-white/10"
+                >
+                  <img
+                    src="assets/button/profile.png"
+                    alt="profile"
+                    class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                  />
+                </div>
+                <div class="hidden lg:flex flex-col leading-tight">
+                  <span class="yekan text-white font-bold text-[0.85rem]">
+                    حساب کاربری
+                  </span>
+                  <span class="yekan text-green-300 text-[0.72rem]">
+                    ورود موفق
+                  </span>
+                </div>
+              </a>
+            }
+            @case (false) {
+              <a
+                routerLink="/authentication/login"
+                class="yekan px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold text-[0.8rem] sm:text-[0.9rem] shadow-[0_15px_40px_rgba(245,158,11,0.28)] hover:scale-[1.03] transition-all duration-300 cursor-pointer"
+              >
+                ثبت نام / ورود
+              </a>
+            }
+          }
+        </div>
+
+        <button
+          class="md:hidden relative w-11 h-11 rounded-xl border border-white/10 bg-white/5 text-white flex items-center justify-center hover:bg-white/10 hover:border-amber-400/30 transition-all duration-300"
+          type="button"
+          [attr.aria-expanded]="menuOpen"
+          aria-label="منوی موبایل"
+          (click)="toggleMenu()"
+        >
+          <span class="hamburger-icon" [class.open]="menuOpen">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Panel -->
+    <div
+      class="md:hidden grid transition-[grid-template-rows] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+      [class.grid-rows-[1fr]]="menuOpen"
+      [class.grid-rows-[0fr]]="!menuOpen"
+    >
+      <div class="overflow-hidden min-h-0">
+        <div
+          class="mobile-menu-panel mx-3 mb-3 rounded-[1.35rem] border border-white/10 bg-gradient-to-b from-white/[0.07] to-black/30 p-3"
+          [class.open]="menuOpen"
+        >
+          <div class="mb-3 px-2 pt-1">
+            <p class="yekan text-white/40 text-[0.72rem] tracking-wide">
+              منوی دسترسی
+            </p>
+            <p class="yekan text-white font-extrabold text-[1.05rem] mt-0.5">
+              کجا می‌خوای بری؟
+            </p>
+          </div>
+
+          <nav class="flex flex-col gap-1.5">
+            @for (item of navItems; track item.title; let i = $index) {
+              <a
+                [routerLink]="item.route"
+                [fragment]="item.fragment"
+                [class.mobile-nav-active]="isNavActive(item)"
+                (click)="onNavClick(item, $event)"
+                class="mobile-nav-item group"
+                [style.animation-delay]="menuOpen ? i * 55 + 'ms' : '0ms'"
+              >
+                <span class="mobile-nav-icon">
+                  @switch (item.icon) {
+                    @case ("home") {
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    }
+                    @case ("products") {
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M4 7.5h16v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-11Z"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                        />
+                        <path
+                          d="M8 7.5V6a4 4 0 0 1 8 0v1.5"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    }
+                    @case ("about") {
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="8"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                        />
+                        <path
+                          d="M12 11v5M12 8h.01"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    }
+                  }
+                </span>
+
+                <span class="yekan flex-1 text-right font-bold text-[0.95rem]">
+                  {{ item.title }}
+                </span>
+
+                <span
+                  class="mobile-nav-arrow text-white/25 group-hover:text-amber-300/80 transition-colors"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M14 6 8 12l6 6"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </a>
+            }
+          </nav>
+
+          <div
+            class="mt-3 pt-3 border-t border-white/10"
+            [style.animation-delay]="menuOpen ? '180ms' : '0ms'"
+            [class.mobile-cta-anim]="menuOpen"
+          >
+            @switch (isLoggedIn) {
+              @case (true) {
+                <a
+                  routerLink="/dashboard"
+                  (click)="closeMenu()"
+                  class="flex items-center gap-3 rounded-2xl border border-green-400/25 bg-green-500/10 px-3 py-3 hover:bg-green-500/15 transition-all duration-300"
+                >
+                  <div
+                    class="w-11 h-11 rounded-full overflow-hidden border-2 border-green-400/50 bg-white/10 shrink-0"
+                  >
+                    <img
+                      src="assets/button/profile.png"
+                      alt="profile"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div class="flex flex-col leading-tight min-w-0">
+                    <span class="yekan text-white font-bold text-[0.9rem]">
+                      حساب کاربری
+                    </span>
+                    <span class="yekan text-green-300/90 text-[0.75rem]">
+                      ورود به داشبورد
+                    </span>
+                  </div>
+                </a>
+              }
+              @case (false) {
+                <a
+                  routerLink="/authentication/login"
+                  (click)="closeMenu()"
+                  class="yekan block w-full text-center px-4 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold text-[0.95rem] shadow-[0_12px_30px_rgba(245,158,11,0.28)] active:scale-[0.98] transition-transform duration-200"
+                >
+                  ثبت نام / ورود
+                </a>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  @if (menuOpen) {
+    <button
+      type="button"
+      class="md:hidden fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px] animate-backdrop"
+      aria-label="بستن منو"
+      (click)="closeMenu()"
+    ></button>
+  }
+</header>

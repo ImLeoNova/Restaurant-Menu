@@ -1,0 +1,299 @@
+<main class="relative min-h-screen bg-[#0b0f19] overflow-x-hidden" dir="rtl">
+  <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+    <div
+      class="absolute top-0 right-0 w-[30rem] h-[30rem] bg-amber-500/10 blur-[120px] rounded-full"
+    ></div>
+    <div
+      class="absolute top-[30%] left-[10%] w-[22rem] h-[22rem] bg-orange-500/10 blur-[120px] rounded-full"
+    ></div>
+    <div
+      class="absolute bottom-0 left-0 w-[26rem] h-[26rem] bg-yellow-500/10 blur-[120px] rounded-full"
+    ></div>
+  </div>
+
+  <div class="pattern-b absolute inset-0 opacity-30 pointer-events-none"></div>
+
+  <div class="relative z-10">
+    <div class="flex justify-center items-center p-3 sm:p-5 sticky top-0 z-30">
+      <div class="w-full max-w-[90rem]">
+        <app-header class="block w-full"></app-header>
+      </div>
+    </div>
+
+    <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <!-- Page intro -->
+      <section class="mb-6 sm:mb-8">
+        <div
+          class="rounded-[1.8rem] border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-7"
+        >
+          <div
+            class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5"
+          >
+            <div class="min-w-0">
+              <p class="yekan text-amber-300/90 text-sm font-bold mb-2">
+                منوی کامل
+              </p>
+              <h1
+                class="yekan text-white text-[1.7rem] sm:text-[2.2rem] font-extrabold"
+              >
+                محصولات فست فود آرین
+              </h1>
+              <p class="yekan text-white/60 mt-2 max-w-2xl leading-7">
+                همه آیتم‌ها را ببین، با نام جستجو کن، دسته‌بندی و بازه قیمت را
+                فیلتر کن و محصول مورد علاقه‌ات را پیدا کن.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <div
+                class="rounded-2xl bg-amber-500/10 border border-amber-400/20 px-4 py-3"
+              >
+                <span class="yekan text-amber-300 font-bold text-sm">
+                  {{ filteredProducts.length }} نتیجه
+                </span>
+              </div>
+
+              <button
+                type="button"
+                class="md:hidden yekan rounded-2xl px-4 py-3 bg-white/5 border border-white/10 text-white font-bold"
+                (click)="toggleFilters()"
+              >
+                {{ filtersOpen ? 'بستن فیلترها' : 'فیلترها' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-5 lg:gap-7">
+        <!-- Filters -->
+        <aside
+          class="filters-panel"
+          [class.open]="filtersOpen"
+        >
+          <div
+            class="lg:sticky lg:top-28 rounded-[1.6rem] border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="yekan text-white font-extrabold text-lg">فیلترها</h2>
+              @if (hasActiveFilters) {
+                <button
+                  type="button"
+                  (click)="clearFilters()"
+                  class="yekan text-amber-300 text-sm hover:text-amber-200 transition-colors"
+                >
+                  پاک کردن
+                </button>
+              }
+            </div>
+
+            <!-- Search -->
+            <label class="block mb-5">
+              <span class="yekan text-white/50 text-sm mb-2 block">جستجو</span>
+              <div class="relative">
+                <input
+                  type="text"
+                  [(ngModel)]="searchTerm"
+                  (ngModelChange)="onSearchChange()"
+                  placeholder="نام یا توضیحات محصول..."
+                  class="yekan w-full rounded-2xl bg-black/25 border border-white/10 px-4 py-3 text-white placeholder:text-white/35 outline-none focus:border-amber-400/50"
+                />
+              </div>
+            </label>
+
+            <!-- Category -->
+            <div class="mb-5">
+              <p class="yekan text-white/50 text-sm mb-2">دسته‌بندی</p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  (click)="selectCategory('')"
+                  class="yekan category-chip"
+                  [class.active]="!selectedCategory"
+                >
+                  همه
+                </button>
+                @for (cat of categories; track cat.category) {
+                  <button
+                    type="button"
+                    (click)="selectCategory(cat.category)"
+                    class="yekan category-chip"
+                    [class.active]="selectedCategory === cat.category"
+                  >
+                    {{ cat.title }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-5">
+              <p class="yekan text-white/50 text-sm mb-2">بازه قیمت (هزار تومن)</p>
+              <div class="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  [(ngModel)]="minPrice"
+                  (ngModelChange)="onPriceChange()"
+                  [placeholder]="'از ' + priceBounds.min"
+                  min="0"
+                  class="yekan w-full rounded-2xl bg-black/25 border border-white/10 px-3 py-3 text-white placeholder:text-white/35 outline-none focus:border-amber-400/50"
+                />
+                <input
+                  type="number"
+                  [(ngModel)]="maxPrice"
+                  (ngModelChange)="onPriceChange()"
+                  [placeholder]="'تا ' + priceBounds.max"
+                  min="0"
+                  class="yekan w-full rounded-2xl bg-black/25 border border-white/10 px-3 py-3 text-white placeholder:text-white/35 outline-none focus:border-amber-400/50"
+                />
+              </div>
+            </div>
+
+            <!-- Sort -->
+            <div class="block">
+              <span class="yekan text-white/50 text-sm mb-2 block">مرتب‌سازی</span>
+              <button
+                #sortTrigger
+                type="button"
+                class="yekan w-full rounded-2xl bg-black/25 border border-white/10 px-4 py-3 text-white outline-none focus:border-amber-400/50 flex items-center justify-between gap-3"
+                [attr.data-value]="sortBy"
+              >
+                <span data-dropdown-label>{{ sortLabel }}</span>
+                <svg
+                  class="app-dropdown-chevron w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+              <ul
+                appDropDownList
+                [inputElement]="sortTrigger"
+                [dropdownHeight]="220"
+                (optionSelected)="onSortSelected($event)"
+              >
+                @for (option of sortOptions; track option.value) {
+                  <li
+                    [attr.data-value]="option.value"
+                    [attr.data-label]="option.label"
+                  >
+                    {{ option.label }}
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Results -->
+        <section class="min-w-0">
+          @if (selectedCategory || searchTerm.trim()) {
+            <div class="flex flex-wrap gap-2 mb-4">
+              @if (selectedCategory) {
+                <span
+                  class="yekan inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-400/20 text-amber-300 px-3 py-1.5 text-sm"
+                >
+                  {{ categoryTitle(selectedCategory) }}
+                  <button
+                    type="button"
+                    class="text-amber-200/80 hover:text-white"
+                    (click)="selectCategory('')"
+                    aria-label="حذف دسته‌بندی"
+                  >
+                    ×
+                  </button>
+                </span>
+              }
+              @if (searchTerm.trim()) {
+                <span
+                  class="yekan inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 text-white/80 px-3 py-1.5 text-sm"
+                >
+                  «{{ searchTerm.trim() }}»
+                  <button
+                    type="button"
+                    class="text-white/50 hover:text-white"
+                    (click)="searchTerm = ''; onSearchChange()"
+                    aria-label="حذف جستجو"
+                  >
+                    ×
+                  </button>
+                </span>
+              }
+            </div>
+          }
+
+          @if (isLoading) {
+            <div
+              class="min-h-[40vh] flex flex-col items-center justify-center gap-4"
+            >
+              <div
+                class="w-14 h-14 rounded-full border-4 border-amber-500/20 border-t-amber-400 animate-spin"
+              ></div>
+              <p class="yekan text-white/70">در حال بارگذاری محصولات...</p>
+            </div>
+          } @else if (!filteredProducts.length) {
+            <div
+              class="rounded-[1.6rem] border border-white/10 bg-white/5 p-8 sm:p-12 text-center"
+            >
+              <div
+                class="mx-auto mb-4 w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-400/20 flex items-center justify-center"
+              >
+                <svg
+                  class="w-7 h-7 text-amber-300"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="7"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+                  <path
+                    d="m16.5 16.5 3.5 3.5"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
+              <h3 class="yekan text-white font-extrabold text-xl mb-2">
+                محصولی پیدا نشد
+              </h3>
+              <p class="yekan text-white/55 mb-5">
+                فیلترها را تغییر بده یا پاک کن تا نتایج بیشتری ببینی.
+              </p>
+              <button
+                type="button"
+                (click)="clearFilters()"
+                class="yekan rounded-2xl px-5 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold"
+              >
+                پاک کردن فیلترها
+              </button>
+            </div>
+          } @else {
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
+            >
+              @for (foodItem of filteredProducts; track foodItem.product_ID) {
+                <app-home-food-card [foodItem]="foodItem" />
+              }
+            </div>
+          }
+        </section>
+      </div>
+
+      <div class="mt-10 hidden md:block">
+        <app-footer />
+      </div>
+    </div>
+  </div>
+</main>

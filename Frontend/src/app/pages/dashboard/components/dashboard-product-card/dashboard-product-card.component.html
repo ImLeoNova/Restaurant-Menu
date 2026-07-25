@@ -1,0 +1,75 @@
+<div
+  class="group rounded-[1.6rem] sm:rounded-[2rem] overflow-hidden border border-white/10 bg-[#131a2d]/90 hover:bg-[#182039] transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1 min-w-0"
+>
+  <div
+    class="relative h-[12rem] sm:h-[14rem] overflow-hidden bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center"
+  >
+    <img
+      [src]="imageUrl"
+      class="w-[8rem] h-[8rem] sm:w-[11rem] sm:h-[11rem] object-contain group-hover:scale-110 transition-all duration-500"
+    />
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"
+    ></div>
+  </div>
+
+  <div class="p-4 sm:p-5 flex flex-col gap-4 min-w-0">
+    <div class="flex flex-col gap-2 min-w-0">
+      <h1
+        class="text-white text-[1.1rem] sm:text-[1.3rem] font-extrabold yekan leading-8 break-words"
+      >
+        {{ foodItem.title }}
+      </h1>
+      <p
+        class="font-normal text-white/70 text-[0.85rem] sm:text-[0.9rem] leading-7 min-h-[4.5rem] break-words"
+      >
+        {{ foodItem.description }}
+      </p>
+    </div>
+
+    <div
+      class="flex items-center justify-between gap-3 pt-2 border-t border-white/10"
+    >
+      <div class="flex flex-col min-w-0">
+        <span class="yekan text-white/50 text-[0.75rem] sm:text-[0.8rem]"
+          >قیمت</span
+        >
+        <p
+          class="font-extrabold text-amber-300 text-[1rem] sm:text-[1.1rem] yekan break-words"
+        >
+          {{ foodItem.price }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button
+          class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-500/15 border border-amber-400/20 text-amber-300 flex items-center justify-center hover:bg-amber-500/25 transition-all"
+          (click)="edit.emit(foodItem)"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+            <path
+              d="m4 20 4.5-1 9-9a2.1 2.1 0 0 0-3-3l-9 9L4 20Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button
+          class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-red-500/15 border border-red-400/20 text-red-300 flex items-center justify-center hover:bg-red-500/25 transition-all"
+          (click)="remove.emit(foodItem)"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 7h12M9 7V5h6v2m-7 3v7m4-7v7m4-7v7M8 19h8a1 1 0 0 0 1-1V7H7v11a1 1 0 0 0 1 1Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

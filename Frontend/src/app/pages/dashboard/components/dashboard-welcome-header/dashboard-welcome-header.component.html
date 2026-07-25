@@ -1,0 +1,52 @@
+<header class="p-3 sm:p-4 md:p-6">
+  <div
+    class="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 p-4 sm:p-6 md:p-8 backdrop-blur-2xl shadow-2xl"
+    [ngClass]="{
+      'bg-gradient-to-l from-amber-500/20 via-orange-500/10 to-transparent':
+        user.role === Roles.USER,
+      'bg-gradient-to-l from-blue-500/20 via-cyan-500/10 to-transparent':
+        user.role === Roles.ADMIN,
+      'bg-gradient-to-l from-rose-500/20 via-fuchsia-500/10 to-transparent':
+        user.role === Roles.FOUNDER,
+    }"
+  >
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_35%)]"
+    ></div>
+
+    <div
+      class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6"
+      dir="rtl"
+    >
+      <div class="flex flex-col gap-3 text-center lg:text-right w-full min-w-0">
+        <div
+          class="flex flex-col sm:flex-row items-center lg:items-start gap-2 sm:gap-3 justify-center lg:justify-start min-w-0"
+        >
+          <span
+            class="yekan text-[1.5rem] sm:text-[2rem] md:text-[2.4rem] font-extrabold break-words"
+            >سلام {{ user.username }}</span
+          >
+          <span class="yekan text-[1rem] sm:text-[1.2rem] text-white/70"
+            >خوش اومدی!</span
+          >
+        </div>
+        <p
+          class="yekan text-white/70 text-[0.9rem] sm:text-[0.95rem] max-w-[40rem] leading-7 mx-auto lg:mx-0"
+        >
+          شما در این بخش از سایت خود میتوانید با داشبورد سفارشات خود را به راحتی
+          ثبت کنید
+        </p>
+      </div>
+
+      <div
+        class="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/5 p-3 sm:p-4 backdrop-blur-xl shrink-0"
+      >
+        <img
+          src="assets/web/logo.png"
+          class="w-[6rem] sm:w-[8rem] md:w-[10rem] object-contain"
+          alt=""
+        />
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,5 @@
+<app-loader class="pointer-events-none"></app-loader>
+
+<div class="route-container" [@routeAnimations]="prepareRoute(outlet)">
+  <router-outlet #outlet="outlet" />
+</div>

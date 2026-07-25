@@ -1,0 +1,167 @@
+<div class="flex flex-col gap-5 sm:gap-6">
+  <div
+    class="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5 md:p-6 shadow-xl"
+  >
+    <div
+      class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between"
+      dir="rtl"
+    >
+      <div class="flex flex-col gap-2 min-w-0">
+        <h1
+          class="yekan text-[1.7rem] sm:text-[2rem] md:text-[2.4rem] font-extrabold text-white break-words"
+        >
+          مدیریت محصولات
+        </h1>
+        <p class="yekan text-white/60 text-[0.9rem] sm:text-[1rem]">
+          محصولات را اضافه، ویرایش، حذف و جستجو کن.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          (click)="addProduct.emit()"
+          class="group rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 px-4 sm:px-5 py-3.5 sm:py-4 yekan font-bold text-white shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3"
+        >
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="whitespace-nowrap">اضافه کردن محصول</span>
+        </button>
+
+        <button
+          (click)="searchProduct.emit()"
+          class="group rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-600 px-4 sm:px-5 py-3.5 sm:py-4 yekan font-bold text-white shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3"
+        >
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
+            <circle
+              cx="11"
+              cy="11"
+              r="6"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="m20 20-4.2-4.2"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="whitespace-nowrap">جستجو</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5 shadow-xl overflow-hidden"
+  >
+    <div
+      class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-5"
+      dir="rtl"
+    >
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="min-w-0">
+          <h2
+            class="yekan font-extrabold text-[1.2rem] sm:text-[1.5rem] break-words"
+          >
+            {{ nowCategory || "همه محصولات" }}
+          </h2>
+          <p class="yekan text-white/60 text-[0.8rem] sm:text-[0.85rem]">
+            دسته‌بندی انتخاب شده
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-3 sm:gap-4 overflow-x-auto pb-2" dir="rtl">
+      @for (categoryITEM of categories; track categoryITEM.category) {
+        <div
+          class="w-[8.5rem] sm:w-[10rem] shrink-0 rounded-[1.4rem] sm:rounded-[1.6rem] p-3 sm:p-4 border cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col items-center justify-center gap-3"
+          (click)="categoryChange.emit(categoryITEM.category)"
+          [ngClass]="{
+            'bg-gradient-to-b from-amber-500/30 to-orange-500/10 border-amber-300/40 shadow-xl':
+              categoryITEM.category == nowCategory,
+            'bg-white/5 border-white/10 hover:bg-white/10':
+              categoryITEM.category !== nowCategory,
+          }"
+        >
+          <div
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden"
+          >
+            <img
+              class="w-10 h-10 sm:w-14 sm:h-14 object-contain"
+              [src]="categoryITEM.image"
+              [title]="categoryITEM.title"
+            />
+          </div>
+          <h1
+            class="yekan font-bold text-center text-white text-[0.9rem] sm:text-[1rem] break-words"
+          >
+            {{ categoryITEM.title }}
+          </h1>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div
+    class="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5 shadow-xl"
+  >
+    @if (products.length == 0) {
+      <div
+        class="flex flex-col items-center justify-center py-14 sm:py-20 text-center"
+        dir="rtl"
+      >
+        <div
+          class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/10 flex items-center justify-center mb-5"
+        >
+          <svg
+            class="w-10 h-10 sm:w-12 sm:h-12 text-white/70"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M7 7h10l1 10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L7 7Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M9 7a3 3 0 0 1 6 0"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <h1 class="text-white yekan text-[1.3rem] sm:text-[1.6rem] font-extrabold">
+          هنوز محصولی ثبت نشده
+        </h1>
+        <p class="yekan text-white/60 mt-2 text-[0.9rem] sm:text-[1rem]">
+          برای این دسته‌بندی هنوز محصولی تعریف نشده است.
+        </p>
+      </div>
+    }
+
+    @if (products.length !== 0) {
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6"
+        dir="rtl"
+      >
+        @for (foodItem of products; track foodItem.product_ID) {
+          <app-dashboard-product-card
+            [foodItem]="foodItem"
+            [imageUrl]="resolveImage(foodItem)"
+            (edit)="editProduct.emit($event)"
+            (remove)="deleteProduct.emit($event)"
+          />
+        }
+      </div>
+    }
+  </div>
+</div>
