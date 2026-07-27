@@ -3,7 +3,7 @@ from models.product import Product
 from middleware.auth import token_required, admin_required
 from helpers.responses import success_response, error_response
 from config.settings import UPLOAD_FOLDER
-
+import os
 product_bp = Blueprint("product_bp", __name__)
 
 @product_bp.route("/api/product/add", methods=["POST"])
@@ -135,7 +135,7 @@ def get_product_image(productID):
         if not product_img:
             return error_response("Product not found.", 404)
 
-        return send_from_directory(UPLOAD_FOLDER, product_img)
+        return os.path.abspath(UPLOAD_FOLDER),
 
     except Exception as e:
         return error_response(f"Internal Server Error: {str(e)}", 500)
