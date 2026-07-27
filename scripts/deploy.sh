@@ -14,13 +14,38 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! docker compose version >/dev/null 2>&1; then
+DOCKER_CMD="docker"
+if ! docker info >/dev/null 2>&1; then
+  if sudo -n docker info >/dev/null 2>&1; then
+    DOCKER_CMD="sudo docker"
+  else
+    echo "Cannot access Docker daemon (permission denied) and passwordless sudo is unavailable." >&2
+    echo "Log the deploy user out/in after installing Docker, or grant NOPASSWD sudo." >&2
+    exit 1
+  fi
+fi
+
+if ! $DOCKER_CMD compose version >/dev/null 2>&1; then
   echo "Docker Compose plugin is not available." >&2
   exit 1
 fi
 
-docker compose -f Backend/docker-compose.yaml down --remove-orphans || true
-docker compose -f Backend/docker-compose.yaml up -d --build
+$DOCKER_CMD compose -f Backend/docker-compose.yaml down --remove-orphans || true
+$DOCKER_CMD compose -f Backend/docker-compose.yaml up -d --build
 
-echo "Deployment completed."
-docker compose -f Backend/docker-compose.yaml ps
+echo "Waiting for containers to stabilize..."
+sleep 5
+
+echo "Deployment status:"
+$DOCKER_CMD compose -f Backend/docker-compose.yaml ps
+
+UNHEALTHY=$($DOCKER_CMD compose -f Backend/docker-compose.yaml ps --format json 2>/dev/null \
+  | grep -c '"State":"exited"' || true)
+
+if [ "$UNHEALTHY" -gt 0 ]; then
+  echo "One or more containers exited unexpectedly. Check logs with:" >&2
+  echo "  docker compose -f Backend/docker-compose.yaml logs" >&2
+  exit 1
+fi
+
+echo "Deployment completed successfully."
