@@ -69,7 +69,7 @@ services:
       - restaurant_network
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"${DB_PASSWORD}\" || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
