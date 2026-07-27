@@ -1,4 +1,5 @@
 import json
+import re
 from flask import Blueprint, request
 from models.account import Account
 from models.product import Product
@@ -7,13 +8,59 @@ from helpers.responses import success_response, error_response
 from core.database import execute_query
 from Ai.ai import AI
 
+
+def sanitize_ai_response(text):
+    if text is None:
+        return ""
+
+    # Remove dangerous tags and attributes, but keep safe HTML like images and layout tags.
+    text = re.sub(r'(?is)<(script|style)[^>]*>.*?</\1>', '', text)
+    text = re.sub(r'(?i)\s(on\w+)\s*=\s*("[^"]*"|\'[^\']*\'|[^>\s]+)', '', text)
+    text = re.sub(r'(?i)\s(href|src)\s*=\s*("|\')\s*(javascript:|data:)[^"\']*("|\')', '', text)
+
+    allowed_tags = {'br', 'p', 'img', 'div', 'span', 'strong', 'em', 'ul', 'ol', 'li', 'a'}
+    allowed_attrs = {'src', 'alt', 'title', 'href', 'class', 'width', 'height', 'style'}
+
+    def sanitize_tag(match):
+        closing = bool(match.group(1))
+        tag = match.group(2).lower()
+        attrs = match.group(3) or ''
+
+        if tag not in allowed_tags:
+            return ''
+
+        if closing:
+            return f'</{tag}>'
+
+        sanitized_attrs = []
+        for attr_match in re.finditer(r'([a-zA-Z0-9:-]+)\s*=\s*("([^"]*)"|\'([^\']*)\'|([^\s>]+))', attrs):
+            name = attr_match.group(1).lower()
+            value = attr_match.group(3) or attr_match.group(4) or attr_match.group(5) or ''
+            if name not in allowed_attrs:
+                continue
+            if name in ('src', 'href'):
+                if not re.match(r'^https?://', value, flags=re.IGNORECASE):
+                    continue
+            sanitized_attrs.append(f'{name}="{value}"')
+
+        attr_string = ' ' + ' '.join(sanitized_attrs) if sanitized_attrs else ''
+        return f'<{tag}{attr_string}>'
+
+    text = re.sub(r'<(/?)([a-zA-Z0-9]+)([^>]*)>', sanitize_tag, text)
+    return text.strip()
+
 ai_bp = Blueprint("ai_bp", __name__)
 
-@ai_bp.route("/api/user/ai/<string:message>", methods=["GET"])
+@ai_bp.route("/api/user/ai", methods=["POST"])
 @token_required
-def ai_message(message):
+def ai_message():
     try:
-        
+        body = request.get_json(silent=True) or {}
+        message = body.get("message")
+
+        if not message:
+            return error_response("AI message is required.", 400)
+
         user_token = request.user
         user_id = user_token["user_id"]
 
@@ -72,6 +119,11 @@ def ai_message(message):
         )
 
         output, new_conversation_history = ai_class.ai_proccess(message=message)
+        output = sanitize_ai_response(output)
+        new_conversation_history = [
+            {"role": item["role"], "content": sanitize_ai_response(item["content"])}
+            for item in new_conversation_history
+        ]
 
         execute_query(
             "UPDATE `restaurantusers` SET `conversation_history` = %s WHERE `user_ID` = %s",
