@@ -3,7 +3,7 @@ import uuid
 from werkzeug.utils import secure_filename
 from core.database import execute_query
 from helpers.validators import allowed_file, is_valid_image
-from config.settings import UPLOAD_FOLDER, SERVER_IP, SERVER_PORT
+from config.settings import UPLOAD_FOLDER
 
 class Product:
     def __init__(self, product_id=None):
@@ -83,7 +83,7 @@ class Product:
         for item in products or []:
             result.append({
                 "product_ID": item["product_ID"],
-                "image": f"http://{SERVER_IP}:{SERVER_PORT}/api/product/image/{item['product_ID']}",
+                "image": f"/api/product/image/{item['product_ID']}",
                 "image_name": item["image"],
                 "title": item["title"],
                 "description": item["description"],
@@ -115,7 +115,7 @@ class Product:
 
         return {
             "product_ID": item["product_ID"],
-            "image": f"http://{SERVER_IP}:{SERVER_PORT}/api/product/image/{item['product_ID']}",
+            "image": f"/api/product/image/{item['product_ID']}",
             "image_name": item["image"],
             "title": item["title"],
             "description": item["description"],
