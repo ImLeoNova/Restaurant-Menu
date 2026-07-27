@@ -135,7 +135,7 @@ def get_product_image(productID):
         if not product_img:
             return error_response("Product not found.", 404)
 
-        return os.path.abspath(UPLOAD_FOLDER),
+        return send_from_directory(UPLOAD_FOLDER, product_img),
 
     except Exception as e:
         return error_response(f"Internal Server Error: {str(e)}", 500)
