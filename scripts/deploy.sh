@@ -14,7 +14,7 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-DOCKER_CMD="docker"
+# از sudo استفr"
 if ! docker info >/dev/null 2>&1; then
   if sudo -n docker info >/dev/null 2>&1; then
     DOCKER_CMD="sudo docker"
@@ -39,7 +39,7 @@ sleep 5
 echo "Deployment status:"
 $DOCKER_CMD compose -f Backend/docker-compose.yaml ps
 
-UNHEALTHY=$($DOCKER_CMD compose -f Backend/docker-compose.yaml ps --format json 2>/dev/null \
+# بررسی واقعی اینکه هیچ کانتینری exited/unhecker-compose.yaml ps --format json 2>/dev/null \
   | grep -c '"State":"exited"' || true)
 
 if [ "$UNHEALTHY" -gt 0 ]; then
