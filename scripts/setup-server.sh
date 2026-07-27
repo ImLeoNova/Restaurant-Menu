@@ -14,11 +14,17 @@ if [ -n "$SUDO" ] && ! sudo -n true 2>/dev/null; then
   exit 1
 fi
 
+$SUDO rm -f /etc/apt/sources.list.d/docker.list
+
 $SUDO apt-get update
 $SUDO apt-get install -y ca-certificates curl gnupg lsb-release git
 
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $SUDO gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+  | $SUDO gpg --batch --yes --no-tty --dearmor -o /etc/apt/keyrings/docker.gpg
+
 $SUDO chmod a+r /etc/apt/keyrings/docker.gpg
 
 ARCH="$(dpkg --print-architecture)"
