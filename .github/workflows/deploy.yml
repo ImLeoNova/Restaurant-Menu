@@ -1,0 +1,56 @@
+name: Deploy to Linux server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy repository to server
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: "."
+          target: "${{ secrets.SERVER_PATH || '/home/ubuntu/restaurant-menu' }}"
+
+      - name: Deploy application on server
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ secrets.SERVER_PATH || '/home/ubuntu/restaurant-menu' }}
+          BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          envs: DEPLOY_PATH,BACKEND_ENV
+          script: |
+            set -euo pipefail
+            mkdir -p "$DEPLOY_PATH"
+            cd "$DEPLOY_PATH"
+
+            if ! command -v docker >/dev/null 2>&1; then
+              chmod +x scripts/setup-server.sh
+              ./scripts/setup-server.sh
+            fi
+
+            mkdir -p Backend
+            cat > Backend/.env <<'EOF'
+            $BACKEND_ENV
+            EOF
+
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh
