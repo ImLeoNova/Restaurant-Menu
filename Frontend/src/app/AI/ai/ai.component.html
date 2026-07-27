@@ -117,9 +117,10 @@
               @case ("AI") {
                 <div class="flex items-end gap-2">
                   <div
-                    [innerHtml]="chatItem.message"
-                    class="ai-loader max-w-[85%] rounded-[1.4rem] rounded-bl-[0.35rem] border border-white/10 bg-white/7 px-4 py-3 text-white/90 yekan text-[0.88rem] leading-7 shadow-lg"
-                  ></div>
+                    class="ai-loader max-w-[85%] rounded-[1.4rem] rounded-bl-[0.35rem] border border-white/10 bg-white/7 px-4 py-3 text-white/90 yekan text-[0.88rem] leading-7 shadow-lg whitespace-pre-wrap"
+                  >
+                    <div [innerHTML]="getSafeHtml(chatItem.message)"></div>
+                  </div>
                   <div
                     class="w-10 h-10 rounded-2xl border border-white/10 bg-gradient-to-br from-amber-400/20 to-orange-500/20 flex items-center justify-center shrink-0"
                   >

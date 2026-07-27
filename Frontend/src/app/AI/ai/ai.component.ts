@@ -23,6 +23,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../../models/user';
 import { ApiResponse } from '../../models/api-response';
+import { sanitizeHtml } from '../safe-html';
 
 @Component({
   selector: 'app-ai',
@@ -33,6 +34,10 @@ import { ApiResponse } from '../../models/api-response';
 })
 export class AiComponent {
   clicked: boolean = false;
+
+  getSafeHtml(message: string | null): string {
+    return sanitizeHtml(message ?? '');
+  }
   chats: Chat[] = [];
   inputMessage: string = '';
   isLoggedIn: boolean = false;
