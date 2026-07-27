@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { User } from '../models/user';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { ApiResponse } from '../models/api-response';
 import { LoginResponse, RegisterResponse } from '../interfaces/interfaces';
 import { UpdateProfilePayload } from '../interfaces/UpdateProfilePayload';
@@ -16,10 +16,6 @@ export class UserService {
   private readonly apiBase: string = environment.websiteAPI;
 
   constructor(private http: HttpClient) {}
-
-  private authHeaders(token: string | null): HttpHeaders {
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
-  }
 
   private jsonHeaders(): HttpHeaders {
     return new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -38,22 +34,22 @@ export class UserService {
     return this.http.post<ApiResponse<LoginResponse>>(
       `${this.apiBase}/api/user/login`,
       { username: user.username, password: user.password },
-      { headers: this.jsonHeaders() },
+      { headers: this.jsonHeaders(), withCredentials: true },
     );
   }
 
-  isTokenValid(token: string | null): Observable<ApiResponse<boolean>> {
-    return this.http.post<ApiResponse<boolean>>(
+  isTokenValid(): Observable<ApiResponse<{ token: string }>> {
+    return this.http.post<ApiResponse<{ token: string }>>(
       `${this.apiBase}/verify-token`,
-      { token },
-      { headers: this.jsonHeaders() },
+      {},
+      { headers: this.jsonHeaders(), withCredentials: true },
     );
   }
 
   // Profile
   getMyProfile(token: string | null): Observable<ApiResponse<User>> {
     return this.http.get<ApiResponse<User>>(`${this.apiBase}/api/user/me`, {
-      headers: this.authHeaders(token),
+      withCredentials: true,
     });
   }
 
@@ -64,7 +60,7 @@ export class UserService {
     return this.http.put<ApiResponse<User>>(
       `${this.apiBase}/api/user/update-profile`,
       payload,
-      { headers: this.authHeaders(token) },
+      { withCredentials: true },
     );
   }
 
@@ -75,14 +71,14 @@ export class UserService {
     return this.http.put<ApiResponse<string>>(
       `${this.apiBase}/api/user/change-password`,
       payload,
-      { headers: this.authHeaders(token) },
+      { withCredentials: true },
     );
   }
 
   deleteMyAccount(token: string | null): Observable<ApiResponse<string>> {
     return this.http.delete<ApiResponse<string>>(
       `${this.apiBase}/api/user/delete-me`,
-      { headers: this.authHeaders(token) },
+      { withCredentials: true },
     );
   }
 
@@ -90,7 +86,7 @@ export class UserService {
   adminGetAllUsers(token: string | null): Observable<ApiResponse<User[]>> {
     return this.http.get<ApiResponse<User[]>>(
       `${this.apiBase}/api/admin/users`,
-      { headers: this.authHeaders(token) },
+      { withCredentials: true },
     );
   }
 
@@ -106,7 +102,7 @@ export class UserService {
         email: user.email,
         role: user.role ?? 'user',
       },
-      { headers: this.authHeaders(token) },
+      { headers: this.jsonHeaders(), withCredentials: true },
     );
   }
 
@@ -118,7 +114,7 @@ export class UserService {
     return this.http.put<ApiResponse<User>>(
       `${this.apiBase}/api/admin/user/${userId}`,
       payload,
-      { headers: this.authHeaders(token) },
+      { headers: this.jsonHeaders(), withCredentials: true },
     );
   }
 
@@ -128,7 +124,7 @@ export class UserService {
   ): Observable<ApiResponse<string>> {
     return this.http.delete<ApiResponse<string>>(
       `${this.apiBase}/api/admin/user/${userId}`,
-      { headers: this.authHeaders(token) },
+      { headers: this.jsonHeaders(), withCredentials: true },
     );
   }
 }

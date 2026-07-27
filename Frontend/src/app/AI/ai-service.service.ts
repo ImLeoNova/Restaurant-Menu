@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AIModel } from './AIModel/aimodel';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { AIResponse } from '../interfaces/interfaces';
 import { ApiResponse } from '../models/api-response';
@@ -22,8 +22,12 @@ export class AiServiceService {
     message: string | null,
     token: string,
   ): Observable<ApiResponse<AIResponse>> {
-    return this.http.get<ApiResponse<AIResponse>>(this.apiURL + message, {
-      headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
-    });
+    return this.http.post<ApiResponse<AIResponse>>(
+      this.apiURL,
+      { message },
+      {
+        withCredentials: true,
+      },
+    );
   }
 }

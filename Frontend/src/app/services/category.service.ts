@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { CategoryMODEL } from '../models/category-model';
 import { FoodMODEL } from '../models/food-model';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { ApiResponse } from '../models/api-response';
 
 @Injectable({
@@ -33,10 +33,7 @@ export class CategoryService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
+    return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
   private applyCategories(list: CategoryMODEL[]): void {
@@ -106,6 +103,7 @@ export class CategoryService {
     return this.http
       .post<ApiResponse<CategoryMODEL[]>>(`${this.API}/add`, formData, {
         headers: this.getAuthHeaders(),
+        withCredentials: true,
       })
       .pipe(
         tap((response) => {
@@ -123,13 +121,10 @@ export class CategoryService {
     formData: FormData,
   ): Observable<ApiResponse<CategoryMODEL>> {
     return this.http
-      .put<ApiResponse<CategoryMODEL>>(
-        `${this.API}/${categoryId}`,
-        formData,
-        {
-          headers: this.getAuthHeaders(),
-        },
-      )
+      .put<ApiResponse<CategoryMODEL>>(`${this.API}/${categoryId}`, formData, {
+        headers: this.getAuthHeaders(),
+        withCredentials: true,
+      })
       .pipe(tap(() => this.refreshCategories()));
   }
 
@@ -137,6 +132,7 @@ export class CategoryService {
     return this.http
       .delete<ApiResponse<unknown>>(`${this.API}/${categoryId}`, {
         headers: this.getAuthHeaders(),
+        withCredentials: true,
       })
       .pipe(tap(() => this.refreshCategories()));
   }

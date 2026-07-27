@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { FoodMODEL } from '../models/food-model';
 import { ApiResponse } from '../models/api-response';
 
@@ -14,16 +14,14 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
+    return new HttpHeaders({});
   }
 
   // Add new product
   addProduct(formData: FormData): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.API}/add`, formData, {
       headers: this.getAuthHeaders(),
+      withCredentials: true,
     });
   }
 
@@ -55,6 +53,7 @@ export class ProductService {
       formData,
       {
         headers: this.getAuthHeaders(),
+        withCredentials: true,
       },
     );
   }
@@ -63,6 +62,7 @@ export class ProductService {
   deleteProduct(product_id: number): Observable<ApiResponse<any>> {
     return this.http.delete<ApiResponse<any>>(`${this.API}/${product_id}`, {
       headers: this.getAuthHeaders(),
+      withCredentials: true,
     });
   }
 

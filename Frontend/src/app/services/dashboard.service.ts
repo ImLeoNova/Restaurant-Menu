@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
 import { FoodMODEL } from '../models/food-model';
@@ -25,7 +25,7 @@ export class DashboardService {
         userID: userId,
       },
       {
-        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+        withCredentials: true,
       },
     );
   }
@@ -47,7 +47,7 @@ export class DashboardService {
       this.apiLink + '/api/product/add',
       formData,
       {
-        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+        withCredentials: true,
       },
     );
   }
