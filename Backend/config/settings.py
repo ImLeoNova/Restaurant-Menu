@@ -39,6 +39,8 @@ DB_NAME = get_env("DB_NAME", default="restaurant")
 
 SECRET_KEY = get_env("SECRET_KEY", required=True)
 
+CORS_ORIGINS = [origin.strip() for origin in get_env("CORS_ORIGINS", default="http://localhost:4200,http://127.0.0.1:4200").split(",") if origin.strip()]
+
 UPLOAD_FOLDER = get_env("UPLOAD_FOLDER", default="products")
 CATEGORY_UPLOAD_FOLDER = get_env("CATEGORY_UPLOAD_FOLDER", default="categories")
 MAX_CONTENT_LENGTH = get_env("MAX_CONTENT_LENGTH", default=5242880, cast=int)

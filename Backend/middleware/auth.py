@@ -4,17 +4,26 @@ from flask import request
 from config.settings import SECRET_KEY
 from helpers.responses import error_response
 
+
+def _extract_token():
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:].strip()
+
+    cookie_token = request.cookies.get("access_token")
+    if cookie_token:
+        return cookie_token
+
+    return None
+
+
 def token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        auth_header = request.headers.get("Authorization")
+        token = _extract_token()
 
-        if not auth_header:
+        if not token:
             return error_response("Token is missing!", 401)
-
-        token = auth_header
-        if auth_header.startswith("Bearer "):
-            token = auth_header[7:]
 
         try:
             decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])

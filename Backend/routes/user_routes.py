@@ -5,8 +5,11 @@ from helpers.responses import success_response, error_response
 from helpers.validators import is_valid_username, is_valid_email
 from core.database import execute_query
 from utils.security import hash_password
+from helpers.rate_limit import RateLimiter
 
 user_bp = Blueprint("user_bp", __name__)
+
+login_rate_limiter = RateLimiter(max_requests=5, window_seconds=300)
 
 @user_bp.route("/api/user/register", methods=["POST"])
 def register_user():
@@ -52,15 +55,28 @@ def login():
         if not username or not password:
             return error_response("Username and password are required.", 400)
 
+        client_ip = request.remote_addr or "unknown"
+        if not login_rate_limiter.is_allowed(client_ip):
+            return error_response("Too many login attempts. Please try again later.", 429)
+
         token = Account.authenticate_user(username, password)
 
         if not token:
             return error_response("Invalid username or password.", 401)
 
-        return success_response("Login successful.", {"token": token}, 200)
+        response, status_code = success_response("Login successful.", {"token": token}, 200)
+        response.set_cookie(
+            "access_token",
+            token,
+            httponly=True,
+            samesite="None",
+            secure=True,
+            path="/",
+        )
+        return response, status_code
 
     except Exception as e:
-        print(e)
+
         return error_response(f"Internal Server Error", 500)
 
 @user_bp.route("/api/user/me", methods=["GET"])
@@ -183,6 +199,21 @@ def change_password():
     except Exception as e:
         print(e)
         return error_response(f"Internal Server Error", 500)
+
+@user_bp.route("/api/user/logout", methods=["POST"])
+def logout():
+    response, status_code = success_response("Logout successful.", None, 200)
+    response.set_cookie(
+        "access_token",
+        "",
+        httponly=True,
+        samesite="None",
+        secure=True,
+        path="/",
+        expires=0,
+    )
+    return response, status_code
+
 
 @user_bp.route("/api/user/delete-me", methods=["DELETE"])
 @token_required

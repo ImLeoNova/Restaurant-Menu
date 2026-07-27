@@ -5,20 +5,17 @@ from config.settings import SECRET_KEY
 
 token_bp = Blueprint("token_bp", __name__)
 
-@token_bp.route("/api/user/verify-token", methods=["POST"])
+@token_bp.route("/api/user/verify-token", methods=["POST", "GET"])
 def verify_token():
     try:
-        body = request.get_json()
+        body = request.get_json(silent=True) or {}
+        token = body.get("token") or request.cookies.get("access_token")
 
-        if not body:
-            return error_response("Invalid JSON body.", 400)
-
-        token = body.get("token")
         if not token:
             return error_response("Token is missing!", 400)
 
         jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return success_response("Token is valid!")
+        return success_response("Token is valid!", {"token": token})
 
     except jwt.ExpiredSignatureError:
         return error_response("Token has expired!", 401)

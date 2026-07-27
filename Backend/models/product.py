@@ -2,12 +2,24 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 from core.database import execute_query
-from helpers.validators import allowed_file
+from helpers.validators import allowed_file, is_valid_image
 from config.settings import UPLOAD_FOLDER, SERVER_IP, SERVER_PORT
 
 class Product:
     def __init__(self, product_id=None):
         self.product_id = product_id
+
+    def _resolve_category_id(self, category):
+        if not category:
+            return None
+
+        category_slug = category.strip().lower()
+        row = execute_query(
+            "SELECT `category_ID` FROM `categories` WHERE `slug` = %s",
+            (category_slug,),
+            fetchone=True,
+        )
+        return row["category_ID"] if row else None
 
     def add_product(self, image_file, title, description, category, price):
         if not title or not description or not category or price is None:
@@ -20,11 +32,19 @@ class Product:
         except ValueError:
             return False, "Invalid price format."
 
+        category_slug = category.strip().lower()
+        category_id = self._resolve_category_id(category_slug)
+        if not category_id:
+            return False, "Invalid category."
+
         if not image_file or image_file.filename == "":
             return False, "Product image is required."
 
         if not allowed_file(image_file.filename):
             return False, "Invalid image file type."
+
+        if not is_valid_image(image_file):
+            return False, "Invalid image content."
 
         safe_name = secure_filename(image_file.filename)
         unique_filename = f"{uuid.uuid4().hex}_{safe_name}"
@@ -33,10 +53,10 @@ class Product:
 
         execute_query(
             """
-            INSERT INTO `products` (`image`, `title`, `description`, `category`, `price`)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO `products` (`image`, `title`, `description`, `category`, `category_ID`, `price`)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (unique_filename, title, description, category, price),
+            (unique_filename, title, description, category_slug, category_id, price),
             commit=True
         )
 
@@ -136,7 +156,12 @@ class Product:
             fields["description"] = description
 
         if category is not None:
-            fields["category"] = category
+            category_slug = category.strip().lower()
+            category_id = self._resolve_category_id(category_slug)
+            if not category_id:
+                return False, "Invalid category."
+            fields["category"] = category_slug
+            fields["category_ID"] = category_id
 
         if price is not None:
             try:
@@ -150,6 +175,9 @@ class Product:
         if image_file:
             if not allowed_file(image_file.filename):
                 return False, "Invalid image file type."
+
+            if not is_valid_image(image_file):
+                return False, "Invalid image content."
 
             safe_name = secure_filename(image_file.filename)
             unique_filename = f"{uuid.uuid4().hex}_{safe_name}"

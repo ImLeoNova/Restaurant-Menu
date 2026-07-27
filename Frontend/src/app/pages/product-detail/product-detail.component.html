@@ -57,9 +57,13 @@
         </button>
       </div>
     } @else if (product) {
-      <div class="detail-enter max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div
+        class="detail-enter max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-16"
+      >
         <!-- Breadcrumb -->
-        <div class="flex flex-wrap items-center gap-2 mb-6 sm:mb-8 text-[0.85rem]">
+        <div
+          class="flex flex-wrap items-center gap-2 mb-6 sm:mb-8 text-[0.85rem]"
+        >
           <button
             type="button"
             routerLink="/restaurant-menu"
@@ -70,7 +74,9 @@
           <span class="text-white/25">/</span>
           <span class="yekan text-white/50">{{ categoryTitle }}</span>
           <span class="text-white/25">/</span>
-          <span class="yekan text-amber-300 font-bold">{{ product.title }}</span>
+          <span class="yekan text-amber-300 font-bold">{{
+            product.title
+          }}</span>
         </div>
 
         <!-- Hero -->
@@ -145,9 +151,7 @@
                   @for (filled of stars(stats.average_rating); track $index) {
                     <svg
                       class="w-4 h-4"
-                      [ngClass]="
-                        filled ? 'text-amber-400' : 'text-white/20'
-                      "
+                      [ngClass]="filled ? 'text-amber-400' : 'text-white/20'"
                       viewBox="0 0 24 24"
                       fill="currentColor"
                     >
@@ -206,10 +210,14 @@
           <div
             class="lg:col-span-3 rounded-[1.8rem] border border-white/10 bg-white/5 p-6 sm:p-8"
           >
-            <h2 class="yekan text-white text-xl sm:text-2xl font-extrabold mb-4">
+            <h2
+              class="yekan text-white text-xl sm:text-2xl font-extrabold mb-4"
+            >
               درباره این غذا
             </h2>
-            <p class="yekan text-white/70 leading-8 text-[0.95rem] sm:text-[1rem]">
+            <p
+              class="yekan text-white/70 leading-8 text-[0.95rem] sm:text-[1rem]"
+            >
               {{ product.description }}
             </p>
             <div
@@ -221,7 +229,9 @@
               </div>
               <div class="rounded-2xl bg-black/20 border border-white/10 p-4">
                 <p class="yekan text-white/45 text-sm mb-1">مناسب برای</p>
-                <p class="yekan text-white font-bold">ناهار، شام و سفارش آنلاین</p>
+                <p class="yekan text-white font-bold">
+                  ناهار، شام و سفارش آنلاین
+                </p>
               </div>
             </div>
           </div>
@@ -286,7 +296,9 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
+            >
               @for (item of relatedProducts; track item.product_ID) {
                 <a
                   [routerLink]="['/restaurant-menu/product', item.product_ID]"
@@ -384,7 +396,7 @@
                       [disabled]="submitLoading"
                       class="yekan rounded-2xl px-6 py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-extrabold hover:scale-[1.02] transition-all disabled:opacity-50"
                     >
-                      {{ submitLoading ? 'در حال ثبت...' : 'ثبت دیدگاه' }}
+                      {{ submitLoading ? "در حال ثبت..." : "ثبت دیدگاه" }}
                     </button>
                     <span class="yekan text-white/40 text-sm"
                       >{{ newComment.length }}/1000</span
@@ -455,7 +467,7 @@
                             class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400/30 to-orange-500/20 border border-white/10 flex items-center justify-center shrink-0"
                           >
                             <span class="yekan text-amber-300 font-extrabold">
-                              {{ comment.username?.charAt(0) || 'ک' }}
+                              {{ comment.username.charAt(0) || "ک" }}
                             </span>
                           </div>
                           <div class="min-w-0">
@@ -469,10 +481,7 @@
                         </div>
 
                         <div class="flex items-center gap-1">
-                          @for (
-                            filled of stars(comment.rating);
-                            track $index
-                          ) {
+                          @for (filled of stars(comment.rating); track $index) {
                             <svg
                               class="w-4 h-4"
                               [ngClass]="

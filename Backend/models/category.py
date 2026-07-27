@@ -6,7 +6,7 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 
 from core.database import execute_query
-from helpers.validators import allowed_file
+from helpers.validators import allowed_file, is_valid_image
 from config.settings import CATEGORY_UPLOAD_FOLDER, SERVER_IP, SERVER_PORT
 
 
@@ -82,6 +82,9 @@ class Category:
 
         if not allowed_file(image_file.filename):
             return False, "فرمت تصویر معتبر نیست."
+
+        if not is_valid_image(image_file):
+            return False, "محتوای تصویر نامعتبر است."
 
         safe_name = secure_filename(image_file.filename)
         unique_filename = f"{uuid.uuid4().hex}_{safe_name}"
@@ -208,6 +211,9 @@ class Category:
         if image_file and image_file.filename:
             if not allowed_file(image_file.filename):
                 return False, "فرمت تصویر معتبر نیست."
+
+            if not is_valid_image(image_file):
+                return False, "محتوای تصویر نامعتبر است."
 
             safe_name = secure_filename(image_file.filename)
             unique_filename = f"{uuid.uuid4().hex}_{safe_name}"

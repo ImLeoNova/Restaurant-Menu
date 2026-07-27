@@ -5,3 +5,7 @@ PyJWT
 gevent
 Werkzeug
 python-dotenv
+openai
+colorama
+flasgger
+standard-imghdr

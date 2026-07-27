@@ -16,6 +16,7 @@ TABLE_DEFINITIONS = [
           `title` varchar(350) NOT NULL,
           `image` varchar(350) NOT NULL DEFAULT '',
           `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`category_ID`),
           UNIQUE KEY `uq_categories_slug` (`slug`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
@@ -30,8 +31,15 @@ TABLE_DEFINITIONS = [
           `title` varchar(350) NOT NULL,
           `description` varchar(350) NOT NULL,
           `category` varchar(350) NOT NULL,
-          `price` varchar(350) NOT NULL,
-          PRIMARY KEY (`product_ID`)
+          `category_ID` int(11) NOT NULL,
+          `price` decimal(10,2) NOT NULL,
+          `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (`product_ID`),
+          KEY `idx_products_category_id` (`category_ID`),
+          CONSTRAINT `fk_products_categories`
+            FOREIGN KEY (`category_ID`) REFERENCES `categories` (`category_ID`)
+            ON DELETE RESTRICT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
         """,
     ),
@@ -45,7 +53,11 @@ TABLE_DEFINITIONS = [
           `email` varchar(350) NOT NULL,
           `role` varchar(350) NOT NULL,
           `conversation_history` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-          PRIMARY KEY (`user_ID`)
+          `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (`user_ID`),
+          UNIQUE KEY `uq_users_username` (`username`),
+          UNIQUE KEY `uq_users_email` (`email`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
         """,
     ),
@@ -65,7 +77,12 @@ TABLE_DEFINITIONS = [
           KEY `idx_product_comments_user` (`user_ID`),
           CONSTRAINT `fk_product_comments_product`
             FOREIGN KEY (`product_ID`) REFERENCES `products` (`product_ID`)
-            ON DELETE CASCADE
+            ON DELETE CASCADE,
+          CONSTRAINT `fk_product_comments_user`
+            FOREIGN KEY (`user_ID`) REFERENCES `restaurantusers` (`user_ID`)
+            ON DELETE CASCADE,
+          CONSTRAINT `chk_product_comments_rating`
+            CHECK (`rating` BETWEEN 1 AND 5)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
         """,
     ),
@@ -92,6 +109,32 @@ def _table_exists(cursor, table_name):
         LIMIT 1
         """,
         (DB_NAME, table_name),
+    )
+    return cursor.fetchone() is not None
+
+
+def _column_exists(cursor, table_name, column_name):
+    cursor.execute(
+        """
+        SELECT 1
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s
+        LIMIT 1
+        """,
+        (DB_NAME, table_name, column_name),
+    )
+    return cursor.fetchone() is not None
+
+
+def _constraint_exists(cursor, table_name, constraint_name):
+    cursor.execute(
+        """
+        SELECT 1
+        FROM information_schema.TABLE_CONSTRAINTS
+        WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND CONSTRAINT_NAME = %s
+        LIMIT 1
+        """,
+        (DB_NAME, table_name, constraint_name),
     )
     return cursor.fetchone() is not None
 
@@ -151,11 +194,73 @@ def ensure_tables():
             connection.close()
 
 
+def _apply_schema_fixes(cursor):
+    if _table_exists(cursor, "products"):
+        if not _column_exists(cursor, "products", "category_ID"):
+            cursor.execute("ALTER TABLE `products` ADD COLUMN `category_ID` int(11) NULL")
+        if not _column_exists(cursor, "products", "price"):
+            cursor.execute("ALTER TABLE `products` MODIFY COLUMN `price` decimal(10,2) NOT NULL")
+        else:
+            cursor.execute("ALTER TABLE `products` MODIFY COLUMN `price` decimal(10,2) NOT NULL")
+        if not _column_exists(cursor, "products", "created_at"):
+            cursor.execute("ALTER TABLE `products` ADD COLUMN `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP")
+        if not _column_exists(cursor, "products", "updated_at"):
+            cursor.execute("ALTER TABLE `products` ADD COLUMN `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP")
+        cursor.execute(
+            "UPDATE `products` p JOIN `categories` c ON p.`category` = c.`slug` SET p.`category_ID` = c.`category_ID` WHERE p.`category_ID` IS NULL"
+        )
+        cursor.execute("ALTER TABLE `products` MODIFY COLUMN `category_ID` int(11) NOT NULL")
+        if not _constraint_exists(cursor, "products", "fk_products_categories"):
+            cursor.execute(
+                "ALTER TABLE `products` ADD CONSTRAINT `fk_products_categories` FOREIGN KEY (`category_ID`) REFERENCES `categories` (`category_ID`) ON DELETE RESTRICT"
+            )
+
+    if _table_exists(cursor, "restaurantusers"):
+        if not _column_exists(cursor, "restaurantusers", "created_at"):
+            cursor.execute("ALTER TABLE `restaurantusers` ADD COLUMN `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP")
+        if not _column_exists(cursor, "restaurantusers", "updated_at"):
+            cursor.execute("ALTER TABLE `restaurantusers` ADD COLUMN `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP")
+        if not _constraint_exists(cursor, "restaurantusers", "uq_users_username"):
+            cursor.execute("ALTER TABLE `restaurantusers` ADD UNIQUE KEY `uq_users_username` (`username`)")
+        if not _constraint_exists(cursor, "restaurantusers", "uq_users_email"):
+            cursor.execute("ALTER TABLE `restaurantusers` ADD UNIQUE KEY `uq_users_email` (`email`)")
+
+    if _table_exists(cursor, "product_comments"):
+        if not _column_exists(cursor, "product_comments", "created_at"):
+            cursor.execute("ALTER TABLE `product_comments` ADD COLUMN `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP")
+        if not _column_exists(cursor, "product_comments", "updated_at"):
+            cursor.execute("ALTER TABLE `product_comments` ADD COLUMN `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP")
+        if not _constraint_exists(cursor, "product_comments", "fk_product_comments_user"):
+            cursor.execute(
+                "ALTER TABLE `product_comments` ADD CONSTRAINT `fk_product_comments_user` FOREIGN KEY (`user_ID`) REFERENCES `restaurantusers` (`user_ID`) ON DELETE CASCADE"
+            )
+        if not _constraint_exists(cursor, "product_comments", "chk_product_comments_rating"):
+            cursor.execute(
+                "ALTER TABLE `product_comments` ADD CONSTRAINT `chk_product_comments_rating` CHECK (`rating` BETWEEN 1 AND 5)"
+            )
+
+
 def ensure_schema():
     """Create database + missing tables on app startup."""
     print(Fore.LIGHTBLUE_EX + "[SCHEMA]: Checking database schema...")
     ensure_database()
     ensure_tables()
+
+    connection = None
+    cursor = None
+    try:
+        connection = _connect(DB_NAME)
+        cursor = connection.cursor()
+        _apply_schema_fixes(cursor)
+        connection.commit()
+    except Error as e:
+        print(Fore.RED + f"[SCHEMA]: Failed to apply schema fixes: {e}")
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
     try:
         from models.category import Category

@@ -1,8 +1,9 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
+from flasgger import Swagger
 from core.extensions import cors
 from core.schema import ensure_schema
-from config.settings import UPLOAD_FOLDER, CATEGORY_UPLOAD_FOLDER, MAX_CONTENT_LENGTH
+from config.settings import UPLOAD_FOLDER, CATEGORY_UPLOAD_FOLDER, MAX_CONTENT_LENGTH, CORS_ORIGINS
 
 from routes.health_routes import health_bp
 from routes.user_routes import user_bp
@@ -18,6 +19,29 @@ from helpers.responses import error_response
 def create_app():
     app = Flask(__name__)
 
+    app.config["SWAGGER"] = {
+        "title": "Restaurant Menu API",
+        "uiversion": 3,
+        "openapi": "3.0.2",
+    }
+
+    swagger_config = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": "apispec_1",
+                "route": "/swagger.json",
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/swagger/",
+    }
+
+    Swagger(app, config=swagger_config)
+
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     os.makedirs(CATEGORY_UPLOAD_FOLDER, exist_ok=True)
 
@@ -27,7 +51,22 @@ def create_app():
 
     ensure_schema()
 
-    cors.init_app(app)
+    cors.init_app(
+        app,
+        resources={r"/*": {"origins": CORS_ORIGINS}},
+        supports_credentials=True,
+        expose_headers=["Content-Type", "Authorization"],
+    )
+
+    @app.after_request
+    def apply_security_headers(response):
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.openai.com; frame-ancestors 'none';"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        return response
 
     app.register_blueprint(health_bp)
     app.register_blueprint(user_bp)

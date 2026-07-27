@@ -5,6 +5,7 @@ from core.security import generate_token
 from helpers.validators import is_valid_username, is_valid_email, is_valid_password
 from helpers.utils import generate_random_string
 from utils.security import verify_password, hash_password
+
 class Account:
     def __init__(self, user_id=None):
         self.user_id = user_id
@@ -18,7 +19,7 @@ class Account:
             return False, "Invalid email format."
 
         if not is_valid_password(password):
-            return False, "Password must be at least 6 characters long."
+            return False, "Password must be at least 8 characters long."
 
         existing_user = execute_query(
             "SELECT * FROM `restaurantusers` WHERE `username` = %s OR `email` = %s",

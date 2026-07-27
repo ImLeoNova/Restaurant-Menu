@@ -20,4 +20,4 @@ RUN mkdir -p /app/products
 
 EXPOSE 8080
 
-CMD ["python", "app.py"]
+CMD ["python", "run.py"]
