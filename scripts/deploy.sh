@@ -14,7 +14,8 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-# از sudo استفr"
+# Default to docker, use sudo if needed
+DOCKER_CMD="docker"
 if ! docker info >/dev/null 2>&1; then
   if sudo -n docker info >/dev/null 2>&1; then
     DOCKER_CMD="sudo docker"
@@ -39,8 +40,9 @@ sleep 5
 echo "Deployment status:"
 $DOCKER_CMD compose -f Backend/docker-compose.yaml ps
 
-# بررسی واقعی اینکه هیچ کانتینری exited/unhecker-compose.yaml ps --format json 2>/dev/null \
-  | grep -c '"State":"exited"' || true)
+# Check if any containers exited unexpectedly
+UNHEALTHY=$($DOCKER_CMD compose -f Backend/docker-compose.yaml ps --format json 2>/dev/null \
+  | grep -c '"State":"exited"' || echo 0)
 
 if [ "$UNHEALTHY" -gt 0 ]; then
   echo "One or more containers exited unexpectedly. Check logs with:" >&2
