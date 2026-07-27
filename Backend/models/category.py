@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 from core.database import execute_query
 from helpers.validators import allowed_file, is_valid_image
-from config.settings import CATEGORY_UPLOAD_FOLDER, SERVER_IP, SERVER_PORT
+from config.settings import CATEGORY_UPLOAD_FOLDER
 
 
 SEED_CATEGORIES = [
@@ -28,7 +28,7 @@ class Category:
 
     @staticmethod
     def _image_url(category_id):
-        return f"http://{SERVER_IP}:{SERVER_PORT}/api/category/image/{category_id}"
+        return f"/api/category/image/{category_id}"
 
     @staticmethod
     def _normalize_slug(slug):
