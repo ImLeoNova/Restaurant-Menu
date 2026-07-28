@@ -118,6 +118,11 @@ def get_category_image(category_id):
         if not object_key:
             return error_response("تصویر دسته‌بندی پیدا نشد.", 404)
 
+        if object_key.startswith("images/"):
+            public_url = s3_client.get_public_url(object_key)
+            if public_url:
+                return redirect(public_url, code=302)
+
         signed_url = s3_client.get_signed_url(object_key, expiry_seconds=3600)
         return redirect(signed_url, code=302)
     except Exception as e:

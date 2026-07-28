@@ -344,6 +344,8 @@ def _signed_url(object_key):
     if not object_key:
         return ""
     try:
+        if object_key.startswith("images/"):
+            return s3_client.get_public_url(object_key)
         return s3_client.get_signed_url(object_key, expiry_seconds=3600)
     except Exception:
         return ""

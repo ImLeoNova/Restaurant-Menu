@@ -66,6 +66,12 @@ class S3StorageClient:
             logger.error("Failed to generate signed URL: %s", e)
             raise StorageError(f"Signed URL generation failed: {e}")
 
+    def get_public_url(self, key):
+        if not key or not self.bucket_name or not self.endpoint_url:
+            return ""
+        base = self.endpoint_url.rstrip("/")
+        return f"{base}/{self.bucket_name}/{key}"
+
     def delete_image(self, key):
         if not key:
             raise StorageError("Object key is required.")
