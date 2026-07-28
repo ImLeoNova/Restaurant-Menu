@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/loader/loader.component';
 import { routeAnimations } from './animations/route-animations';
 import { filter, Subscription } from 'rxjs';
+import { LoaderService } from './services/loader.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private isMobile = false;
   private routerSub?: Subscription;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private loaderService: LoaderService,
+  ) {}
 
   ngOnInit(): void {
     this.updateDevice();
@@ -30,6 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         window.scrollTo(0, 0);
+        this.loaderService.reset();
       });
   }
 
