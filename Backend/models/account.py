@@ -1,4 +1,5 @@
 import json
+import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from core.database import execute_query
 from core.security import generate_token
@@ -180,3 +181,54 @@ class Account:
             fetchall=True
         )
         return users if users else []
+
+    @staticmethod
+    def seed_default_admin():
+        admin_exists = execute_query(
+            "SELECT `user_ID` FROM `restaurantusers` WHERE `role` = %s LIMIT 1",
+            ("Admin",),
+            fetchone=True,
+        )
+        if admin_exists:
+            return True, "Admin user already exists."
+
+        default_username = (os.getenv("DEFAULT_ADMIN_USERNAME") or "admin").strip() or "admin"
+        default_email = (os.getenv("DEFAULT_ADMIN_EMAIL") or "admin@example.com").strip() or "admin@example.com"
+        default_password = (os.getenv("DEFAULT_ADMIN_PASSWORD") or "Admin@123456").strip() or "Admin@123456"
+
+        username = default_username
+        email = default_email
+        counter = 1
+
+        while True:
+            existing = execute_query(
+                "SELECT `user_ID` FROM `restaurantusers` WHERE `username` = %s OR `email` = %s",
+                (username, email),
+                fetchone=True,
+            )
+            if not existing:
+                break
+
+            counter += 1
+            username = f"{default_username}{counter}"
+            if "@" in default_email:
+                local_part, domain = default_email.split("@", 1)
+                email = f"{local_part}{counter}@{domain}"
+            else:
+                email = f"{default_email}{counter}"
+
+        user_id = generate_random_string(30)
+        hashed_password = hash_password(default_password)
+        conversation_history = json.dumps([], ensure_ascii=False)
+
+        execute_query(
+            """
+            INSERT INTO `restaurantusers`
+            (`user_ID`, `username`, `password`, `email`, `role`, `conversation_history`)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (user_id, username, hashed_password, email, "Admin", conversation_history),
+            commit=True,
+        )
+
+        return True, "Default admin user created."

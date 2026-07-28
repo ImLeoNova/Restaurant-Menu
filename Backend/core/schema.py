@@ -790,8 +790,12 @@ def ensure_schema():
 
     try:
         from models.category import Category
+        from models.account import Account
 
         Category.seed_defaults()
         print(Fore.GREEN + "[SCHEMA]: Default categories ensured.")
+
+        Account.seed_default_admin()
+        print(Fore.GREEN + "[SCHEMA]: Default admin user ensured.")
     except Exception as e:
-        print(Fore.YELLOW + f"[SCHEMA]: Category seed skipped: {e}")
+        print(Fore.YELLOW + f"[SCHEMA]: Seed skipped: {e}")
