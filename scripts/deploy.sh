@@ -50,4 +50,11 @@ if [ "$UNHEALTHY" -gt 0 ]; then
   exit 1
 fi
 
+echo "Running S3 image migration (if needed)..."
+if $DOCKER_CMD compose -f Backend/docker-compose.yaml exec -T backend python scripts/migrate_images_to_s3.py up; then
+  echo "Migration completed."
+else
+  echo "Migration failed or was skipped. Check logs above." >&2
+fi
+
 echo "Deployment completed successfully."
