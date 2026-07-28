@@ -6,6 +6,7 @@ from helpers.validators import is_valid_username, is_valid_email
 from core.database import execute_query
 from utils.security import hash_password
 from helpers.rate_limit import RateLimiter
+from config.settings import COOKIE_SECURE, COOKIE_SAMESITE
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -69,8 +70,8 @@ def login():
             "access_token",
             token,
             httponly=True,
-            samesite="None",
-            secure=True,
+            samesite=COOKIE_SAMESITE,
+            secure=COOKIE_SECURE,
             path="/",
         )
         return response, status_code

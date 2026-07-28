@@ -29,6 +29,12 @@ def get_env(name, default=None, required=False, cast=str):
 
     return value
 
+
+def parse_bool(value):
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("1", "true", "yes", "y")
+
 SERVER_IP = get_env("SERVER_IP", default=None) or get_local_ip()
 SERVER_PORT = get_env("SERVER_PORT", default=8080, cast=int)
 
@@ -51,6 +57,8 @@ ALLOWED_EXTENSIONS = {
     if ext.strip()
 }
 
+COOKIE_SECURE = parse_bool(get_env("COOKIE_SECURE", default="False"))
+COOKIE_SAMESITE = get_env("COOKIE_SAMESITE", default="Lax")
 
 # Ai Config
 OPENAI_KEY = get_env("OPENAI_KEY", default=None)
