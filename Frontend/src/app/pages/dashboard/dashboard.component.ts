@@ -1,6 +1,8 @@
 import { FoodMODEL } from './../../models/food-model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AuthState } from '../../state/app.state';
 import { logout } from '../../state/auth.actions';
 import { isTokenExpired } from '../../state/auth';
@@ -61,8 +63,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   token: string | null = null;
+  private authSub?: Subscription;
   user: User = new User('', '', '', '', '', '[]');
 
   nowPage: string = 'home';
@@ -142,10 +145,14 @@ export class DashboardComponent implements OnInit {
     public userService: UserService,
     private loaderService: LoaderService,
   ) {
-    this.store
+    this.authSub = this.store
       .select((state) => state.auth)
-      .subscribe((auth: AuthState) => {
-        this.token = auth.token;
+      .pipe(
+        map((auth: AuthState) => auth.token),
+        distinctUntilChanged(),
+      )
+      .subscribe((token: string | null) => {
+        this.token = token;
 
         if (this.token && !isTokenExpired(this.token)) {
           const decodedJWT: JwtDecoded = jwtDecode<JwtDecoded>(this.token);
@@ -158,14 +165,22 @@ export class DashboardComponent implements OnInit {
             },
             error: () => {
               this.store.dispatch(logout());
-              this.router.navigate(['/login']);
+              this.router.navigate(['/authentication/login']);
             },
           });
         } else {
-          this.store.dispatch(logout());
-          this.router.navigate(['/login']);
+          // NOTE: no dispatch(logout()) here on purpose.
+          // If the token is already null/expired, dispatching logout() again
+          // would push a brand-new (but value-equal) auth object through the
+          // store, re-triggering this very subscription synchronously and
+          // causing an infinite dispatch loop that freezes the tab.
+          this.router.navigate(['/authentication/login']);
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
   }
 
   handleLogout(): void {
