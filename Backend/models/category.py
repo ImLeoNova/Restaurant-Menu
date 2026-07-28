@@ -306,14 +306,7 @@ class Category:
 
         os.makedirs(CATEGORY_UPLOAD_FOLDER, exist_ok=True)
 
-        assets_dir = (
-            Path(__file__).resolve().parents[2]
-            / "Frontend"
-            / "src"
-            / "assets"
-            / "web"
-            / "others-image"
-        )
+        assets_dir = Path(__file__).resolve().parent.parent / "categories"
 
         for slug, title, asset_name in SEED_CATEGORIES:
             image_name = ""
