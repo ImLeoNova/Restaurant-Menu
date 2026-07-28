@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "Backend"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from storage.s3_client import s3_client, StorageError
 from config.settings import (
