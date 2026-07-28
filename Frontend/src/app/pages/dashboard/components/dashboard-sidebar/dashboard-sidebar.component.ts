@@ -14,6 +14,7 @@ export class DashboardSidebarComponent {
   @Input({ required: true }) user!: User;
   @Input({ required: true }) nowPage!: string;
   @Output() pageChange = new EventEmitter<string>();
+  @Output() logoutClick = new EventEmitter<void>();
 
   protected readonly Roles = Roles;
 }

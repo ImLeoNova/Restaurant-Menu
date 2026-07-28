@@ -189,7 +189,7 @@
     </nav>
   </div>
 
-  <div class="p-3 sm:p-4 border-t border-white/10">
+  <div class="p-3 sm:p-4 border-t border-white/10 flex flex-col gap-2">
     <div
       routerLink="/restaurant-menu"
       class="cursor-pointer rounded-2xl px-4 py-3.5 sm:py-4 flex items-center justify-between bg-gradient-to-r from-red-500 to-rose-600 hover:scale-[1.01] transition-all duration-300 shadow-lg"
@@ -212,5 +212,46 @@
         <span class="yekan font-bold truncate">برگشت به سایت</span>
       </div>
     </div>
+
+    <button
+      type="button"
+      (click)="logoutClick.emit()"
+      class="group w-full cursor-pointer rounded-2xl px-4 py-3.5 sm:py-4 flex items-center justify-between bg-white/5 border border-red-400/20 hover:bg-red-500/10 hover:border-red-400/40 transition-all duration-300"
+      dir="rtl"
+    >
+      <div class="flex items-center gap-3 min-w-0">
+        <div
+          class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0 transition-colors duration-300 group-hover:bg-red-500/20"
+        >
+          <svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <polyline
+              points="16 17 21 12 16 7"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <line
+              x1="21"
+              y1="12"
+              x2="9"
+              y2="12"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <span class="yekan font-bold text-red-400 truncate">خروج از حساب</span>
+      </div>
+    </button>
   </div>
 </aside>
