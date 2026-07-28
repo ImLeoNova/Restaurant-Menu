@@ -50,11 +50,43 @@ if [ "$UNHEALTHY" -gt 0 ]; then
   exit 1
 fi
 
-echo "Running S3 image migration (if needed)..."
-if $DOCKER_CMD compose -f Backend/docker-compose.yaml exec -T backend python scripts/migrate_images_to_s3.py up; then
-  echo "Migration completed."
+echo "Checking if S3 image migration is needed..."
+MIGRATION_NEEDED=$($DOCKER_CMD compose -f Backend/docker-compose.yaml exec -T backend python -c "
+import sys
+sys.path.insert(0, '.')
+from core.database import execute_query
+try:
+    row = execute_query(\"SELECT COUNT(*) AS total FROM categories WHERE image IS NOT NULL AND image != '' AND image NOT LIKE 'images/%'\", fetchone=True)
+    count = int(row.get('total') or 0) if row else 0
+    print(count)
+except Exception as e:
+    print('0')
+" || echo "0")
+
+if [ "$MIGRATION_NEEDED" -gt 0 ]; then
+  echo "Unmigrated images found ($MIGRATION_NEEDED records). Running migration..."
+  
+  cat > Backend/docker-compose.migrate.yml <<EOF
+services:
+  backend:
+    volumes:
+      - ./products:/app/products:ro
+      - ./categories:/app/categories:ro
+EOF
+
+  if $DOCKER_CMD compose -f Backend/docker-compose.yaml -f Backend/docker-compose.migrate.yml exec -T backend python scripts/migrate_images_to_s3.py up; then
+    echo "Migration completed successfully."
+  else
+    echo "Migration failed. Check logs above." >&2
+  fi
+
+  rm -f Backend/docker-compose.migrate.yml
+  
+  echo "Restarting backend without migration volumes..."
+  $DOCKER_CMD compose -f Backend/docker-compose.yaml up -d --force-recreate backend
+  sleep 3
 else
-  echo "Migration failed or was skipped. Check logs above." >&2
+  echo "No unmigrated images found. Skipping migration."
 fi
 
 echo "Deployment completed successfully."
