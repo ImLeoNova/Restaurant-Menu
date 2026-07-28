@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
+import { logout as logoutAction } from '../../state/auth.actions';
 
 export interface HeaderNavItem {
   title: string;
@@ -47,7 +48,7 @@ export class HeaderComponent implements OnDestroy {
 
   constructor(
     private store: Store<{ auth: AuthState }>,
-    private router: Router
+    private router: Router,
   ) {
     store
       .select((state) => state.auth)
@@ -74,13 +75,15 @@ export class HeaderComponent implements OnDestroy {
     if (!item.fragment) return;
 
     event?.preventDefault();
-    void this.router.navigate([item.route], { fragment: item.fragment }).then(() => {
-      setTimeout(() => {
-        document
-          .getElementById(item.fragment!)
-          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 50);
-    });
+    void this.router
+      .navigate([item.route], { fragment: item.fragment })
+      .then(() => {
+        setTimeout(() => {
+          document
+            .getElementById(item.fragment!)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      });
   }
 
   isNavActive(item: HeaderNavItem): boolean {
@@ -120,6 +123,12 @@ export class HeaderComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     document.body.style.overflow = '';
+  }
+
+  logout(): void {
+    this.store.dispatch(logoutAction());
+    this.closeMenu();
+    void this.router.navigate(['/authentication/login']);
   }
 
   private syncBodyScroll(): void {
