@@ -40,7 +40,7 @@ export class UserService {
 
   isTokenValid(): Observable<ApiResponse<{ token: string }>> {
     return this.http.post<ApiResponse<{ token: string }>>(
-      `${this.apiBase}/verify-token`,
+      `${this.apiBase}/api/user/verify-token`,
       {},
       { headers: this.jsonHeaders(), withCredentials: true },
     );
