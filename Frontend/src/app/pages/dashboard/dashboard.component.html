@@ -9,7 +9,10 @@
     />
 
     <section class="flex-1 min-w-0">
-      <app-dashboard-welcome-header [user]="user" />
+      <app-dashboard-welcome-header
+        [user]="user"
+        (logoutClick)="handleLogout()"
+      />
 
       <div class="px-3 sm:px-4 md:px-6 pb-6 sm:pb-8">
         @switch (nowPage) {

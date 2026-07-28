@@ -82,6 +82,14 @@ export class UserService {
     );
   }
 
+  logout(): Observable<ApiResponse<null>> {
+    return this.http.post<ApiResponse<null>>(
+      `${this.apiBase}/api/user/logout`,
+      {},
+      { withCredentials: true },
+    );
+  }
+
   // Admin
   adminGetAllUsers(token: string | null): Observable<ApiResponse<User[]>> {
     return this.http.get<ApiResponse<User[]>>(

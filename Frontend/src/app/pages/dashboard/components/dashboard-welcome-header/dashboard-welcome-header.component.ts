@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { User } from '../../../../models/user';
 import { Roles } from '../../../../enums/enums';
@@ -11,6 +11,7 @@ import { Roles } from '../../../../enums/enums';
 })
 export class DashboardWelcomeHeaderComponent {
   @Input({ required: true }) user!: User;
+  @Output() logoutClick = new EventEmitter<void>();
 
   protected readonly Roles = Roles;
 }

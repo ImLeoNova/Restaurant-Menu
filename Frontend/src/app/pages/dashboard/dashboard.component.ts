@@ -166,6 +166,23 @@ export class DashboardComponent implements OnInit {
       });
   }
 
+  handleLogout(): void {
+    this.isSubmitting = true;
+    this.userService.logout().subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.store.dispatch(logout());
+        void this.router.navigate(['/authentication/login']);
+      },
+      error: () => {
+        // Even if backend logout fails, clear local state and redirect
+        this.isSubmitting = false;
+        this.store.dispatch(logout());
+        void this.router.navigate(['/authentication/login']);
+      },
+    });
+  }
+
   public loadUsers() {
     if (this.user.role === Roles.FOUNDER || this.user.role === Roles.ADMIN) {
       this.userService.adminGetAllUsers(this.token).subscribe({
