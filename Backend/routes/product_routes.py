@@ -1,9 +1,9 @@
-from flask import Blueprint, request, send_from_directory
+from flask import Blueprint, request, redirect
 from models.product import Product
 from middleware.auth import token_required, admin_required
 from helpers.responses import success_response, error_response
-from config.settings import UPLOAD_FOLDER
-import os
+from storage.s3_client import s3_client
+
 product_bp = Blueprint("product_bp", __name__)
 
 @product_bp.route("/api/product/add", methods=["POST"])
@@ -24,8 +24,8 @@ def add_product():
         status, message = product_class.add_product(
             image_file=image_file,
             title=title,
-            description=description,
             category=category,
+            description=description,
             price=price
         )
 
@@ -129,13 +129,14 @@ def get_categories():
 @product_bp.route("/api/product/image/<string:productID>", methods=["GET"])
 def get_product_image(productID):
     try:
-        product_req = Product(productID)
-        product_img = product_req.get_product_image_name()
+        product_class = Product(productID)
+        object_key = product_class.get_product_image_name()
 
-        if not product_img:
+        if not object_key:
             return error_response("Product not found.", 404)
 
-        return send_from_directory(UPLOAD_FOLDER, product_img)
+        signed_url = s3_client.get_signed_url(object_key, expiry_seconds=3600)
+        return redirect(signed_url, code=302)
 
     except Exception as e:
         return error_response(f"Internal Server Error: {str(e)}", 500)

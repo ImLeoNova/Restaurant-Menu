@@ -1,8 +1,8 @@
-from flask import Blueprint, request, send_from_directory
+from flask import Blueprint, request, redirect
 from models.category import Category
 from middleware.auth import token_required, admin_required
 from helpers.responses import success_response, error_response
-from config.settings import CATEGORY_UPLOAD_FOLDER
+from storage.s3_client import s3_client
 
 category_bp = Blueprint("category_bp", __name__)
 
@@ -114,9 +114,11 @@ def delete_category(category_id):
 @category_bp.route("/api/category/image/<int:category_id>", methods=["GET"])
 def get_category_image(category_id):
     try:
-        image_name = Category(category_id).get_category_image_name()
-        if not image_name:
+        object_key = Category(category_id).get_category_image_name()
+        if not object_key:
             return error_response("تصویر دسته‌بندی پیدا نشد.", 404)
-        return send_from_directory(CATEGORY_UPLOAD_FOLDER, image_name)
+
+        signed_url = s3_client.get_signed_url(object_key, expiry_seconds=3600)
+        return redirect(signed_url, code=302)
     except Exception as e:
         return error_response(f"Internal Server Error: {str(e)}", 500)

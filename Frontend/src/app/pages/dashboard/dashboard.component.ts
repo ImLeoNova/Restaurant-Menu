@@ -479,10 +479,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       foodPrice: String((product as any).price ?? ''),
     });
 
-    this.updateImgSRC =
-      (product as any).image_url ||
-      (product as any).image ||
-      this.productService.getProductImageURL(productIdStr);
+    this.updateImgSRC = (product as any).image;
   }
 
   updateFood(): void {
@@ -748,10 +745,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
     });
   }
-
-  getProductImageUrl = (id: string): string => {
-    return this.productService.getProductImageURL(id);
-  };
 
   viewCategoryProducts(category: CategoryMODEL): void {
     this.selectedCategoryItem = category;

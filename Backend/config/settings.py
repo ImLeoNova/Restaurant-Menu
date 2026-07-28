@@ -51,6 +51,12 @@ UPLOAD_FOLDER = get_env("UPLOAD_FOLDER", default="products")
 CATEGORY_UPLOAD_FOLDER = get_env("CATEGORY_UPLOAD_FOLDER", default="categories")
 MAX_CONTENT_LENGTH = get_env("MAX_CONTENT_LENGTH", default=5242880, cast=int)
 
+S3_ENDPOINT_URL = get_env("S3_ENDPOINT_URL", default=None)
+S3_ACCESS_KEY_ID = get_env("S3_ACCESS_KEY_ID", default=None)
+S3_SECRET_ACCESS_KEY = get_env("S3_SECRET_ACCESS_KEY", default=None)
+S3_BUCKET_NAME = get_env("S3_BUCKET_NAME", default=None)
+S3_REGION = get_env("S3_REGION", default="us-east-1")
+
 ALLOWED_EXTENSIONS = {
     ext.strip().lower()
     for ext in get_env("ALLOWED_EXTENSIONS", default="png,jpg,jpeg,gif,webp").split(",")

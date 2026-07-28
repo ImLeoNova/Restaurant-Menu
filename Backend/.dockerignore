@@ -5,7 +5,6 @@ __pycache__/
 .env
 .git
 .gitignore
-products/
 venv/
 .idea/
 .vscode/

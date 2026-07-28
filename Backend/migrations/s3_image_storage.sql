@@ -1,0 +1,8 @@
+-- S3 image storage schema documentation
+-- No structural DDL changes are required.
+-- The existing `products.image` and `categories.image` varchar(350) columns
+-- are already sufficient to store S3 object keys (e.g. "images/products/1/abc.png").
+-- Perform the actual data migration with:
+--   python scripts/migrate_images_to_s3.py up
+-- Roll back with:
+--   python scripts/migrate_images_to_s3.py down

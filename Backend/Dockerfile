@@ -16,8 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
-RUN mkdir -p /app/products
-
 EXPOSE 8080
 
 CMD ["python", "run.py"]

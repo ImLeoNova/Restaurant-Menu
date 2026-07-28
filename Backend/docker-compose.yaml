@@ -37,9 +37,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./products:/app/products
-      - ./categories:/app/categories
     networks:
       - restaurant_network
     healthcheck:

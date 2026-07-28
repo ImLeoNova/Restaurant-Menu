@@ -70,9 +70,4 @@ export class ProductService {
   getCategories(): Observable<ApiResponse<string[]>> {
     return this.http.get<ApiResponse<string[]>>(`${this.API}/categories`);
   }
-
-  // Get product image URL
-  getProductImageURL(productID: string): string {
-    return `${this.API}/image/${productID}`;
-  }
 }

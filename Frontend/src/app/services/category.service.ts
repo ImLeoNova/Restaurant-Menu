@@ -136,8 +136,4 @@ export class CategoryService {
       })
       .pipe(tap(() => this.refreshCategories()));
   }
-
-  getCategoryImageURL(categoryId: number | string): string {
-    return `${this.API}/image/${categoryId}`;
-  }
 }

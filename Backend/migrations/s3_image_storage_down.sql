@@ -1,0 +1,4 @@
+-- Rollback documentation for S3 image storage migration
+-- No structural DDL changes to revert.
+-- Restore local files and DB references with:
+--   python scripts/migrate_images_to_s3.py down

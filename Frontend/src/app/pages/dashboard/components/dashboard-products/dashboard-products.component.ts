@@ -14,7 +14,6 @@ export class DashboardProductsComponent {
   @Input({ required: true }) products!: FoodMODEL[];
   @Input({ required: true }) categories!: CategoryMODEL[];
   @Input() nowCategory: string | null = null;
-  @Input({ required: true }) getProductImageUrl!: (id: string) => string;
 
   @Output() addProduct = new EventEmitter<void>();
   @Output() searchProduct = new EventEmitter<void>();
@@ -23,8 +22,6 @@ export class DashboardProductsComponent {
   @Output() deleteProduct = new EventEmitter<FoodMODEL>();
 
   resolveImage(foodItem: FoodMODEL): string {
-    return (
-      foodItem.image || this.getProductImageUrl(foodItem.product_ID)
-    );
+    return foodItem.image || "";
   }
 }

@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 from flasgger import Swagger
 from core.extensions import cors
 from core.schema import ensure_schema
-from config.settings import UPLOAD_FOLDER, CATEGORY_UPLOAD_FOLDER, MAX_CONTENT_LENGTH, CORS_ORIGINS
+from config.settings import MAX_CONTENT_LENGTH, CORS_ORIGINS, S3_ENDPOINT_URL
 
 from routes.health_routes import health_bp
 from routes.user_routes import user_bp
@@ -42,11 +42,6 @@ def create_app():
 
     Swagger(app, config=swagger_config)
 
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    os.makedirs(CATEGORY_UPLOAD_FOLDER, exist_ok=True)
-
-    app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-    app.config["CATEGORY_UPLOAD_FOLDER"] = CATEGORY_UPLOAD_FOLDER
     app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
     ensure_schema()
@@ -60,7 +55,24 @@ def create_app():
 
     @app.after_request
     def apply_security_headers(response):
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.openai.com; frame-ancestors 'none';"
+        s3_origin = ""
+        if S3_ENDPOINT_URL:
+            try:
+                from urllib.parse import urlparse
+                parsed = urlparse(S3_ENDPOINT_URL)
+                s3_origin = f" {parsed.scheme}://{parsed.netloc}"
+            except Exception:
+                pass
+
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            f"img-src 'self' data:{s3_origin}; "
+            "connect-src 'self' https://api.openai.com; "
+            "frame-ancestors 'none';"
+        )
+        response.headers["Content-Security-Policy"] = csp
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"

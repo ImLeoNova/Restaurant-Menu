@@ -1,9 +1,9 @@
-import os
-import uuid
 from werkzeug.utils import secure_filename
+
 from core.database import execute_query
 from helpers.validators import allowed_file, is_valid_image
-from config.settings import UPLOAD_FOLDER
+from storage.s3_client import s3_client
+
 
 class Product:
     def __init__(self, product_id=None):
@@ -20,6 +20,9 @@ class Product:
             fetchone=True,
         )
         return row["category_ID"] if row else None
+
+    def _build_image_key(self, filename):
+        return f"images/products/{self.product_id}/{filename}"
 
     def add_product(self, image_file, title, description, category, price):
         if not title or not description or not category or price is None:
@@ -47,16 +50,19 @@ class Product:
             return False, "Invalid image content."
 
         safe_name = secure_filename(image_file.filename)
-        unique_filename = f"{uuid.uuid4().hex}_{safe_name}"
-        file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-        image_file.save(file_path)
+        unique_filename = f"{category_id}_{safe_name}"
+        image_file.stream.seek(0)
+        object_key = f"images/products/{unique_filename}"
+
+        content_type = _guess_content_type(safe_name)
+        s3_client.upload_image(image_file.stream, object_key, content_type=content_type)
 
         execute_query(
             """
             INSERT INTO `products` (`image`, `title`, `description`, `category`, `category_ID`, `price`)
             VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (unique_filename, title, description, category_slug, category_id, price),
+            (object_key, title, description, category_slug, category_id, price),
             commit=True
         )
 
@@ -83,7 +89,7 @@ class Product:
         for item in products or []:
             result.append({
                 "product_ID": item["product_ID"],
-                "image": f"/api/product/image/{item['product_ID']}",
+                "image": _signed_url(item["image"]),
                 "image_name": item["image"],
                 "title": item["title"],
                 "description": item["description"],
@@ -115,7 +121,7 @@ class Product:
 
         return {
             "product_ID": item["product_ID"],
-            "image": f"/api/product/image/{item['product_ID']}",
+            "image": _signed_url(item["image"]),
             "image_name": item["image"],
             "title": item["title"],
             "description": item["description"],
@@ -147,7 +153,7 @@ class Product:
             return False, "Product not found."
 
         fields = {}
-        old_image_name = current_product["image"]
+        old_image_key = current_product["image"]
 
         if title is not None:
             fields["title"] = title
@@ -180,15 +186,17 @@ class Product:
                 return False, "Invalid image content."
 
             safe_name = secure_filename(image_file.filename)
-            unique_filename = f"{uuid.uuid4().hex}_{safe_name}"
-            file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-            image_file.save(file_path)
-            fields["image"] = unique_filename
+            unique_filename = f"{self.product_id}_{safe_name}"
+            image_file.stream.seek(0)
+            object_key = f"images/products/{unique_filename}"
 
-            old_file_path = os.path.join(UPLOAD_FOLDER, old_image_name)
-            if os.path.exists(old_file_path):
+            content_type = _guess_content_type(safe_name)
+            s3_client.upload_image(image_file.stream, object_key, content_type=content_type)
+            fields["image"] = object_key
+
+            if old_image_key:
                 try:
-                    os.remove(old_file_path)
+                    s3_client.delete_image(old_image_key)
                 except Exception:
                     pass
 
@@ -219,7 +227,7 @@ class Product:
         if not current_product:
             return False, "Product not found."
 
-        image_name = current_product["image"]
+        image_key = current_product["image"]
 
         execute_query(
             "DELETE FROM `product_comments` WHERE `product_ID` = %s",
@@ -233,10 +241,9 @@ class Product:
             commit=True
         )
 
-        file_path = os.path.join(UPLOAD_FOLDER, image_name)
-        if os.path.exists(file_path):
+        if image_key:
             try:
-                os.remove(file_path)
+                s3_client.delete_image(image_key)
             except Exception:
                 pass
 
@@ -250,3 +257,24 @@ class Product:
         )
 
         return [row["category"] for row in rows] if rows else []
+
+
+def _guess_content_type(filename):
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    mapping = {
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "gif": "image/gif",
+        "webp": "image/webp",
+    }
+    return mapping.get(ext, "application/octet-stream")
+
+
+def _signed_url(object_key):
+    if not object_key:
+        return ""
+    try:
+        return s3_client.get_signed_url(object_key, expiry_seconds=3600)
+    except Exception:
+        return ""

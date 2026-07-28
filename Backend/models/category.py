@@ -1,13 +1,11 @@
-import os
 import re
-import uuid
-import shutil
 from pathlib import Path
+
 from werkzeug.utils import secure_filename
 
 from core.database import execute_query
 from helpers.validators import allowed_file, is_valid_image
-from config.settings import CATEGORY_UPLOAD_FOLDER
+from storage.s3_client import s3_client
 
 
 SEED_CATEGORIES = [
@@ -49,13 +47,14 @@ class Category:
             )
             product_count = int(count_row["total"]) if count_row else 0
 
+        image_value = row.get("image") or ""
         return {
             "category_ID": row["category_ID"],
             "title": row["title"],
             "category": row["slug"],
             "slug": row["slug"],
-            "image": Category._image_url(row["category_ID"]) if row.get("image") else "",
-            "image_name": row.get("image") or "",
+            "image": _signed_url(image_value),
+            "image_name": image_value,
             "product_count": product_count,
         }
 
@@ -88,16 +87,18 @@ class Category:
 
         safe_name = secure_filename(image_file.filename)
         unique_filename = f"{uuid.uuid4().hex}_{safe_name}"
-        os.makedirs(CATEGORY_UPLOAD_FOLDER, exist_ok=True)
-        file_path = os.path.join(CATEGORY_UPLOAD_FOLDER, unique_filename)
-        image_file.save(file_path)
+        image_file.stream.seek(0)
+        object_key = f"images/categories/{unique_filename}"
+
+        content_type = _guess_content_type(safe_name)
+        s3_client.upload_image(image_file.stream, object_key, content_type=content_type)
 
         execute_query(
             """
             INSERT INTO `categories` (`slug`, `title`, `image`)
             VALUES (%s, %s, %s)
             """,
-            (slug, title, unique_filename),
+            (slug, title, object_key),
             commit=True,
         )
 
@@ -181,7 +182,7 @@ class Category:
 
         fields = {}
         old_slug = current["slug"]
-        old_image_name = current.get("image") or ""
+        old_image_key = current.get("image") or ""
 
         if title is not None:
             title = title.strip()
@@ -217,18 +218,18 @@ class Category:
 
             safe_name = secure_filename(image_file.filename)
             unique_filename = f"{uuid.uuid4().hex}_{safe_name}"
-            os.makedirs(CATEGORY_UPLOAD_FOLDER, exist_ok=True)
-            file_path = os.path.join(CATEGORY_UPLOAD_FOLDER, unique_filename)
-            image_file.save(file_path)
-            fields["image"] = unique_filename
+            image_file.stream.seek(0)
+            object_key = f"images/categories/{unique_filename}"
 
-            if old_image_name:
-                old_path = os.path.join(CATEGORY_UPLOAD_FOLDER, old_image_name)
-                if os.path.exists(old_path):
-                    try:
-                        os.remove(old_path)
-                    except Exception:
-                        pass
+            content_type = _guess_content_type(safe_name)
+            s3_client.upload_image(image_file.stream, object_key, content_type=content_type)
+            fields["image"] = object_key
+
+            if old_image_key:
+                try:
+                    s3_client.delete_image(old_image_key)
+                except Exception:
+                    pass
 
         if not fields:
             return False, "هیچ فیلدی برای بروزرسانی ارسال نشده است."
@@ -276,7 +277,7 @@ class Category:
                 f"این دسته‌بندی دارای {product_count} محصول است. ابتدا محصولات را حذف یا جابه‌جا کنید.",
             )
 
-        image_name = current.get("image") or ""
+        image_key = current.get("image") or ""
 
         execute_query(
             "DELETE FROM `categories` WHERE `category_ID` = %s",
@@ -284,13 +285,11 @@ class Category:
             commit=True,
         )
 
-        if image_name:
-            file_path = os.path.join(CATEGORY_UPLOAD_FOLDER, image_name)
-            if os.path.exists(file_path):
-                try:
-                    os.remove(file_path)
-                except Exception:
-                    pass
+        if image_key:
+            try:
+                s3_client.delete_image(image_key)
+            except Exception:
+                pass
 
         return True, "دسته‌بندی با موفقیت حذف شد."
 
@@ -304,23 +303,47 @@ class Category:
         if existing and int(existing.get("total") or 0) > 0:
             return
 
-        os.makedirs(CATEGORY_UPLOAD_FOLDER, exist_ok=True)
-
         assets_dir = Path(__file__).resolve().parent.parent / "categories"
 
         for slug, title, asset_name in SEED_CATEGORIES:
-            image_name = ""
+            object_key = ""
             source = assets_dir / asset_name
             if source.exists():
                 ext = source.suffix.lower() or ".png"
-                image_name = f"{uuid.uuid4().hex}_{slug}{ext}"
-                shutil.copy2(source, os.path.join(CATEGORY_UPLOAD_FOLDER, image_name))
+                object_key = f"images/categories/seed_{slug}{ext}"
+                with open(source, "rb") as f:
+                    s3_client.upload_image(
+                        f,
+                        object_key,
+                        content_type=_guess_content_type(asset_name),
+                    )
 
             execute_query(
                 """
                 INSERT INTO `categories` (`slug`, `title`, `image`)
                 VALUES (%s, %s, %s)
                 """,
-                (slug, title, image_name),
+                (slug, title, object_key),
                 commit=True,
             )
+
+
+def _guess_content_type(filename):
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    mapping = {
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "gif": "image/gif",
+        "webp": "image/webp",
+    }
+    return mapping.get(ext, "application/octet-stream")
+
+
+def _signed_url(object_key):
+    if not object_key:
+        return ""
+    try:
+        return s3_client.get_signed_url(object_key, expiry_seconds=3600)
+    except Exception:
+        return ""

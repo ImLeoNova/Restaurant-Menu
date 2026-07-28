@@ -28,7 +28,6 @@
               [products]="getProductsByCurrentCategory()"
               [categories]="categoryService.getCategories()"
               [nowCategory]="categoryService.nowCategory"
-              [getProductImageUrl]="getProductImageUrl"
               (addProduct)="openModal('add')"
               (searchProduct)="openModal('search')"
               (categoryChange)="onCategoryChange($event)"

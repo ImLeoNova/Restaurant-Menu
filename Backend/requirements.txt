@@ -9,3 +9,4 @@ openai
 colorama
 flasgger
 standard-imghdr
+boto3
