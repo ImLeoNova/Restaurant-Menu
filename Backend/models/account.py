@@ -184,51 +184,82 @@ class Account:
 
     @staticmethod
     def seed_default_admin():
-        admin_exists = execute_query(
-            "SELECT `user_ID` FROM `restaurantusers` WHERE `role` = %s LIMIT 1",
-            ("Admin",),
-            fetchone=True,
-        )
-        if admin_exists:
-            return True, "Admin user already exists."
-
-        default_username = (os.getenv("DEFAULT_ADMIN_USERNAME") or "admin").strip() or "admin"
-        default_email = (os.getenv("DEFAULT_ADMIN_EMAIL") or "admin@example.com").strip() or "admin@example.com"
-        default_password = (os.getenv("DEFAULT_ADMIN_PASSWORD") or "Admin@123456").strip() or "Admin@123456"
-
-        username = default_username
-        email = default_email
-        counter = 1
-
-        while True:
-            existing = execute_query(
-                "SELECT `user_ID` FROM `restaurantusers` WHERE `username` = %s OR `email` = %s",
-                (username, email),
+        def create_user(role, default_username, default_email, default_password):
+            exists = execute_query(
+                "SELECT `user_ID` FROM `restaurantusers` WHERE `role` = %s LIMIT 1",
+                (role,),
                 fetchone=True,
             )
-            if not existing:
-                break
 
-            counter += 1
-            username = f"{default_username}{counter}"
-            if "@" in default_email:
-                local_part, domain = default_email.split("@", 1)
-                email = f"{local_part}{counter}@{domain}"
-            else:
-                email = f"{default_email}{counter}"
+            if exists:
+                return
 
-        user_id = generate_random_string(30)
-        hashed_password = hash_password(default_password)
-        conversation_history = json.dumps([], ensure_ascii=False)
+            username = default_username
+            email = default_email
+            counter = 1
 
-        execute_query(
-            """
-            INSERT INTO `restaurantusers`
-            (`user_ID`, `username`, `password`, `email`, `role`, `conversation_history`)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (user_id, username, hashed_password, email, "Admin", conversation_history),
-            commit=True,
+            while True:
+                existing = execute_query(
+                    """
+                    SELECT `user_ID`
+                    FROM `restaurantusers`
+                    WHERE `username` = %s OR `email` = %s
+                    """,
+                    (username, email),
+                    fetchone=True,
+                )
+
+                if not existing:
+                    break
+
+                counter += 1
+                username = f"{default_username}{counter}"
+
+                if "@" in default_email:
+                    local_part, domain = default_email.split("@", 1)
+                    email = f"{local_part}{counter}@{domain}"
+                else:
+                    email = f"{default_email}{counter}"
+
+            execute_query(
+                """
+                INSERT INTO `restaurantusers`
+                (`user_ID`, `username`, `password`, `email`, `role`, `conversation_history`)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    generate_random_string(30),
+                    username,
+                    hash_password(default_password),
+                    email,
+                    role,
+                    json.dumps([], ensure_ascii=False),
+                ),
+                commit=True,
+            )
+
+        # Founder
+        create_user(
+            role="Founder",
+            default_username=os.getenv("DEFAULT_FOUNDER_USERNAME", "superadmin").strip() or "superadmin",
+            default_email=os.getenv("DEFAULT_FOUNDER_EMAIL", "superadmin@example.com").strip() or "superadmin@example.com",
+            default_password=os.getenv("DEFAULT_FOUNDER_PASSWORD", "SuperAdmin@123456").strip() or "SuperAdmin@123456",
         )
 
-        return True, "Default admin user created."
+        # Admin
+        create_user(
+            role="Admin",
+            default_username=os.getenv("DEFAULT_ADMIN_USERNAME", "admin").strip() or "admin",
+            default_email=os.getenv("DEFAULT_ADMIN_EMAIL", "admin@example.com").strip() or "admin@example.com",
+            default_password=os.getenv("DEFAULT_ADMIN_PASSWORD", "Admin@123456").strip() or "Admin@123456",
+        )
+
+        # Normal User
+        create_user(
+            role="User",
+            default_username=os.getenv("DEFAULT_USER_USERNAME", "user").strip() or "user",
+            default_email=os.getenv("DEFAULT_USER_EMAIL", "user@example.com").strip() or "user@example.com",
+            default_password=os.getenv("DEFAULT_USER_PASSWORD", "User@123456").strip() or "User@123456",
+        )
+
+        return True, "Default Founder, Admin and User ensured."
