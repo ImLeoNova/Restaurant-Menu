@@ -16,6 +16,7 @@ import { ProductService } from '../../services/product.service';
 import { ApiResponse } from '../../models/api-response';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { UserService } from '../../services/user.service';
+import { LoaderService } from '../../services/loader.service';
 import { CategoryMODEL } from '../../models/category-model';
 import { DashboardBackgroundComponent } from './components/dashboard-background/dashboard-background.component';
 import { DashboardSidebarComponent } from './components/dashboard-sidebar/dashboard-sidebar.component';
@@ -139,6 +140,7 @@ export class DashboardComponent implements OnInit {
     private dashboardService: DashboardService,
     public productService: ProductService,
     public userService: UserService,
+    private loaderService: LoaderService,
   ) {
     this.store
       .select((state) => state.auth)
@@ -171,12 +173,19 @@ export class DashboardComponent implements OnInit {
     this.userService.logout().subscribe({
       next: () => {
         this.isSubmitting = false;
+        // ensure global loader is hidden in case any request remained
+        try {
+          this.loaderService.reset();
+        } catch (e) {}
         this.store.dispatch(logout());
         void this.router.navigate(['/authentication/login']);
       },
       error: () => {
         // Even if backend logout fails, clear local state and redirect
         this.isSubmitting = false;
+        try {
+          this.loaderService.reset();
+        } catch (e) {}
         this.store.dispatch(logout());
         void this.router.navigate(['/authentication/login']);
       },

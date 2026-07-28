@@ -204,14 +204,16 @@ def change_password():
 @user_bp.route("/api/user/logout", methods=["POST"])
 def logout():
     response, status_code = success_response("Logout successful.", None, 200)
+    # Clear the access_token cookie using the same attributes as when it was set
     response.set_cookie(
         "access_token",
         "",
         httponly=True,
-        samesite="None",
-        secure=True,
+        samesite=COOKIE_SAMESITE,
+        secure=COOKIE_SECURE,
         path="/",
         expires=0,
+        max_age=0,
     )
     return response, status_code
 

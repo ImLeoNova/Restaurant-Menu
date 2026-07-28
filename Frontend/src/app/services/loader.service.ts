@@ -23,4 +23,10 @@ export class LoaderService {
       this.loadingSubject.next(false);
     }
   }
+
+  // Force hide and reset counter (useful for logout/edge-cases)
+  reset() {
+    this.requestCount = 0;
+    this.loadingSubject.next(false);
+  }
 }
