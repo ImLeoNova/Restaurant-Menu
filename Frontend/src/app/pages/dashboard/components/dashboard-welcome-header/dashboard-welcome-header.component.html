@@ -38,12 +38,30 @@
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 lg:gap-4 self-center lg:self-auto">
         <button
           (click)="logoutClick.emit()"
-          class="yekan px-4 py-2 rounded-xl bg-red-600 text-white font-bold hover:opacity-95 transition duration-200"
+          class="group yekan inline-flex items-center justify-center gap-2 rounded-2xl border border-red-400/30 bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 px-4 py-2.5 text-sm sm:text-base font-extrabold text-white shadow-[0_10px_30px_rgba(239,68,68,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(239,68,68,0.35)]"
         >
-          خروج
+          <span
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-transform duration-300 group-hover:rotate-12"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </span>
+          <span>خروج</span>
         </button>
       </div>
 
