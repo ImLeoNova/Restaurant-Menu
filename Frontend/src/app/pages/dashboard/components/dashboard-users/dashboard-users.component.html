@@ -55,33 +55,50 @@
         </div>
       </div>
 
-      <div class="relative w-full sm:w-auto">
-        <svg
-          class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60"
-          viewBox="0 0 24 24"
-          fill="none"
+      <div class="flex flex-col sm:flex-row items-stretch gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 w-full sm:min-w-[20rem]">
+          <svg
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="m21 21-4.35-4.35"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <input
+            type="text"
+            [ngModel]="searchKeyword"
+            (ngModelChange)="onSearchInput($event)"
+            placeholder="جستجو بر اساس نام یا ایمیل..."
+            class="yekan w-full bg-white/10 border border-white/20 rounded-2xl pr-11 pl-4 py-3.5 text-white placeholder:text-white/50 text-[0.9rem] outline-none focus:border-amber-400/70 focus:bg-white/15 transition-all"
+          />
+        </div>
+
+        <button
+          (click)="addUser.emit()"
+          class="w-full sm:w-auto min-w-[11rem] rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 sm:px-5 py-3.5 yekan font-bold text-white shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2"
         >
-          <circle
-            cx="11"
-            cy="11"
-            r="8"
-            stroke="currentColor"
-            stroke-width="1.8"
-          />
-          <path
-            d="m21 21-4.35-4.35"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-        </svg>
-        <input
-          type="text"
-          [ngModel]="searchKeyword"
-          (ngModelChange)="onSearchInput($event)"
-          placeholder="جستجو بر اساس نام یا ایمیل..."
-          class="yekan w-full sm:w-[22rem] bg-white/10 border border-white/20 rounded-2xl pr-11 pl-4 py-3.5 text-white placeholder:text-white/50 text-[0.9rem] outline-none focus:border-amber-400/70 focus:bg-white/15 transition-all"
-        />
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="whitespace-nowrap">افزودن کاربر</span>
+        </button>
       </div>
     </div>
   </div>
@@ -133,23 +150,6 @@
   }
 
   @if (!isLoading && users.length > 0) {
-    <div class="flex flex-wrap gap-3 mb-2">
-      <button
-        (click)="addUser.emit()"
-        class="group w-full sm:w-auto min-w-[13rem] rounded-[1.3rem] bg-gradient-to-r from-emerald-500 to-green-600 px-5 sm:px-6 py-4 sm:py-4.5 yekan font-bold text-white shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3"
-      >
-        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M12 5v14M5 12h14"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-        <span class="whitespace-nowrap">افزودن کاربر</span>
-      </button>
-    </div>
-
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
       @for (u of users; track u.user_ID) {
         <app-dashboard-user-card
