@@ -143,19 +143,6 @@
       </div>
     </div>
 
-    <app-cart-drawer
-      [items]="cartService.getItems()"
-      [subtotal]="cartSubtotal"
-      [grandTotal]="cartSubtotal"
-      [itemCount]="cartItemsCount"
-      [isOpen]="cartOpen"
-      (close)="closeCart()"
-      (increase)="onIncrease($event)"
-      (decrease)="onDecrease($event)"
-      (remove)="onRemove($event)"
-      (clear)="onClearCart()"
-    />
-
     <!-- Mobile Menu Panel -->
     <div
       class="md:hidden grid transition-[grid-template-rows] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -307,6 +294,18 @@
       </div>
     </div>
   </div>
+  <app-cart-drawer
+    [items]="cartService.getItems()"
+    [subtotal]="cartSubtotal"
+    [grandTotal]="cartSubtotal"
+    [itemCount]="cartItemsCount"
+    [isOpen]="cartOpen"
+    (close)="closeCart()"
+    (increase)="onIncrease($event)"
+    (decrease)="onDecrease($event)"
+    (remove)="onRemove($event)"
+    (clear)="onClearCart()"
+  />
 
   <!-- Backdrop -->
   @if (menuOpen) {
