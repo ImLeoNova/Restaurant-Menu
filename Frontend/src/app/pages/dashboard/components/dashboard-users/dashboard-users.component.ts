@@ -16,6 +16,7 @@ export class DashboardUsersComponent {
 
   @Output() searchKeywordChange = new EventEmitter<string>();
   @Output() search = new EventEmitter<void>();
+  @Output() addUser = new EventEmitter<void>();
   @Output() editUser = new EventEmitter<User>();
   @Output() deleteUser = new EventEmitter<User>();
 

@@ -100,7 +100,7 @@ export class UserService {
 
   adminCreateUser(
     token: string | null,
-    user: User & { role?: 'user' | 'admin' },
+    user: User & { role?: string },
   ): Observable<ApiResponse<string>> {
     return this.http.post<ApiResponse<string>>(
       `${this.apiBase}/api/admin/user/create`,

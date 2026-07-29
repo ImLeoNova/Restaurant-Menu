@@ -43,6 +43,7 @@
               [searchKeyword]="searchUserKeyword"
               (searchKeywordChange)="searchUserKeyword = $event"
               (search)="searchUsers()"
+              (addUser)="openAddUserModal()"
               (editUser)="openEditUserModal($event)"
               (deleteUser)="openModal('delete_user', $event)"
             />
@@ -134,6 +135,16 @@
           [errorMessage]="errorMessage"
           [successMessage]="successMessage"
           (submitForm)="updateAdminUser()"
+          (close)="closeModal()"
+        />
+      }
+
+      @case ("add_user") {
+        <app-add-user-modal
+          [form]="addUserFORM"
+          [errorMessage]="errorMessage"
+          [successMessage]="successMessage"
+          (submitForm)="addAdminUser()"
           (close)="closeModal()"
         />
       }

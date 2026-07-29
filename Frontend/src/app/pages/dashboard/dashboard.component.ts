@@ -36,6 +36,7 @@ import { EditUserModalComponent } from './components/modals/edit-user-modal/edit
 import { AddCategoryModalComponent } from './components/modals/add-category-modal/add-category-modal.component';
 import { UpdateCategoryModalComponent } from './components/modals/update-category-modal/update-category-modal.component';
 import { DeleteCategoryModalComponent } from './components/modals/delete-category-modal/delete-category-modal.component';
+import { AddUserModalComponent } from './components/modals/add-user-modal/add-user-modal.component';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -59,6 +60,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     AddCategoryModalComponent,
     UpdateCategoryModalComponent,
     DeleteCategoryModalComponent,
+    AddUserModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -128,6 +130,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     user_id: new FormControl('', [Validators.required]),
     username: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required]),
+    role: new FormControl('', [Validators.required]),
+  });
+
+  addUserFORM: FormGroup = new FormGroup({
+    username: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
     role: new FormControl('', [Validators.required]),
   });
   users: User[] = [];
@@ -258,6 +267,48 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  openAddUserModal(): void {
+    this.resetAddUserForm();
+    this.openModal('add_user');
+  }
+
+  addAdminUser(): void {
+    this.errorMessage = undefined;
+    this.successMessage = undefined;
+
+    const { username, email, password, role } = this.addUserFORM.value;
+
+    if (!username || !email || !password || !role) {
+      this.errorMessage = 'لطفا تمام فیلدها را پر کنید';
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    const newUser = new User('', username, password, email, role, '[]');
+
+    this.userService
+      .adminCreateUser(this.token, newUser)
+      .subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          this.successMessage = response.message || 'کاربر با موفقیت افزوده شد';
+          this.loadUsers();
+          setTimeout(() => this.closeModal(), 1000);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = err?.error?.message || 'خطا در افزودن کاربر';
+        },
+      });
+  }
+
+  resetAddUserForm(): void {
+    this.addUserFORM.reset();
+    this.errorMessage = undefined;
+    this.successMessage = undefined;
+  }
+
   ngOnInit(): void {
     this.loadProducts();
   }
@@ -314,6 +365,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.resetCategoryForm();
     }
 
+    if (modal === 'add_user') {
+      this.resetAddUserForm();
+    }
+
     if (
       (modal === 'update' || modal === 'remove') &&
       item &&
@@ -357,6 +412,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.categoryImgSRC = null;
     this.updateCategoryImageFile = undefined;
     this.updateCategoryImgSRC = null;
+    this.addUserFORM.reset();
   }
 
   input(event: Event) {
