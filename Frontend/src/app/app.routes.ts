@@ -8,6 +8,9 @@ import { ProductDetailComponent } from './pages/product-detail/product-detail.co
 import { ProductsComponent } from './pages/products/products.component';
 import { authGuard } from './guards/auth.guard';
 import { authenticationGuard } from './guards/authentication.guard';
+import { profileCompletedGuard } from './guards/profile-completed.guard';
+import { CompleteProfileComponent } from './Authentication/complete-profile/complete-profile.component';
+import { completeProfileGuard } from './guards/complete-profile.guard';
 
 export const routes: Routes = [
   {
@@ -43,7 +46,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, profileCompletedGuard],
     data: { animation: 'dashboard' },
   },
   {
@@ -60,6 +63,12 @@ export const routes: Routes = [
         component: RegisterAuthComponent,
         canActivate: [authenticationGuard],
         data: { animation: 'register' },
+      },
+      {
+        path: 'complete-profile',
+        component: CompleteProfileComponent,
+        canActivate: [authGuard, completeProfileGuard],
+        data: { animation: 'complete-profile' },
       },
     ],
   },

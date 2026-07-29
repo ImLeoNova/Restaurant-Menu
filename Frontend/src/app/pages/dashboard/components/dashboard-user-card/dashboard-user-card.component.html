@@ -22,7 +22,7 @@
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-3 min-w-0">
         <div
-          class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-extrabold text-[1.4rem] shadow-lg"
+          class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-extrabold text-[1.4rem] shadow-lg overflow-hidden"
           [ngClass]="{
             'bg-gradient-to-br from-amber-400/50 to-orange-500/40 border border-amber-400/50 text-amber-100':
               user.role === Roles.ADMIN,
@@ -32,7 +32,15 @@
               user.role === Roles.FOUNDER,
           }"
         >
-          {{ user.username.charAt(0).toUpperCase() }}
+          @if (user.avatar) {
+            <img
+              [src]="user.avatar"
+              alt="avatar"
+              class="h-full w-full object-cover"
+            />
+          } @else {
+            {{ (user.first_name || user.username).charAt(0).toUpperCase() }}
+          }
         </div>
 
         <div class="min-w-0">
@@ -120,11 +128,7 @@
         (click)="edit.emit(user)"
         class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500/10 border border-amber-400/25 hover:bg-amber-500/25 hover:border-amber-400/60 transition-all duration-200"
       >
-        <svg
-          class="w-3.5 h-3.5 text-amber-400"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
+        <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none">
           <path
             d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
             stroke="currentColor"

@@ -59,7 +59,8 @@ export class RegisterAuthComponent {
         this.userService
           .registerUser(userModel)
           .subscribe((response: RegisterResponse) => {
-            this.successMessage = 'با موفقیت ثبت نام کردید .';
+            this.successMessage =
+              'ثبت‌نام انجام شد. لطفاً وارد حساب خود شوید و فرم تکمیل پروفایل را ادامه دهید.';
             setTimeout(() => {
               this.router.navigate(['/authentication/login']);
             }, 700);

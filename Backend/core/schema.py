@@ -52,12 +52,19 @@ TABLE_DEFINITIONS = [
           `password` varchar(350) NOT NULL,
           `email` varchar(350) NOT NULL,
           `role` varchar(350) NOT NULL,
+          `first_name` varchar(120) DEFAULT NULL,
+          `last_name` varchar(120) DEFAULT NULL,
+          `phone_number` varchar(20) DEFAULT NULL,
+          `address` varchar(500) DEFAULT NULL,
+          `national_id` varchar(10) DEFAULT NULL,
+          `avatar` varchar(350) DEFAULT NULL,
           `conversation_history` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
           `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
           `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`user_ID`),
           UNIQUE KEY `uq_users_username` (`username`),
-          UNIQUE KEY `uq_users_email` (`email`)
+          UNIQUE KEY `uq_users_email` (`email`),
+          UNIQUE KEY `uq_users_national_id` (`national_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
         """,
     ),
@@ -250,6 +257,42 @@ DESIRED_SCHEMA = {
                 'column_default': None,
                 'extra': '',
             },
+            'first_name': {
+                'column_type': 'varchar(120)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'last_name': {
+                'column_type': 'varchar(120)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'phone_number': {
+                'column_type': 'varchar(20)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'address': {
+                'column_type': 'varchar(500)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'national_id': {
+                'column_type': 'varchar(10)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'avatar': {
+                'column_type': 'varchar(350)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
             'conversation_history': {
                 'column_type': 'longtext',
                 'is_nullable': 'NO',
@@ -273,6 +316,7 @@ DESIRED_SCHEMA = {
         'unique_keys': {
             'uq_users_username': ['username'],
             'uq_users_email': ['email'],
+            'uq_users_national_id': ['national_id'],
         },
         'indexes': {},
         'foreign_keys': {},

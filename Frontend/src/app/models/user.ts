@@ -5,6 +5,14 @@ export class User {
   email: string;
   role: string;
   conversation_history: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  address?: string;
+  national_id?: string;
+  avatar?: string;
+  profile_completed?: boolean;
+
   constructor(
     user_ID: string,
     username: string,

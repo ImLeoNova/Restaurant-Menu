@@ -4,6 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
+import { UserService } from '../../services/user.service';
+import { environment } from '../../environments/environment';
 
 export interface HeaderNavItem {
   title: string;
@@ -24,6 +26,8 @@ export class HeaderComponent implements OnDestroy {
   isLoggedIn = false;
   token: string | null = null;
   menuOpen = false;
+  userName = '';
+  avatarUrl: string | null = null;
 
   readonly navItems: HeaderNavItem[] = [
     {
@@ -48,13 +52,27 @@ export class HeaderComponent implements OnDestroy {
   constructor(
     private store: Store<{ auth: AuthState }>,
     private router: Router,
+    private userService: UserService,
   ) {
     store
       .select((state) => state.auth)
       .subscribe((auth: AuthState) => {
         this.token = auth.token;
         this.isLoggedIn = !!(this.token && !isTokenExpired(this.token));
+        if (this.isLoggedIn) {
+          this.loadProfile();
+        }
       });
+  }
+
+  private loadProfile(): void {
+    this.userService.getMyProfile(this.token).subscribe((response: any) => {
+      const profile = response?.data;
+      this.userName = profile?.first_name || profile?.username || 'کاربر';
+      this.avatarUrl = profile?.avatar
+        ? `${environment.websiteAPI}/api/user/avatar/${profile.user_ID}`
+        : null;
+    });
   }
 
   toggleMenu(): void {

@@ -1,12 +1,13 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, redirect
 from models.account import Account
 from middleware.auth import token_required
 from helpers.responses import success_response, error_response
-from helpers.validators import is_valid_username, is_valid_email
+from helpers.validators import is_valid_username, is_valid_email, is_valid_phone_number, is_valid_national_id, is_valid_address
 from core.database import execute_query
 from utils.security import hash_password
 from helpers.rate_limit import RateLimiter
-from config.settings import COOKIE_SECURE, COOKIE_SAMESITE
+from config.settings import COOKIE_SECURE, COOKIE_SAMESITE, MAX_CONTENT_LENGTH
+from storage.s3_client import s3_client
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -130,6 +131,11 @@ def update_profile():
 
         username = body.get("username")
         email = body.get("email")
+        first_name = body.get("first_name")
+        last_name = body.get("last_name")
+        phone_number = body.get("phone_number")
+        address = body.get("address")
+        national_id = body.get("national_id")
 
         update_fields = {}
 
@@ -161,13 +167,25 @@ def update_profile():
 
             update_fields["email"] = email
 
-        account = Account(request.user["user_id"])
-        status, message = account.update_user_data(update_fields)
+        profile_account = Account(request.user["user_id"])
+        message = "Profile updated successfully."
+        if update_fields:
+            status, message = profile_account.update_user_data(update_fields)
+            if not status:
+                return error_response(message, 400)
 
-        if not status:
-            return error_response(message, 400)
+        profile_status, profile_message = profile_account.update_profile_details(
+            first_name=first_name,
+            last_name=last_name,
+            phone_number=phone_number,
+            address=address,
+            national_id=national_id,
+        )
 
-        updated_user = account.get_user_data(include_password=False)
+        if not profile_status:
+            return error_response(profile_message, 400)
+
+        updated_user = profile_account.get_user_data(include_password=False)
         return success_response(message, updated_user)
 
     except Exception as e:
@@ -200,6 +218,72 @@ def change_password():
     except Exception as e:
         print(e)
         return error_response(f"Internal Server Error", 500)
+
+@user_bp.route("/api/user/avatar", methods=["POST"])
+@token_required
+def upload_avatar():
+    try:
+        if "file" not in request.files:
+            return error_response("Avatar file is required.", 400)
+
+        file_storage = request.files["file"]
+        if file_storage.filename == "":
+            return error_response("Avatar file is required.", 400)
+
+        if request.content_length and request.content_length > 2 * 1024 * 1024:
+            return error_response("Avatar file must be smaller than 2MB.", 413)
+
+        account = Account(request.user["user_id"])
+        status, message = account.set_avatar(file_storage)
+
+        if not status:
+            return error_response(message, 400)
+
+        return success_response(message, {"avatar": account.get_avatar_key()})
+
+    except Exception as e:
+        print(e)
+        return error_response("Internal Server Error", 500)
+
+
+@user_bp.route("/api/user/avatar", methods=["DELETE"])
+@token_required
+def delete_avatar():
+    try:
+        account = Account(request.user["user_id"])
+        status, message = account.remove_avatar()
+
+        if not status:
+            return error_response(message, 400)
+
+        return success_response(message, None)
+
+    except Exception as e:
+        print(e)
+        return error_response("Internal Server Error", 500)
+
+
+@user_bp.route("/api/user/avatar/<string:user_id>", methods=["GET"])
+def get_avatar(user_id):
+    try:
+        account = Account(user_id)
+        object_key = account.get_avatar_key()
+
+        if not object_key:
+            return error_response("Avatar not found.", 404)
+
+        if object_key.startswith("images/"):
+            public_url = s3_client.get_public_url(object_key)
+            if public_url:
+                return redirect(public_url, code=302)
+
+        signed_url = s3_client.get_signed_url(object_key, expiry_seconds=3600)
+        return redirect(signed_url, code=302)
+
+    except Exception as e:
+        print(e)
+        return error_response("Internal Server Error", 500)
+
 
 @user_bp.route("/api/user/logout", methods=["POST"])
 def logout():

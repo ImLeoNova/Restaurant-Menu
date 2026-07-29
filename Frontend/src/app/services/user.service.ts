@@ -8,6 +8,7 @@ import { ApiResponse } from '../models/api-response';
 import { LoginResponse, RegisterResponse } from '../interfaces/interfaces';
 import { UpdateProfilePayload } from '../interfaces/UpdateProfilePayload';
 import { ChangePasswordPayload } from '../interfaces/ChangePasswordPayload';
+import { CompleteProfilePayload } from '../interfaces/CompleteProfilePayload';
 
 @Injectable({
   providedIn: 'root',
@@ -60,6 +61,34 @@ export class UserService {
     return this.http.put<ApiResponse<User>>(
       `${this.apiBase}/api/user/update-profile`,
       payload,
+      { withCredentials: true },
+    );
+  }
+
+  completeProfile(
+    payload: CompleteProfilePayload,
+  ): Observable<ApiResponse<User>> {
+    return this.http.put<ApiResponse<User>>(
+      `${this.apiBase}/api/user/update-profile`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
+  uploadAvatar(file: File): Observable<ApiResponse<{ avatar: string }>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<ApiResponse<{ avatar: string }>>(
+      `${this.apiBase}/api/user/avatar`,
+      formData,
+      { withCredentials: true },
+    );
+  }
+
+  deleteAvatar(): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(
+      `${this.apiBase}/api/user/avatar`,
       { withCredentials: true },
     );
   }

@@ -1,7 +1,4 @@
-export interface UpdateProfilePayload {
-  username?: string;
-  email?: string;
-  role?: string;
+export interface CompleteProfilePayload {
   first_name?: string;
   last_name?: string;
   phone_number?: string;

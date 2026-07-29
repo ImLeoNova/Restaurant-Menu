@@ -1,0 +1,344 @@
+<main
+  class="min-h-screen w-full bg-[#05070b] px-4 py-8 sm:px-6 lg:px-8"
+  dir="rtl"
+>
+  <div class="mx-auto flex max-w-5xl flex-col gap-6">
+    <div
+      class="rounded-[2rem] border border-emerald-400/20 bg-[#111827]/95 p-4 shadow-2xl shadow-emerald-950/30 sm:p-6"
+    >
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="yekan text-sm text-emerald-300">مرحله {{ step }} از 3</p>
+          <h1 class="yekan text-2xl font-black text-white">تکمیل پروفایل</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          @for (item of [1, 2, 3]; track item) {
+            <div
+              class="h-2.5 w-10 rounded-full transition-all"
+              [ngClass]="item <= step ? 'bg-emerald-500' : 'bg-white/10'"
+            ></div>
+          }
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div
+          class="mb-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+        >
+          {{ errorMessage }}
+        </div>
+      }
+      @if (successMessage) {
+        <div
+          class="mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200"
+        >
+          {{ successMessage }}
+        </div>
+      }
+
+      @switch (step) {
+        @case (1) {
+          <section class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div
+              class="rounded-[1.5rem] border border-emerald-400/20 bg-gradient-to-br from-emerald-500/10 to-transparent p-5"
+            >
+              <div class="mb-4 flex items-center gap-3">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/15 text-emerald-300"
+                >
+                  <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                    />
+                    <path
+                      d="M5 20a7 7 0 0 1 14 0"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="yekan text-lg font-extrabold text-white">
+                    عکس پروفایل
+                  </h2>
+                  <p class="yekan text-sm text-white/60">
+                    اختیاری است اما برای حس بهتر خیلی پیشنهاد می‌شود.
+                  </p>
+                </div>
+              </div>
+
+              <label
+                class="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-[1.5rem] border border-dashed border-emerald-400/30 bg-white/5 p-8 text-center transition hover:border-emerald-400/60 hover:bg-emerald-500/10"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave()"
+                (drop)="onDrop($event)"
+              >
+                <input
+                  type="file"
+                  class="hidden"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                />
+                <div
+                  class="flex h-20 w-20 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-500/15 text-emerald-300"
+                >
+                  <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 16V8m0 0-3 3m3-3 3 3"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M5 18a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.2a2 2 0 0 0 1.9-1.3l.3-.7h3.1l.3.7a2 2 0 0 0 1.9 1.3H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="yekan text-base font-bold text-white">
+                    کلیک کنید یا فایل را بکشید
+                  </p>
+                  <p class="yekan mt-1 text-sm text-white/60">
+                    پیش‌نمایش زنده قبل از ارسال
+                  </p>
+                </div>
+              </label>
+
+              <div class="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  class="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/80"
+                  (click)="skipAvatar()"
+                >
+                  رد کردن این مرحله
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="rounded-[1.5rem] border border-white/10 bg-black/20 p-5"
+            >
+              @if (avatarPreview) {
+                <div class="flex flex-col items-center gap-4">
+                  <img
+                    [src]="avatarPreview"
+                    alt="پیش‌نمایش آواتار"
+                    class="h-48 w-48 rounded-full border border-emerald-400/30 object-cover"
+                  />
+                  <p class="yekan text-sm text-emerald-300">
+                    پیش‌نمایش آماده است
+                  </p>
+                </div>
+              } @else {
+                <div
+                  class="flex h-full flex-col justify-center gap-3 text-center"
+                >
+                  <div
+                    class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300"
+                  >
+                    <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                      />
+                      <path
+                        d="M4 20a8 8 0 0 1 16 0"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </div>
+                  <p class="yekan text-base font-bold text-white">
+                    هنوز تصویری انتخاب نشده
+                  </p>
+                  <p class="yekan text-sm text-white/60">
+                    در مرحله بعد می‌توانید بدون آواتار هم ادامه دهید.
+                  </p>
+                </div>
+              }
+            </div>
+          </section>
+        }
+        @case (2) {
+          <form [formGroup]="form" class="grid gap-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-2">
+              <label class="yekan text-sm text-white/80" for="first_name"
+                >نام</label
+              >
+              <input
+                id="first_name"
+                formControlName="first_name"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-400"
+                placeholder="نام"
+              />
+              @if (
+                form.get("first_name")?.touched &&
+                form.get("first_name")?.invalid
+              ) {
+                <p class="text-sm text-rose-300" aria-live="polite">
+                  نام الزامی است.
+                </p>
+              }
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="yekan text-sm text-white/80" for="last_name"
+                >نام خانوادگی</label
+              >
+              <input
+                id="last_name"
+                formControlName="last_name"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-400"
+                placeholder="نام خانوادگی"
+              />
+              @if (
+                form.get("last_name")?.touched && form.get("last_name")?.invalid
+              ) {
+                <p class="text-sm text-rose-300" aria-live="polite">
+                  نام خانوادگی الزامی است.
+                </p>
+              }
+            </div>
+            <div class="flex flex-col gap-2 sm:col-span-2">
+              <label class="yekan text-sm text-white/80" for="phone_number"
+                >شماره موبایل</label
+              >
+              <input
+                id="phone_number"
+                formControlName="phone_number"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-400"
+                placeholder="09123456789"
+              />
+              @if (
+                form.get("phone_number")?.touched &&
+                form.get("phone_number")?.invalid
+              ) {
+                <p class="text-sm text-rose-300" aria-live="polite">
+                  شماره موبایل باید با 09 یا +98 شروع شود.
+                </p>
+              }
+            </div>
+            <div class="flex flex-col gap-2 sm:col-span-2">
+              <label class="yekan text-sm text-white/80" for="address"
+                >آدرس</label
+              >
+              <textarea
+                id="address"
+                formControlName="address"
+                rows="4"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-400"
+                placeholder="آدرس دقیق"
+              ></textarea>
+              @if (
+                form.get("address")?.touched && form.get("address")?.invalid
+              ) {
+                <p class="text-sm text-rose-300" aria-live="polite">
+                  آدرس باید حداقل ۵ کاراکتر باشد.
+                </p>
+              }
+            </div>
+            <div class="flex flex-col gap-2 sm:col-span-2">
+              <div class="flex items-center gap-2">
+                <label class="yekan text-sm text-white/80" for="national_id"
+                  >کد ملی</label
+                >
+                <span
+                  class="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2 py-1 text-[0.7rem] text-emerald-300"
+                  >اختیاری</span
+                >
+              </div>
+              <input
+                id="national_id"
+                formControlName="national_id"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-400"
+                placeholder="1234567890"
+              />
+              @if (
+                form.get("national_id")?.touched &&
+                form.get("national_id")?.invalid
+              ) {
+                <p class="text-sm text-rose-300" aria-live="polite">
+                  کد ملی باید ۱۰ رقم باشد.
+                </p>
+              }
+            </div>
+          </form>
+        }
+        @case (3) {
+          <div
+            class="rounded-[1.5rem] border border-emerald-400/20 bg-emerald-500/10 p-5"
+          >
+            <h2 class="yekan text-xl font-extrabold text-white">مرور نهایی</h2>
+            <div class="mt-4 space-y-3 text-sm text-white/80">
+              <p>
+                <span class="text-emerald-300">نام:</span>
+                {{ form.value.first_name || "—" }}
+              </p>
+              <p>
+                <span class="text-emerald-300">نام خانوادگی:</span>
+                {{ form.value.last_name || "—" }}
+              </p>
+              <p>
+                <span class="text-emerald-300">شماره موبایل:</span>
+                {{ form.value.phone_number || "—" }}
+              </p>
+              <p>
+                <span class="text-emerald-300">آدرس:</span>
+                {{ form.value.address || "—" }}
+              </p>
+              <p>
+                <span class="text-emerald-300">کد ملی:</span>
+                {{ form.value.national_id || "اختیاری" }}
+              </p>
+            </div>
+          </div>
+        }
+      }
+
+      <div
+        class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between"
+      >
+        <button
+          type="button"
+          class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-white/80"
+          (click)="prevStep()"
+          [disabled]="step === 1"
+        >
+          بازگشت
+        </button>
+        @if (step < 3) {
+          <button
+            type="button"
+            class="rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-bold text-white"
+            [disabled]="!currentStepValid"
+            (click)="nextStep()"
+          >
+            بعدی
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-bold text-white"
+            [disabled]="isSubmitting"
+            (click)="submit()"
+          >
+            @if (isSubmitting) {
+              <span
+                class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+              ></span>
+            } @else {
+              تکمیل پروفایل
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</main>

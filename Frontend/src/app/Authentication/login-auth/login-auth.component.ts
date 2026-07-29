@@ -73,8 +73,6 @@ export class LoginAuthComponent {
 
         // Here we go to the login page after login
         setTimeout(() => {
-          // const storeToken = this.store.select(state => state.auth.token)
-          // this.store.subscribe(state => console.log(state));
           this.router.navigate(['/dashboard']);
         }, 600);
       },
