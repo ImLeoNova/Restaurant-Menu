@@ -186,3 +186,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     opacity: 1;
   }
 }
+
+app-add-user-modal,
+app-edit-user-modal,
+app-delete-user-modal,
+app-add-product-modal,
+app-update-product-modal,
+app-delete-product-modal,
+app-search-product-modal,
+app-add-category-modal,
+app-update-category-modal,
+app-delete-category-modal {
+  display: contents;
+}
