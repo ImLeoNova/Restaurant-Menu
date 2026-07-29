@@ -1,7 +1,9 @@
 <div
   class="fixed inset-0 z-[60] transition-all duration-300"
-  [class="pointer-events-none opacity-0"]="!isOpen"
-  [class="pointer-events-auto opacity-100"]="isOpen"
+  [class.pointer-events-none]="!isOpen"
+  [class.opacity-0]="!isOpen"
+  [class.pointer-events-auto]="isOpen"
+  [class.opacity-100]="isOpen"
 >
   <div
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
