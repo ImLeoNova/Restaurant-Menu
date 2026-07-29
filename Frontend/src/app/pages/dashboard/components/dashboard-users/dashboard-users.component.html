@@ -16,11 +16,7 @@
         <div
           class="w-16 h-16 rounded-[1.4rem] bg-gradient-to-br from-amber-400/30 to-orange-600/20 border border-amber-400/40 flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(245,158,11,0.15)]"
         >
-          <svg
-            class="w-8 h-8 text-amber-300"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
+          <svg class="w-8 h-8 text-amber-300" viewBox="0 0 24 24" fill="none">
             <path
               d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
               stroke="currentColor"
@@ -43,11 +39,15 @@
           </svg>
         </div>
         <div class="min-w-0">
-          <h1 class="yekan text-white font-extrabold text-[1.6rem] sm:text-[2rem]">
+          <h1
+            class="yekan text-white font-extrabold text-[1.6rem] sm:text-[2rem]"
+          >
             مدیریت کاربران
           </h1>
           <div class="flex items-center gap-2 mt-1">
-            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            <div
+              class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+            ></div>
             <p class="yekan text-white/50 text-[0.85rem]">
               {{ users.length }} کاربر فعال در سیستم
             </p>
@@ -136,7 +136,7 @@
     <div class="flex flex-wrap gap-3 mb-2">
       <button
         (click)="addUser.emit()"
-        class="group rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 px-4 sm:px-5 py-3.5 sm:py-4 yekan font-bold text-white shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3"
+        class="group w-full sm:w-auto min-w-[13rem] rounded-[1.3rem] bg-gradient-to-r from-emerald-500 to-green-600 px-5 sm:px-6 py-4 sm:py-4.5 yekan font-bold text-white shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3"
       >
         <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
           <path

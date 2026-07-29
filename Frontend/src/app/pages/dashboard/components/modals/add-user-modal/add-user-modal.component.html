@@ -1,17 +1,17 @@
 <div
-  class="w-full max-w-[40rem] rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-[#111827]/95 text-white shadow-2xl overflow-hidden my-6"
+  class="w-full max-w-[46rem] sm:max-w-[48rem] rounded-[1.5rem] sm:rounded-[2rem] border border-emerald-400/20 bg-[#111827]/95 text-white shadow-2xl overflow-hidden my-6"
   dir="rtl"
   [formGroup]="form"
 >
   <div
-    class="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between gap-3 bg-white/5"
+    class="p-4 sm:p-6 border-b border-emerald-400/20 flex items-center justify-between gap-3 bg-gradient-to-r from-emerald-500/15 via-green-500/10 to-transparent"
   >
     <div class="flex items-center gap-3 min-w-0">
       <div
-        class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/15 flex items-center justify-center border border-amber-400/20 shrink-0"
+        class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center border border-emerald-400/20 shrink-0"
       >
         <svg
-          class="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"
+          class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300"
           viewBox="0 0 24 24"
           fill="none"
         >
@@ -100,12 +100,7 @@
             class="cursor-pointer rounded-2xl py-3 text-center border transition-all duration-200 yekan font-bold text-[0.85rem]"
             [ngClass]="{
               'bg-emerald-500/25 border-emerald-400/60 text-emerald-300':
-                form.get('role')?.value === role.value &&
-                role.color === 'emerald',
-              'bg-amber-500/25 border-amber-400/60 text-amber-300':
-                form.get('role')?.value === role.value && role.color === 'amber',
-              'bg-purple-500/25 border-purple-400/60 text-purple-300':
-                form.get('role')?.value === role.value && role.color === 'purple',
+                form.get('role')?.value === role.value,
               'bg-white/5 border-white/10 text-white/50 hover:bg-white/10':
                 form.get('role')?.value !== role.value,
             }"
@@ -117,14 +112,18 @@
     </div>
 
     @if (errorMessage !== undefined) {
-      <div class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3">
+      <div
+        class="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3"
+      >
         <h1 class="yekan text-[0.85rem] font-bold text-rose-300">
           {{ errorMessage }}
         </h1>
       </div>
     }
     @if (successMessage !== undefined) {
-      <div class="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+      <div
+        class="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3"
+      >
         <h1 class="yekan text-[0.85rem] font-bold text-emerald-300">
           {{ successMessage }}
         </h1>
@@ -134,7 +133,7 @@
     <div class="flex flex-col sm:flex-row gap-3 mt-1">
       <button
         (click)="submitForm.emit()"
-        class="flex-1 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 yekan font-bold text-white hover:scale-[1.01] transition-all shadow-lg flex items-center justify-center gap-3"
+        class="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 px-6 py-4 yekan font-bold text-white hover:scale-[1.01] transition-all shadow-lg flex items-center justify-center gap-3"
       >
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
           <path
