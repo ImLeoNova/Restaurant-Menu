@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
 import { UserService } from '../../services/user.service';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 export interface HeaderNavItem {
   title: string;
