@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from models.comment import Comment
 
@@ -43,3 +44,14 @@ class CommentSerializationTests(unittest.TestCase):
         self.assertEqual(result["display_name"], "کاربر")
         self.assertIsNone(result["avatar"])
         self.assertNotIn("username", result)
+
+    @patch("models.comment.execute_query")
+    def test_get_by_product_selects_identity_fields(self, mock_execute_query):
+        mock_execute_query.return_value = []
+
+        Comment().get_by_product(7, limit=10, offset=0)
+
+        query = mock_execute_query.call_args.args[0]
+        self.assertIn("u.`first_name`", query)
+        self.assertIn("u.`last_name`", query)
+        self.assertIn("u.`avatar`", query)

@@ -16,7 +16,9 @@ class Comment:
                 c.`rating`,
                 c.`created_at`,
                 c.`updated_at`,
-                u.`username`
+                u.`first_name`,
+                u.`last_name`,
+                u.`avatar`
             FROM `product_comments` c
             LEFT JOIN `restaurantusers` u ON u.`user_ID` = c.`user_ID`
             WHERE c.`product_ID` = %s
