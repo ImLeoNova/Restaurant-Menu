@@ -11,6 +11,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { ProductService } from '../../services/product.service';
 import { CommentService } from '../../services/comment.service';
 import { CategoryService } from '../../services/category.service';
+import { CartService } from '../../services/cart.service';
 import { FoodMODEL } from '../../models/food-model';
 import { CommentStats, ProductComment } from '../../models/comment-model';
 import { AuthState } from '../../state/app.state';
@@ -73,6 +74,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     private productService: ProductService,
     private commentService: CommentService,
     private categoryService: CategoryService,
+    private cartService: CartService,
     private store: Store<{ auth: AuthState }>,
   ) {}
 
@@ -191,6 +193,23 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     return Array.from({ length: 5 }, (_, i) => i + 1).map((star) =>
       star <= Math.round(count) ? 1 : 0,
     );
+  }
+
+  quantity = 1;
+
+  addToCart(): void {
+    if (this.product) {
+      this.cartService.addToCart(this.product, this.quantity);
+      this.successMessage = `محصول به سبد خرید اضافه شد.`;
+    }
+  }
+
+  increaseQuantity(): void {
+    this.quantity += 1;
+  }
+
+  decreaseQuantity(): void {
+    this.quantity = Math.max(1, this.quantity - 1);
   }
 
   avatarUrl(comment: ProductComment): string | null {

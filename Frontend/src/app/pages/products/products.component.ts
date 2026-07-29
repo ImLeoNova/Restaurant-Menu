@@ -8,6 +8,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { HomeFoodCardComponent } from '../home/components/home-food-card/home-food-card.component';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
+import { CartService } from '../../services/cart.service';
 import { FoodMODEL } from '../../models/food-model';
 import { CategoryMODEL } from '../../models/category-model';
 import {
@@ -56,6 +57,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
+    private cartService: CartService,
     private route: ActivatedRoute,
     private router: Router,
     private title: Title,
@@ -136,8 +138,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   selectCategory(category: string): void {
-    this.selectedCategory =
-      this.selectedCategory === category ? '' : category;
+    this.selectedCategory = this.selectedCategory === category ? '' : category;
     this.applyFilters();
     this.syncQueryParams();
   }
@@ -241,6 +242,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
       queryParamsHandling: '',
       replaceUrl: true,
     });
+  }
+
+  addToCart(product: FoodMODEL, quantity = 1): void {
+    this.cartService.addToCart(product, quantity);
   }
 
   private toPrice(value: string | number): number {

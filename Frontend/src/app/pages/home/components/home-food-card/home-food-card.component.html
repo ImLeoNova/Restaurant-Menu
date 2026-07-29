@@ -45,13 +45,45 @@
         </p>
       </div>
 
-      <button
-        type="button"
-        [routerLink]="['/restaurant-menu/product', foodItem.product_ID]"
-        class="rounded-2xl px-4 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-black yekan font-bold hover:scale-[1.03] transition-all duration-300 shadow-lg shrink-0"
-      >
-        مشاهده بیشتر
-      </button>
+      <div class="flex flex-col items-end gap-2 shrink-0">
+        <div
+          class="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-2 py-2"
+        >
+          <button
+            type="button"
+            (click)="decreaseQuantity()"
+            class="h-8 w-8 rounded-xl bg-white/10 text-white"
+          >
+            −
+          </button>
+          <span class="yekan min-w-8 text-center text-white">{{
+            quantity
+          }}</span>
+          <button
+            type="button"
+            (click)="increaseQuantity()"
+            class="h-8 w-8 rounded-xl bg-white/10 text-white"
+          >
+            ＋
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="emitAddToCart()"
+            class="rounded-2xl px-3 py-2 bg-gradient-to-r from-amber-400 to-orange-500 text-black yekan font-bold hover:scale-[1.03] transition-all duration-300 shadow-lg"
+          >
+            افزودن
+          </button>
+          <a
+            [routerLink]="['/restaurant-menu/product', foodItem.product_ID]"
+            class="rounded-2xl px-3 py-2 bg-white/10 text-white yekan font-bold hover:bg-white/15 transition-all duration-300"
+          >
+            بیشتر
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

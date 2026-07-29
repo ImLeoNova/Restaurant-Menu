@@ -58,7 +58,7 @@
                 class="md:hidden yekan rounded-2xl px-4 py-3 bg-white/5 border border-white/10 text-white font-bold"
                 (click)="toggleFilters()"
               >
-                {{ filtersOpen ? 'بستن فیلترها' : 'فیلترها' }}
+                {{ filtersOpen ? "بستن فیلترها" : "فیلترها" }}
               </button>
             </div>
           </div>
@@ -67,10 +67,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-5 lg:gap-7">
         <!-- Filters -->
-        <aside
-          class="filters-panel"
-          [class.open]="filtersOpen"
-        >
+        <aside class="filters-panel" [class.open]="filtersOpen">
           <div
             class="lg:sticky lg:top-28 rounded-[1.6rem] border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5"
           >
@@ -128,7 +125,9 @@
 
             <!-- Price -->
             <div class="mb-5">
-              <p class="yekan text-white/50 text-sm mb-2">بازه قیمت (هزار تومن)</p>
+              <p class="yekan text-white/50 text-sm mb-2">
+                بازه قیمت (هزار تومن)
+              </p>
               <div class="grid grid-cols-2 gap-2">
                 <input
                   type="number"
@@ -151,7 +150,9 @@
 
             <!-- Sort -->
             <div class="block">
-              <span class="yekan text-white/50 text-sm mb-2 block">مرتب‌سازی</span>
+              <span class="yekan text-white/50 text-sm mb-2 block"
+                >مرتب‌سازی</span
+              >
               <button
                 #sortTrigger
                 type="button"
@@ -284,7 +285,10 @@
               class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
             >
               @for (foodItem of filteredProducts; track foodItem.product_ID) {
-                <app-home-food-card [foodItem]="foodItem" />
+                <app-home-food-card
+                  [foodItem]="foodItem"
+                  (addToCart)="addToCart(foodItem, $event.quantity)"
+                />
               }
             </div>
           }

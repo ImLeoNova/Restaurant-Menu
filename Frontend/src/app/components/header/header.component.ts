@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
 import { UserService } from '../../services/user.service';
+import { CartService } from '../../services/cart.service';
+import { CartDrawerComponent } from '../cart-drawer/cart-drawer.component';
 import { environment } from '../../../environments/environment';
 
 export interface HeaderNavItem {
@@ -19,7 +21,7 @@ export interface HeaderNavItem {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink, NgClass, CartDrawerComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
@@ -29,7 +31,11 @@ export class HeaderComponent implements OnDestroy {
   menuOpen = false;
   userName = '';
   avatarUrl: string | null = null;
+  cartOpen = false;
+  cartItemsCount = 0;
+  cartSubtotal = 0;
   private avatarSub?: Subscription;
+  private cartSub?: Subscription;
 
   readonly navItems: HeaderNavItem[] = [
     {
@@ -55,9 +61,15 @@ export class HeaderComponent implements OnDestroy {
     private store: Store<{ auth: AuthState }>,
     private router: Router,
     private userService: UserService,
+    public readonly cartService: CartService,
   ) {
     this.avatarSub = this.userService.avatarUrl$.subscribe((url) => {
       this.avatarUrl = url;
+    });
+
+    this.cartSub = this.cartService.items$.subscribe((items) => {
+      this.cartItemsCount = this.cartService.getItemCount();
+      this.cartSubtotal = this.cartService.getSubtotal();
     });
 
     store
@@ -148,10 +160,44 @@ export class HeaderComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.avatarSub?.unsubscribe();
+    this.cartSub?.unsubscribe();
     document.body.style.overflow = '';
   }
 
+  toggleCart(): void {
+    this.cartOpen = !this.cartOpen;
+    this.syncBodyScroll();
+  }
+
+  closeCart(): void {
+    this.cartOpen = false;
+    this.syncBodyScroll();
+  }
+
+  onIncrease(item: {
+    product: { product_ID: number | string };
+    quantity: number;
+  }): void {
+    this.cartService.updateQuantity(item.product.product_ID, item.quantity + 1);
+  }
+
+  onDecrease(item: {
+    product: { product_ID: number | string };
+    quantity: number;
+  }): void {
+    this.cartService.updateQuantity(item.product.product_ID, item.quantity - 1);
+  }
+
+  onRemove(item: { product: { product_ID: number | string } }): void {
+    this.cartService.removeFromCart(item.product.product_ID);
+  }
+
+  onClearCart(): void {
+    this.cartService.clearCart();
+  }
+
   private syncBodyScroll(): void {
-    document.body.style.overflow = this.menuOpen ? 'hidden' : '';
+    document.body.style.overflow =
+      this.menuOpen || this.cartOpen ? 'hidden' : '';
   }
 }

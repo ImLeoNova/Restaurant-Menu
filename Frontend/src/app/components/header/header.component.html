@@ -58,6 +58,32 @@
 
       <!-- Desktop Auth + Mobile Hamburger -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <button
+          type="button"
+          (click)="toggleCart()"
+          class="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition-all duration-300 hover:bg-white/10"
+          aria-label="سبد خرید"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L17 6H7"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="10" cy="19" r="1.5" fill="currentColor" />
+            <circle cx="17" cy="19" r="1.5" fill="currentColor" />
+          </svg>
+          @if (cartItemsCount > 0) {
+            <span
+              class="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1 text-[0.7rem] font-black text-black"
+            >
+              {{ cartItemsCount }}
+            </span>
+          }
+        </button>
+
         <div class="hidden md:contents">
           @switch (isLoggedIn) {
             @case (true) {
@@ -116,6 +142,19 @@
         </button>
       </div>
     </div>
+
+    <app-cart-drawer
+      [items]="cartService.getItems()"
+      [subtotal]="cartSubtotal"
+      [grandTotal]="cartSubtotal"
+      [itemCount]="cartItemsCount"
+      [isOpen]="cartOpen"
+      (close)="closeCart()"
+      (increase)="onIncrease($event)"
+      (decrease)="onDecrease($event)"
+      (remove)="onRemove($event)"
+      (clear)="onClearCart()"
+    />
 
     <!-- Mobile Menu Panel -->
     <div
