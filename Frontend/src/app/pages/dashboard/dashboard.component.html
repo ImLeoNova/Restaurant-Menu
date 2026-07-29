@@ -48,6 +48,9 @@
               (deleteUser)="openModal('delete_user', $event)"
             />
           }
+          @case ("profile") {
+            <app-dashboard-profile />
+          }
           @case ("categories") {
             <app-dashboard-categories
               [categories]="categoryService.categorys"

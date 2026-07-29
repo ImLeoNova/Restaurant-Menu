@@ -2,7 +2,13 @@ from flask import Blueprint, request
 from models.account import Account
 from middleware.auth import token_required, admin_required
 from helpers.responses import success_response, error_response
-from helpers.validators import is_valid_username, is_valid_email
+from helpers.validators import (
+    is_valid_username,
+    is_valid_email,
+    is_valid_phone_number,
+    is_valid_national_id,
+    is_valid_address,
+)
 from core.database import execute_query
 
 admin_bp = Blueprint("admin_bp", __name__)
@@ -69,6 +75,11 @@ def admin_update_user(user_id):
         username = body.get("username")
         email    = body.get("email")
         role     = body.get("role")
+        first_name = body.get("first_name")
+        last_name = body.get("last_name")
+        phone_number = body.get("phone_number")
+        address = body.get("address")
+        national_id = body.get("national_id")
 
         update_fields = {}
 
@@ -94,9 +105,39 @@ def admin_update_user(user_id):
 
         if role is not None:
             role = role.lower()
-            if role not in ["user", "admin"]:
-                return error_response("Role must be either 'user' or 'admin'.", 400)
+            if role not in ["user", "admin", "founder"]:
+                return error_response("Role must be either 'user', 'admin', or 'founder'.", 400)
             update_fields["role"] = role.capitalize()
+
+        if first_name is not None:
+            if not isinstance(first_name, str) or not 1 <= len(first_name.strip()) <= 120:
+                return error_response("Invalid first name.", 400)
+            update_fields["first_name"] = first_name.strip()
+
+        if last_name is not None:
+            if not isinstance(last_name, str) or not 1 <= len(last_name.strip()) <= 120:
+                return error_response("Invalid last name.", 400)
+            update_fields["last_name"] = last_name.strip()
+
+        if phone_number is not None:
+            if not is_valid_phone_number(phone_number):
+                return error_response("Invalid phone number.", 400)
+            update_fields["phone_number"] = phone_number.strip()
+
+        if address is not None:
+            if not is_valid_address(address):
+                return error_response("Invalid address.", 400)
+            update_fields["address"] = address.strip()
+
+        if national_id is not None:
+            if not is_valid_national_id(national_id):
+                return error_response("Invalid national ID.", 400)
+            if execute_query(
+                "SELECT 1 FROM `restaurantusers` WHERE `national_id` = %s AND `user_ID` != %s",
+                (national_id, user_id), fetchone=True
+            ):
+                return error_response("National ID already in use.", 400)
+            update_fields["national_id"] = national_id.strip()
 
         if not update_fields:
             return error_response("No valid fields provided for update.", 400)

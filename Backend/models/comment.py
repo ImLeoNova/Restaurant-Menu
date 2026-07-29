@@ -114,7 +114,9 @@ class Comment:
                 c.`rating`,
                 c.`created_at`,
                 c.`updated_at`,
-                u.`username`
+                u.`first_name`,
+                u.`last_name`,
+                u.`avatar`
             FROM `product_comments` c
             LEFT JOIN `restaurantusers` u ON u.`user_ID` = c.`user_ID`
             WHERE c.`user_ID` = %s AND c.`product_ID` = %s
@@ -182,7 +184,9 @@ class Comment:
                 c.`rating`,
                 c.`created_at`,
                 c.`updated_at`,
-                u.`username`
+                u.`first_name`,
+                u.`last_name`,
+                u.`avatar`
             FROM `product_comments` c
             LEFT JOIN `restaurantusers` u ON u.`user_ID` = c.`user_ID`
             WHERE c.`comment_ID` = %s
@@ -222,11 +226,16 @@ class Comment:
         created_at = row.get("created_at")
         updated_at = row.get("updated_at")
 
+        first_name = (row.get("first_name") or "").strip()
+        last_name = (row.get("last_name") or "").strip()
+        display_name = f"{first_name} {last_name}".strip()
+
         return {
             "comment_ID": row["comment_ID"],
             "product_ID": row["product_ID"],
             "user_ID": row["user_ID"],
-            "username": row.get("username") or "کاربر",
+            "display_name": display_name or "کاربر",
+            "avatar": row.get("avatar"),
             "content": row["content"],
             "rating": int(row["rating"]),
             "created_at": created_at.isoformat() if created_at else None,

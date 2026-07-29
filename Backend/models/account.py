@@ -357,7 +357,7 @@ class Account:
     @staticmethod
     def list_users():
         users = execute_query(
-            "SELECT `user_ID`, `username`, `email`, `role` FROM `restaurantusers`",
+            "SELECT `user_ID`, `username`, `first_name`, `last_name`, `email`, `role`, `phone_number`, `created_at` FROM `restaurantusers`",
             fetchall=True
         )
         return users if users else []

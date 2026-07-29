@@ -27,6 +27,7 @@ import { DashboardHomeComponent } from './components/dashboard-home/dashboard-ho
 import { DashboardProductsComponent } from './components/dashboard-products/dashboard-products.component';
 import { DashboardUsersComponent } from './components/dashboard-users/dashboard-users.component';
 import { DashboardCategoriesComponent } from './components/dashboard-categories/dashboard-categories.component';
+import { DashboardProfileComponent } from './components/dashboard-profile/dashboard-profile.component';
 import { AddProductModalComponent } from './components/modals/add-product-modal/add-product-modal.component';
 import { SearchProductModalComponent } from './components/modals/search-product-modal/search-product-modal.component';
 import { UpdateProductModalComponent } from './components/modals/update-product-modal/update-product-modal.component';
@@ -51,6 +52,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     DashboardProductsComponent,
     DashboardUsersComponent,
     DashboardCategoriesComponent,
+    DashboardProfileComponent,
     AddProductModalComponent,
     SearchProductModalComponent,
     UpdateProductModalComponent,
@@ -131,6 +133,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     username: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required]),
     role: new FormControl('', [Validators.required]),
+    first_name: new FormControl(''),
+    last_name: new FormControl(''),
+    phone_number: new FormControl(''),
+    address: new FormControl(''),
+    national_id: new FormControl(''),
   });
 
   addUserFORM: FormGroup = new FormGroup({
@@ -234,6 +241,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       username: u.username,
       email: u.email,
       role: u.role,
+      first_name: u.first_name || '',
+      last_name: u.last_name || '',
+      phone_number: u.phone_number || '',
+      address: u.address || '',
+      national_id: u.national_id || '',
     });
     this.openModal('edit_user');
   }
@@ -242,29 +254,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.errorMessage = undefined;
     this.successMessage = undefined;
 
-    const { user_id, username, email, role } = this.updateUserFORM.value;
+    const {
+      user_id,
+      username,
+      email,
+      role,
+      first_name,
+      last_name,
+      phone_number,
+      address,
+      national_id,
+    } = this.updateUserFORM.value;
 
     if (!username || !email || !role) {
       this.errorMessage = 'لطفا تمام فیلدها را پر کنید';
       return;
     }
 
+    const payload: Record<string, string> = { username, email, role };
+    if (typeof first_name === 'string' && first_name.trim())
+      payload['first_name'] = first_name.trim();
+    if (typeof last_name === 'string' && last_name.trim())
+      payload['last_name'] = last_name.trim();
+    if (typeof phone_number === 'string' && phone_number.trim())
+      payload['phone_number'] = phone_number.trim();
+    if (typeof address === 'string' && address.trim())
+      payload['address'] = address.trim();
+    if (typeof national_id === 'string' && national_id.trim())
+      payload['national_id'] = national_id.trim();
+
     this.isSubmitting = true;
 
-    this.userService
-      .adminUpdateUser(this.token, user_id, { username, email, role })
-      .subscribe({
-        next: (response) => {
-          this.isSubmitting = false;
-          this.successMessage = response.message || 'کاربر با موفقیت ویرایش شد';
-          this.loadUsers();
-          setTimeout(() => this.closeModal(), 1000);
-        },
-        error: (err) => {
-          this.isSubmitting = false;
-          this.errorMessage = err?.error?.message || 'خطا در ویرایش کاربر';
-        },
-      });
+    this.userService.adminUpdateUser(this.token, user_id, payload).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.successMessage = response.message || 'کاربر با موفقیت ویرایش شد';
+        this.loadUsers();
+        setTimeout(() => this.closeModal(), 1000);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.errorMessage = err?.error?.message || 'خطا در ویرایش کاربر';
+      },
+    });
   }
 
   openAddUserModal(): void {
@@ -287,20 +319,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const newUser = new User('', username, password, email, role, '[]');
 
-    this.userService
-      .adminCreateUser(this.token, newUser)
-      .subscribe({
-        next: (response) => {
-          this.isSubmitting = false;
-          this.successMessage = response.message || 'کاربر با موفقیت افزوده شد';
-          this.loadUsers();
-          setTimeout(() => this.closeModal(), 1000);
-        },
-        error: (err) => {
-          this.isSubmitting = false;
-          this.errorMessage = err?.error?.message || 'خطا در افزودن کاربر';
-        },
-      });
+    this.userService.adminCreateUser(this.token, newUser).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.successMessage = response.message || 'کاربر با موفقیت افزوده شد';
+        this.loadUsers();
+        setTimeout(() => this.closeModal(), 1000);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.errorMessage = err?.error?.message || 'خطا در افزودن کاربر';
+      },
+    });
   }
 
   resetAddUserForm(): void {

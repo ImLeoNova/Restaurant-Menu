@@ -12,13 +12,11 @@ import { ProductService } from '../../services/product.service';
 import { CommentService } from '../../services/comment.service';
 import { CategoryService } from '../../services/category.service';
 import { FoodMODEL } from '../../models/food-model';
-import {
-  CommentStats,
-  ProductComment,
-} from '../../models/comment-model';
+import { CommentStats, ProductComment } from '../../models/comment-model';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
 import { JwtDecoded } from '../../interfaces/interfaces';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-product-detail',
@@ -127,11 +125,31 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   get ratingPercentages(): { label: number; count: number; percent: number }[] {
     const total = this.stats.total || 1;
     return [
-      { label: 5, count: this.stats.five_star, percent: (this.stats.five_star / total) * 100 },
-      { label: 4, count: this.stats.four_star, percent: (this.stats.four_star / total) * 100 },
-      { label: 3, count: this.stats.three_star, percent: (this.stats.three_star / total) * 100 },
-      { label: 2, count: this.stats.two_star, percent: (this.stats.two_star / total) * 100 },
-      { label: 1, count: this.stats.one_star, percent: (this.stats.one_star / total) * 100 },
+      {
+        label: 5,
+        count: this.stats.five_star,
+        percent: (this.stats.five_star / total) * 100,
+      },
+      {
+        label: 4,
+        count: this.stats.four_star,
+        percent: (this.stats.four_star / total) * 100,
+      },
+      {
+        label: 3,
+        count: this.stats.three_star,
+        percent: (this.stats.three_star / total) * 100,
+      },
+      {
+        label: 2,
+        count: this.stats.two_star,
+        percent: (this.stats.two_star / total) * 100,
+      },
+      {
+        label: 1,
+        count: this.stats.one_star,
+        percent: (this.stats.one_star / total) * 100,
+      },
     ];
   }
 
@@ -173,6 +191,16 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     return Array.from({ length: 5 }, (_, i) => i + 1).map((star) =>
       star <= Math.round(count) ? 1 : 0,
     );
+  }
+
+  avatarUrl(comment: ProductComment): string | null {
+    return comment.avatar
+      ? `${environment.websiteAPI}/api/user/avatar/${comment.user_ID}`
+      : null;
+  }
+
+  commentInitial(comment: ProductComment): string {
+    return (comment.display_name || 'ک').trim().charAt(0).toUpperCase() || 'ک';
   }
 
   setRating(value: number): void {

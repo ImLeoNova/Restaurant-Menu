@@ -148,6 +148,35 @@
         </div>
       }
 
+      <div
+        (click)="pageChange.emit('profile')"
+        class="group cursor-pointer rounded-2xl px-4 py-3.5 sm:py-4 flex items-center justify-between transition-all duration-300 border border-transparent hover:border-white/10 hover:bg-white/10"
+        [ngClass]="{
+          'bg-white/10 border-white/10 shadow-lg': nowPage === 'profile',
+        }"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0"
+          >
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+              />
+              <path
+                d="M4 20a8 8 0 0 1 16 0"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <h1 class="yekan font-semibold truncate">پروفایل من</h1>
+        </div>
+      </div>
+
       @if (user.role == Roles.FOUNDER) {
         <div
           (click)="pageChange.emit('users')"

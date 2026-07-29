@@ -2,6 +2,7 @@ import { Component, HostListener, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
 import { UserService } from '../../services/user.service';
@@ -28,6 +29,7 @@ export class HeaderComponent implements OnDestroy {
   menuOpen = false;
   userName = '';
   avatarUrl: string | null = null;
+  private avatarSub?: Subscription;
 
   readonly navItems: HeaderNavItem[] = [
     {
@@ -54,6 +56,10 @@ export class HeaderComponent implements OnDestroy {
     private router: Router,
     private userService: UserService,
   ) {
+    this.avatarSub = this.userService.avatarUrl$.subscribe((url) => {
+      this.avatarUrl = url;
+    });
+
     store
       .select((state) => state.auth)
       .subscribe((auth: AuthState) => {
@@ -69,9 +75,11 @@ export class HeaderComponent implements OnDestroy {
     this.userService.getMyProfile(this.token).subscribe((response: any) => {
       const profile = response?.data;
       this.userName = profile?.first_name || profile?.username || 'کاربر';
-      this.avatarUrl = profile?.avatar
-        ? `${environment.websiteAPI}/api/user/avatar/${profile.user_ID}`
-        : null;
+      this.userService.setCurrentAvatarUrl(
+        profile?.avatar
+          ? `${environment.websiteAPI}/api/user/avatar/${profile.user_ID}`
+          : null,
+      );
     });
   }
 
@@ -139,6 +147,7 @@ export class HeaderComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.avatarSub?.unsubscribe();
     document.body.style.overflow = '';
   }
 

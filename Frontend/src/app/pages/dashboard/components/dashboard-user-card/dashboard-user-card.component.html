@@ -32,20 +32,20 @@
               user.role === Roles.FOUNDER,
           }"
         >
-          @if (user.avatar) {
-            <img
-              [src]="user.avatar"
-              alt="avatar"
-              class="h-full w-full object-cover"
-            />
-          } @else {
-            {{ (user.first_name || user.username).charAt(0).toUpperCase() }}
-          }
+          {{
+            ((user.first_name || "") + " " + (user.last_name || ""))
+              .trim()
+              .charAt(0)
+              .toUpperCase() || user.username.charAt(0).toUpperCase()
+          }}
         </div>
 
         <div class="min-w-0">
           <h2 class="yekan text-white font-extrabold text-[1.05rem] truncate">
-            {{ user.username }}
+            {{
+              ((user.first_name || "") + " " + (user.last_name || "")).trim() ||
+                user.username
+            }}
           </h2>
           <p class="yekan text-white/40 text-[0.78rem] truncate mt-0.5">
             {{ user.email }}

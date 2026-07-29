@@ -104,6 +104,72 @@
       />
     </div>
 
+    <div
+      class="rounded-[1.4rem] border border-white/10 bg-white/5 p-4 sm:p-5 flex flex-col gap-4"
+    >
+      <div class="flex items-center gap-2">
+        <div class="h-px flex-1 bg-white/10"></div>
+        <h3 class="yekan text-[0.85rem] font-bold text-white/70">
+          اطلاعات تکمیلی
+        </h3>
+        <div class="h-px flex-1 bg-white/10"></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-2">
+          <label class="yekan font-semibold text-white/90">نام</label>
+          <input
+            formControlName="first_name"
+            type="text"
+            placeholder="نام..."
+            class="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-4 text-white outline-none focus:border-amber-400 transition-all"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="yekan font-semibold text-white/90">نام خانوادگی</label>
+          <input
+            formControlName="last_name"
+            type="text"
+            placeholder="نام خانوادگی..."
+            class="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-4 text-white outline-none focus:border-amber-400 transition-all"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="yekan font-semibold text-white/90">تلفن</label>
+          <input
+            formControlName="phone_number"
+            type="text"
+            placeholder="0912..."
+            class="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-4 text-white outline-none focus:border-amber-400 transition-all"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="yekan font-semibold text-white/90"
+            >کد ملی (اختیاری)</label
+          >
+          <input
+            formControlName="national_id"
+            type="text"
+            placeholder="کد ملی..."
+            class="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-4 text-white outline-none focus:border-amber-400 transition-all"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="yekan font-semibold text-white/90">آدرس</label>
+        <textarea
+          formControlName="address"
+          rows="3"
+          placeholder="آدرس کامل..."
+          class="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-4 text-white outline-none focus:border-amber-400 transition-all resize-none"
+        ></textarea>
+      </div>
+    </div>
+
     <div class="flex flex-col gap-2">
       <label class="yekan font-semibold text-white/90">نقش کاربر</label>
       <div class="grid grid-cols-3 gap-3">
@@ -116,7 +182,8 @@
                 form.get('role')?.value === role.value &&
                 role.color === 'emerald',
               'bg-amber-500/25 border-amber-400/60 text-amber-300':
-                form.get('role')?.value === role.value && role.color === 'amber',
+                form.get('role')?.value === role.value &&
+                role.color === 'amber',
               'bg-purple-500/25 border-purple-400/60 text-purple-300':
                 form.get('role')?.value === role.value &&
                 role.color === 'purple',

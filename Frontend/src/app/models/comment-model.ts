@@ -12,7 +12,8 @@ export interface ProductComment {
   comment_ID: number;
   product_ID: number;
   user_ID: string;
-  username: string;
+  display_name: string;
+  avatar: string | null;
   content: string;
   rating: number;
   created_at: string | null;

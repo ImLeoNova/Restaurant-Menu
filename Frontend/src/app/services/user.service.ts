@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { User } from '../models/user';
 import { environment } from '../../environments/environment';
@@ -15,6 +15,9 @@ import { CompleteProfilePayload } from '../interfaces/CompleteProfilePayload';
 })
 export class UserService {
   private readonly apiBase: string = environment.websiteAPI;
+  private readonly avatarUrlSubject = new BehaviorSubject<string | null>(null);
+
+  readonly avatarUrl$ = this.avatarUrlSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -48,7 +51,7 @@ export class UserService {
   }
 
   // Profile
-  getMyProfile(token: string | null): Observable<ApiResponse<User>> {
+  getMyProfile(token: string | null = null): Observable<ApiResponse<User>> {
     return this.http.get<ApiResponse<User>>(`${this.apiBase}/api/user/me`, {
       withCredentials: true,
     });
@@ -73,6 +76,10 @@ export class UserService {
       payload,
       { withCredentials: true },
     );
+  }
+
+  setCurrentAvatarUrl(url: string | null): void {
+    this.avatarUrlSubject.next(url);
   }
 
   uploadAvatar(file: File): Observable<ApiResponse<{ avatar: string }>> {
