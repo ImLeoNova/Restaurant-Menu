@@ -29,7 +29,7 @@ def register_user():
             return error_response("Username, password, and email are required.", 400)
 
         account = Account()
-        status, message = account.add_user(username, password, email, role="user")
+        status, message = account.add_user(username, password, email, role="User")
 
         if not status:
             return error_response(message, 400)

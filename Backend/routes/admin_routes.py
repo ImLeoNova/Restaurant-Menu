@@ -37,7 +37,7 @@ def admin_create_user():
         username = body.get("username")
         password = body.get("password")
         email    = body.get("email")
-        role     = body.get("role", "user").lower()
+        role     = body.get("role", "User").capitalize()
 
         if not username or not password or not email:
             return error_response("Username, password, and email are required.", 400)
