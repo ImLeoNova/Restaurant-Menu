@@ -177,7 +177,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.dashboardService.userDATA(this.token, userID).subscribe({
             next: (userData: any) => {
               this.user = userData.data;
-              this.user.role = this.user.role.toLocaleLowerCase();
+              this.user.role = this.user.role.toLowerCase();
               this.loadUsers();
             },
             error: () => {
