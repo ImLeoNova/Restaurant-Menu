@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from models.comment import Comment
+from models.comment_summary import CommentSummary
 from models.product import Product
 from middleware.auth import token_required, admin_required
 from helpers.responses import success_response, error_response
@@ -29,6 +30,73 @@ def get_product_comments(product_id):
                 "comments": comments,
                 "stats": stats,
             },
+        )
+    except Exception as e:
+        return error_response(f"Internal Server Error: {str(e)}", 500)
+
+
+@comment_bp.route("/api/product/<int:product_id>/comments/summary", methods=["GET"])
+def get_product_comments_summary(product_id):
+    try:
+        product = Product(product_id).get_single_product()
+        if not product:
+            return error_response("Product not found.", 404)
+
+        comment_model = Comment()
+        stats = comment_model.get_stats(product_id)
+
+        if stats["total"] < CommentSummary.MIN_COMMENTS:
+            return success_response(
+                "Not enough comments to summarize yet.",
+                {
+                    "available": False,
+                    "reason": "not_enough_comments",
+                    "min_required": CommentSummary.MIN_COMMENTS,
+                    "total": stats["total"],
+                },
+            )
+
+        summary_model = CommentSummary(product_id)
+        cached = summary_model.get_cached()
+
+        is_fresh = (
+            cached
+            and cached["comment_count"] == stats["total"]
+            and abs(cached["average_rating"] - stats["average_rating"]) < 0.05
+        )
+
+        if is_fresh:
+            return success_response(
+                "Summary fetched from cache.",
+                {"available": True, "cached": True, **cached},
+            )
+
+        comments = comment_model.get_by_product(product_id, limit=60, offset=0)
+
+        try:
+            summary, positives, negatives = CommentSummary.generate_from_comments(
+                product_title=product.get("title", ""),
+                comments=comments,
+            )
+        except Exception:
+            if cached:
+                return success_response(
+                    "Serving last known summary; regeneration failed.",
+                    {"available": True, "cached": True, "stale": True, **cached},
+                )
+            return error_response("Failed to generate review summary.", 502)
+
+        saved = summary_model.save(
+            summary=summary,
+            positives=positives,
+            negatives=negatives,
+            comment_count=stats["total"],
+            average_rating=stats["average_rating"],
+        )
+
+        return success_response(
+            "Summary generated successfully.",
+            {"available": True, "cached": False, **saved},
         )
     except Exception as e:
         return error_response(f"Internal Server Error: {str(e)}", 500)

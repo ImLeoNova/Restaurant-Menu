@@ -349,6 +349,124 @@
           </section>
         }
 
+        <!-- AI Review Summary -->
+        @if (summaryLoading) {
+          <section class="mb-8 lg:mb-10">
+            <div
+              class="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 sm:p-8 flex items-center gap-4"
+            >
+              <div
+                class="w-11 h-11 rounded-2xl bg-white/10 animate-pulse shrink-0"
+              ></div>
+              <div class="flex-1 flex flex-col gap-2">
+                <div
+                  class="h-3 w-40 rounded-full bg-white/10 animate-pulse"
+                ></div>
+                <div
+                  class="h-3 w-full rounded-full bg-white/10 animate-pulse"
+                ></div>
+                <div
+                  class="h-3 w-2/3 rounded-full bg-white/10 animate-pulse"
+                ></div>
+              </div>
+            </div>
+          </section>
+        } @else if (reviewSummary?.available) {
+          <section class="mb-8 lg:mb-10">
+            <div
+              class="relative overflow-hidden rounded-[1.8rem] border border-amber-400/15 bg-gradient-to-br from-amber-500/[0.07] via-white/5 to-orange-500/[0.05] p-6 sm:p-8"
+            >
+              <div
+                class="absolute -top-16 -left-16 w-52 h-52 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"
+              ></div>
+
+              <div
+                class="relative flex flex-wrap items-center justify-between gap-3 mb-5"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-[0_8px_24px_-8px_rgba(251,191,36,0.6)]"
+                  >
+                    <svg
+                      class="w-5 h-5 text-black"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M12 3l1.6 4.8L18 9.5l-4.4 1.7L12 16l-1.6-4.8L6 9.5l4.4-1.7L12 3z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M19 14l.8 2.3L22 17l-2.2.7-.8 2.3-.8-2.3L16 17l2.2-.7.8-2.3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="yekan text-white font-extrabold text-lg">
+                      خلاصه دیدگاه‌های خریداران
+                    </h2>
+                    <p class="yekan text-amber-300/80 text-xs mt-0.5">
+                      تولید شده با هوش مصنوعی از روی
+                      {{ reviewSummary?.comment_count }} دیدگاه ثبت‌شده
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p
+                class="relative yekan text-white/80 text-[0.95rem] sm:text-base leading-8 mb-6"
+              >
+                {{ reviewSummary?.summary }}
+              </p>
+
+              @if (
+                (reviewSummary?.positives?.length || 0) > 0 ||
+                (reviewSummary?.negatives?.length || 0) > 0
+              ) {
+                <div class="relative flex flex-wrap gap-2">
+                  @for (point of reviewSummary?.positives; track point) {
+                    <span
+                      class="yekan inline-flex items-center gap-1.5 rounded-full pl-3 pr-2.5 py-2 bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 text-[0.8rem] font-bold"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M5 13l4 4L19 7"
+                          stroke="currentColor"
+                          stroke-width="2.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      {{ point }}
+                    </span>
+                  }
+                  @for (point of reviewSummary?.negatives; track point) {
+                    <span
+                      class="yekan inline-flex items-center gap-1.5 rounded-full pl-3 pr-2.5 py-2 bg-rose-500/10 border border-rose-400/20 text-rose-300 text-[0.8rem] font-bold"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M6 6l12 12M18 6L6 18"
+                          stroke="currentColor"
+                          stroke-width="2.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      {{ point }}
+                    </span>
+                  }
+                </div>
+              }
+
+              <p class="relative yekan text-white/35 text-[0.75rem] mt-6">
+                این خلاصه به صورت خودکار تولید شده و ممکن است دقیق نباشد.
+              </p>
+            </div>
+          </section>
+        }
+
         <!-- Comments -->
         <section id="comments" class="scroll-mt-28">
           <div

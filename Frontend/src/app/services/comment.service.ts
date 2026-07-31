@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from '../models/api-response';
 import {
+  CommentsSummary,
   CreateCommentPayload,
   ProductComment,
   ProductCommentsResponse,
@@ -30,6 +31,12 @@ export class CommentService {
   ): Observable<ApiResponse<ProductCommentsResponse>> {
     return this.http.get<ApiResponse<ProductCommentsResponse>>(
       `${this.API}/${productId}/comments?limit=${limit}&offset=${offset}`,
+    );
+  }
+
+  getSummary(productId: number): Observable<ApiResponse<CommentsSummary>> {
+    return this.http.get<ApiResponse<CommentsSummary>>(
+      `${this.API}/${productId}/comments/summary`,
     );
   }
 

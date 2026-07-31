@@ -13,7 +13,11 @@ import { CommentService } from '../../services/comment.service';
 import { CategoryService } from '../../services/category.service';
 import { CartService } from '../../services/cart.service';
 import { FoodMODEL } from '../../models/food-model';
-import { CommentStats, ProductComment } from '../../models/comment-model';
+import {
+  CommentsSummary,
+  CommentStats,
+  ProductComment,
+} from '../../models/comment-model';
 import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
 import { JwtDecoded } from '../../interfaces/interfaces';
@@ -52,6 +56,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   notFound = false;
   errorMessage = '';
   successMessage = '';
+
+  reviewSummary: CommentsSummary | null = null;
+  summaryLoading = false;
 
   isLoggedIn = false;
   currentUserId: string | null = null;
@@ -243,6 +250,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.loadComments(productId);
         this.loadRelated(this.product.category, productId);
+        this.loadSummary(productId);
       },
       error: () => {
         this.isLoading = false;
@@ -263,6 +271,20 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       error: () => {
         this.comments = [];
         this.commentsLoading = false;
+      },
+    });
+  }
+
+  loadSummary(productId: number): void {
+    this.summaryLoading = true;
+    this.commentService.getSummary(productId).subscribe({
+      next: (response) => {
+        this.reviewSummary = response.data || null;
+        this.summaryLoading = false;
+      },
+      error: () => {
+        this.reviewSummary = null;
+        this.summaryLoading = false;
       },
     });
   }

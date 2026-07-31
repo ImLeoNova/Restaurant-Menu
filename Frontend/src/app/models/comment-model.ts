@@ -29,3 +29,19 @@ export interface CreateCommentPayload {
   content: string;
   rating: number;
 }
+
+export interface CommentsSummary {
+  available: boolean;
+  reason?: string;
+  min_required?: number;
+  cached?: boolean;
+  stale?: boolean;
+  product_ID?: number;
+  summary?: string;
+  positives?: string[];
+  negatives?: string[];
+  comment_count?: number;
+  average_rating?: number;
+  updated_at?: string | null;
+  total?: number;
+}
