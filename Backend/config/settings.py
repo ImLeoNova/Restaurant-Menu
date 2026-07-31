@@ -69,3 +69,7 @@ COOKIE_SAMESITE = get_env("COOKIE_SAMESITE", default="Lax")
 # Ai Config
 OPENAI_KEY = get_env("OPENAI_KEY", default=None)
 OPENAI_BASEURL = get_env("OPENAI_BASEURL", default="https://api.openai.com/v1")
+
+# Comment anti-spam / rate limiting
+COMMENT_RATE_LIMIT_PER_HOUR = get_env("COMMENT_RATE_LIMIT_PER_HOUR", default=10, cast=int)
+COMMENT_MIN_SECONDS_BETWEEN = get_env("COMMENT_MIN_SECONDS_BETWEEN", default=15, cast=int)

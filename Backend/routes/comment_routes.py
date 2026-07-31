@@ -114,7 +114,7 @@ def add_product_comment(product_id):
         if not user_id:
             return error_response("Invalid token payload.", 401)
 
-        status, message, comment = Comment().add_comment(
+        status, message, comment, error_code = Comment().add_comment(
             product_id=product_id,
             user_id=user_id,
             content=content,
@@ -122,6 +122,8 @@ def add_product_comment(product_id):
         )
 
         if not status:
+            if error_code == "rate_limited":
+                return error_response(message, 429)
             status_code = 404 if message == "Product not found." else 400
             return error_response(message, status_code)
 

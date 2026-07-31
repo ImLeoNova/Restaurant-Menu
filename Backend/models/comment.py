@@ -1,4 +1,5 @@
 from core.database import execute_query
+from config import settings
 
 
 class Comment:
@@ -77,25 +78,29 @@ class Comment:
             fetchone=True,
         )
         if not product:
-            return False, "Product not found.", None
+            return False, "Product not found.", None, None
 
         cleaned = (content or "").strip()
         if not cleaned:
-            return False, "Comment content is required.", None
+            return False, "Comment content is required.", None, None
 
         if len(cleaned) < 3:
-            return False, "Comment is too short.", None
+            return False, "Comment is too short.", None, None
 
         if len(cleaned) > 1000:
-            return False, "Comment is too long.", None
+            return False, "Comment is too long.", None, None
 
         try:
             rating = int(rating)
         except (TypeError, ValueError):
-            return False, "Invalid rating.", None
+            return False, "Invalid rating.", None, None
 
         if rating < 1 or rating > 5:
-            return False, "Rating must be between 1 and 5.", None
+            return False, "Rating must be between 1 and 5.", None, None
+
+        rate_error = self._check_rate_limit(user_id)
+        if rate_error:
+            return False, rate_error, None, "rate_limited"
 
         execute_query(
             """
@@ -129,7 +134,43 @@ class Comment:
             fetchone=True,
         )
 
-        return True, "Comment added successfully.", self._serialize(created)
+        return True, "Comment added successfully.", self._serialize(created), None
+
+    def _check_rate_limit(self, user_id):
+        """Returns a Persian error message if the user is posting too fast
+        or too often, otherwise returns None (allowed)."""
+        last_comment = execute_query(
+            "SELECT `created_at` FROM `product_comments` WHERE `user_ID` = %s ORDER BY `comment_ID` DESC LIMIT 1",
+            (user_id,),
+            fetchone=True,
+        )
+        if last_comment and last_comment.get("created_at"):
+            elapsed = execute_query(
+                "SELECT TIMESTAMPDIFF(SECOND, %s, NOW()) AS `elapsed`",
+                (last_comment["created_at"],),
+                fetchone=True,
+            )
+            elapsed_seconds = int((elapsed or {}).get("elapsed") or 0)
+            if elapsed_seconds < settings.COMMENT_MIN_SECONDS_BETWEEN:
+                wait = settings.COMMENT_MIN_SECONDS_BETWEEN - elapsed_seconds
+                return f"لطفاً {wait} ثانیه دیگر صبر کنید و دوباره نظر ثبت کنید."
+
+        hourly_count = execute_query(
+            """
+            SELECT COUNT(*) AS `cnt` FROM `product_comments`
+            WHERE `user_ID` = %s AND `created_at` >= (NOW() - INTERVAL 1 HOUR)
+            """,
+            (user_id,),
+            fetchone=True,
+        )
+        count = int((hourly_count or {}).get("cnt") or 0)
+        if count >= settings.COMMENT_RATE_LIMIT_PER_HOUR:
+            return (
+                f"شما به سقف مجاز ثبت نظر (حداکثر {settings.COMMENT_RATE_LIMIT_PER_HOUR} "
+                "نظر در ساعت) رسیده‌اید. کمی بعد دوباره امتحان کنید."
+            )
+
+        return None
 
     def update_comment(self, user_id, content=None, rating=None, is_admin=False):
         current = execute_query(
