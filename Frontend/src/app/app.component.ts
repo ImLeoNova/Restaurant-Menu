@@ -1,6 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/loader/loader.component';
+import { ToastContainerComponent } from './components/toast-container/toast-container.component';
 import { routeAnimations } from './animations/route-animations';
 import { filter, Subscription } from 'rxjs';
 import { LoaderService } from './services/loader.service';
@@ -8,7 +9,7 @@ import { LoaderService } from './services/loader.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoaderComponent],
+  imports: [RouterOutlet, LoaderComponent, ToastContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   animations: [routeAnimations],
