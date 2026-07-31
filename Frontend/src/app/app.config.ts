@@ -1,4 +1,9 @@
-import { ApplicationConfig, APP_INITIALIZER, inject } from '@angular/core';
+import {
+  ApplicationConfig,
+  APP_INITIALIZER,
+  inject,
+  isDevMode,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { authReducer } from './state/auth.reducer';
 import { routes } from './app.routes';
@@ -12,6 +17,7 @@ import { Store } from '@ngrx/store';
 import { loginSuccess, logout } from './state/auth.actions';
 import { catchError, map } from 'rxjs/operators';
 import { firstValueFrom, of } from 'rxjs';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const reducers: ActionReducerMap<{ auth: AuthState }, any> = {
   auth: authReducer,
@@ -53,5 +59,9 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeAuth,
       multi: true,
     },
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };
