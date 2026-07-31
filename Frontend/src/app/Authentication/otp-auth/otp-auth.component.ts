@@ -65,21 +65,22 @@ export class OtpAuthComponent implements OnInit, OnDestroy {
     if (!('OTPCredential' in window)) return;
     try {
       this.otpAbort = new AbortController();
-      // @ts-expect-error WebOTP API
+      const options: CredentialRequestOptions = {
+        signal: this.otpAbort.signal,
+      };
+      // WebOTP is not in standard DOM types yet
+      (options as any).otp = { transport: ['sms'] };
       navigator.credentials
-        .get({
-          otp: { transport: ['sms'] },
-          signal: this.otpAbort.signal,
-        })
-        .then((cred: any) => {
-          if (cred?.code) this.fillOtp(String(cred.code));
+        .get(options)
+        .then((cred: Credential | null) => {
+          const code = (cred as any)?.code;
+          if (code) this.fillOtp(String(code));
         })
         .catch(() => {});
     } catch {
       /* ignore */
     }
   }
-
   fillOtp(code: string): void {
     const cleaned = code.replace(/\D/g, '').slice(0, 6);
     for (let i = 0; i < 6; i++) this.digits[i] = cleaned[i] || '';
@@ -128,7 +129,10 @@ export class OtpAuthComponent implements OnInit, OnDestroy {
           sessionStorage.setItem('reg_verification_token', token);
           sessionStorage.setItem('reg_phone', res.data?.phone || this.phone);
         }
-        setTimeout(() => this.router.navigate(['/authentication/register/account']), 600);
+        setTimeout(
+          () => this.router.navigate(['/authentication/register/account']),
+          600,
+        );
       },
       error: (err) => {
         this.loading = false;

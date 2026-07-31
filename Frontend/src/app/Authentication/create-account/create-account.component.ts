@@ -27,8 +27,13 @@ export class CreateAccountComponent implements OnInit {
   hidePass = true;
   hideConfirm = true;
   errorMessage: string | undefined;
-  usernameStatus: 'idle' | 'checking' | 'available' | 'taken' | 'reserved' | 'invalid' =
-    'idle';
+  usernameStatus:
+    | 'idle'
+    | 'checking'
+    | 'available'
+    | 'taken'
+    | 'reserved'
+    | 'invalid' = 'idle';
   strength = 0;
 
   form = new FormGroup(
@@ -56,7 +61,8 @@ export class CreateAccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.phone = sessionStorage.getItem('reg_phone') || '';
-    this.verificationToken = sessionStorage.getItem('reg_verification_token') || '';
+    this.verificationToken =
+      sessionStorage.getItem('reg_verification_token') || '';
     if (!this.phone || !this.verificationToken) {
       this.router.navigate(['/authentication/register']);
       return;
@@ -80,8 +86,10 @@ export class CreateAccountComponent implements OnInit {
       .subscribe((res) => {
         if (!res) return;
         if (res.data?.available) this.usernameStatus = 'available';
-        else if (res.data?.reason === 'reserved') this.usernameStatus = 'reserved';
-        else if (res.data?.reason === 'invalid_format') this.usernameStatus = 'invalid';
+        else if (res.data?.reason === 'reserved')
+          this.usernameStatus = 'reserved';
+        else if (res.data?.reason === 'invalid_format')
+          this.usernameStatus = 'invalid';
         else this.usernameStatus = 'taken';
       });
 
@@ -104,6 +112,28 @@ export class CreateAccountComponent implements OnInit {
     if (/[^A-Za-z0-9]/.test(p)) s++;
     if (p.length >= 12) s++;
     return Math.min(s, 4);
+  }
+
+  get usernameStatusClass(): string {
+    switch (this.usernameStatus) {
+      case 'available':
+        return 'text-emerald-300';
+      case 'taken':
+      case 'reserved':
+      case 'invalid':
+        return 'text-rose-400';
+      case 'checking':
+        return 'text-white/50';
+      default:
+        return '';
+    }
+  }
+
+  get strengthColor(): string {
+    if (this.strength <= 1) return '#f43f5e';
+    if (this.strength === 2) return '#f59e0b';
+    if (this.strength === 3) return '#34d399';
+    return '#10b981';
   }
 
   get strengthLabel(): string {

@@ -18,7 +18,9 @@
       <h1 class="text-2xl font-black">ایجاد حساب کاربری</h1>
       <p class="text-sm text-white/60 mt-2">
         شماره تأییدشده:
-        <span class="text-orange-300 tracking-wider" dir="ltr">{{ phone }}</span>
+        <span class="text-orange-300 tracking-wider" dir="ltr">{{
+          phone
+        }}</span>
       </p>
     </div>
 
@@ -33,16 +35,22 @@
           autocomplete="username"
           placeholder="نام کاربری"
         />
-        <p class="mt-1 text-xs min-h-[1.2rem]"
-          [class.text-emerald-300]="usernameStatus === 'available'"
-          [class.text-rose-400]="usernameStatus === 'taken' || usernameStatus === 'reserved' || usernameStatus === 'invalid'"
-          [class.text-white/50]="usernameStatus === 'checking'"
-        >
-          @if (usernameStatus === 'checking') { در حال بررسی... }
-          @if (usernameStatus === 'available') { نام کاربری آزاد است }
-          @if (usernameStatus === 'taken') { این نام کاربری قبلاً گرفته شده }
-          @if (usernameStatus === 'reserved') { این نام کاربری رزرو شده است }
-          @if (usernameStatus === 'invalid') { فرمت نام کاربری نامعتبر است }
+        <p class="mt-1 text-xs min-h-[1.2rem]" [ngClass]="usernameStatusClass">
+          @if (usernameStatus === "checking") {
+            <span>در حال بررسی...</span>
+          }
+          @if (usernameStatus === "available") {
+            <span>نام کاربری آزاد است</span>
+          }
+          @if (usernameStatus === "taken") {
+            <span>این نام کاربری قبلاً گرفته شده</span>
+          }
+          @if (usernameStatus === "reserved") {
+            <span>این نام کاربری رزرو شده است</span>
+          }
+          @if (usernameStatus === "invalid") {
+            <span>فرمت نام کاربری نامعتبر است</span>
+          }
         </p>
       </div>
 
@@ -62,7 +70,7 @@
             (click)="hidePass = !hidePass"
             class="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
           >
-            {{ hidePass ? 'نمایش' : 'مخفی' }}
+            {{ hidePass ? "نمایش" : "مخفی" }}
           </button>
         </div>
         <div class="mt-2 strength-bar">
@@ -99,10 +107,12 @@
             (click)="hideConfirm = !hideConfirm"
             class="absolute left-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
           >
-            {{ hideConfirm ? 'نمایش' : 'مخفی' }}
+            {{ hideConfirm ? "نمایش" : "مخفی" }}
           </button>
         </div>
-        @if (form.hasError('mismatch') && form.get('passwordConfirm')?.touched) {
+        @if (
+          form.hasError("mismatch") && form.get("passwordConfirm")?.touched
+        ) {
           <p class="mt-1 text-xs text-rose-400">رمزها مطابقت ندارند</p>
         }
       </div>
@@ -116,7 +126,7 @@
         [disabled]="!canSubmit"
         class="w-full h-14 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ loading ? 'در حال ثبت...' : 'ایجاد حساب' }}
+        {{ loading ? "در حال ثبت..." : "ایجاد حساب" }}
       </button>
     </form>
   </div>
