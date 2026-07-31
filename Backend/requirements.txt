@@ -10,3 +10,4 @@ colorama
 flasgger
 standard-imghdr
 boto3
+smsir-sdk

@@ -1,0 +1,106 @@
+<main
+  class="relative w-full h-screen overflow-hidden bg-[#0f0f10] flex items-center justify-center"
+  dir="rtl"
+>
+  <div class="absolute inset-0 overflow-hidden">
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(251,146,60,0.20),_transparent_32%)]"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(245,158,11,0.16),_transparent_30%)]"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(135deg,_#0b0b0c_0%,_#151515_45%,_#101010_100%)]"
+    ></div>
+    <div
+      class="absolute top-[10%] right-[8%] w-72 h-72 rounded-full bg-orange-500/10 blur-3xl"
+    ></div>
+    <div
+      class="absolute bottom-[8%] left-[8%] w-80 h-80 rounded-full bg-amber-400/10 blur-3xl"
+    ></div>
+    <div class="absolute inset-0 bg-black/35"></div>
+  </div>
+
+  <div
+    class="relative z-10 w-full h-screen flex items-center justify-center px-4 sm:px-6"
+  >
+    <div
+      class="w-full max-w-md rounded-[2rem] border border-orange-400/15 bg-[#161616]/80 backdrop-blur-2xl shadow-[0_10px_50px_rgba(0,0,0,0.35)] p-6 sm:p-8 text-white fade-up"
+    >
+      <div class="text-center mb-6 yekan">
+        <div
+          class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-7 h-7 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M7 3h3l1.5 4.5L9 9.5a12 12 0 0 0 5.5 5.5l2-2.5L21 14v3a2 2 0 0 1-2.2 2A17 17 0 0 1 3 5.2 2 2 0 0 1 5 3h2Z"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-black">ثبت‌نام با شماره موبایل</h1>
+        <p class="text-sm text-white/60 mt-2">
+          شماره موبایل خود را وارد کنید تا کد تأیید ارسال شود
+        </p>
+      </div>
+
+      <form [formGroup]="phoneForm" (ngSubmit)="submit()" class="space-y-4 yekan">
+        <div>
+          <label class="text-sm text-white/85 mb-2 block">شماره موبایل</label>
+          <div class="relative">
+            <span
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-orange-300 text-sm font-bold"
+              >+98</span
+            >
+            <input
+              formControlName="phone"
+              (input)="onPhoneInput($event)"
+              inputmode="numeric"
+              autocomplete="tel"
+              class="w-full h-14 pr-14 pl-4 rounded-2xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/35 outline-none transition-all duration-300 focus:border-orange-400/60 focus:bg-white/[0.06] tracking-wider text-left"
+              dir="ltr"
+              type="tel"
+              placeholder="09123456789"
+            />
+          </div>
+          @if (phoneForm.get('phone')?.touched && phoneForm.get('phone')?.invalid) {
+            <p class="mt-2 text-xs text-rose-400">
+              شماره موبایل معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)
+            </p>
+          }
+        </div>
+
+        @if (errorMessage) {
+          <p class="text-rose-400 text-sm">{{ errorMessage }}</p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="!phoneValid || loading"
+          class="disabled:bg-gray-700 disabled:text-gray-300 disabled:shadow-none w-full h-14 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold cursor-pointer transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_10px_30px_rgba(249,115,22,0.25)] disabled:cursor-not-allowed"
+        >
+          {{ loading ? 'در حال ارسال...' : 'ادامه' }}
+        </button>
+      </form>
+
+      <div
+        class="flex items-center justify-between gap-3 pt-6 yekan text-sm border-t border-white/10 mt-6"
+      >
+        <span class="text-white/70">حساب کاربری دارید؟</span>
+        <a
+          routerLink="/authentication/login"
+          class="text-orange-300 hover:text-orange-200 font-bold"
+          >ورود</a
+        >
+      </div>
+    </div>
+  </div>
+</main>

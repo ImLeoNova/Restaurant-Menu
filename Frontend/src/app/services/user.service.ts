@@ -25,6 +25,51 @@ export class UserService {
     return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
+  // Phone OTP Auth
+  sendOtp(phone: string): Observable<ApiResponse<{ phone: string; expires_in: number }>> {
+    return this.http.post<ApiResponse<{ phone: string; expires_in: number }>>(
+      `${this.apiBase}/api/auth/otp/send`,
+      { phone },
+      { headers: this.jsonHeaders() },
+    );
+  }
+
+  verifyOtp(
+    phone: string,
+    code: string,
+  ): Observable<ApiResponse<{ phone: string; verification_token: string; expires_in: number }>> {
+    return this.http.post<
+      ApiResponse<{ phone: string; verification_token: string; expires_in: number }>
+    >(
+      `${this.apiBase}/api/auth/otp/verify`,
+      { phone, code },
+      { headers: this.jsonHeaders() },
+    );
+  }
+
+  checkUsername(
+    username: string,
+  ): Observable<ApiResponse<{ available: boolean; reason: string | null }>> {
+    return this.http.post<ApiResponse<{ available: boolean; reason: string | null }>>(
+      `${this.apiBase}/api/auth/username/check`,
+      { username },
+      { headers: this.jsonHeaders() },
+    );
+  }
+
+  registerWithPhone(payload: {
+    username: string;
+    password: string;
+    phone: string;
+    verification_token: string;
+  }): Observable<ApiResponse<{ token?: string }>> {
+    return this.http.post<ApiResponse<{ token?: string }>>(
+      `${this.apiBase}/api/user/register`,
+      payload,
+      { headers: this.jsonHeaders(), withCredentials: true },
+    );
+  }
+
   // Auth
   registerUser(user: User): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(

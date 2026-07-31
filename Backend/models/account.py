@@ -71,6 +71,69 @@ class Account:
 
         return True, "User successfully added."
 
+    def add_user_with_phone(self, username, password, phone_number, email=None, role="User"):
+        """Create account only after phone OTP verification (caller must consume verification token)."""
+        if not is_valid_username(username):
+            return False, "Username must be 3 to 30 characters and contain only letters, numbers, or underscore."
+
+        if not is_valid_password(password):
+            return False, "Password must be at least 8 characters long."
+
+        if not is_valid_phone_number(phone_number):
+            return False, "Invalid phone number."
+
+        reserved = {
+            "admin", "administrator", "root", "superadmin", "support",
+            "system", "null", "undefined", "moderator", "owner", "api",
+        }
+        if username.lower() in reserved:
+            return False, "This username is reserved."
+
+        if len(password) < 8:
+            return False, "Password must be at least 8 characters long."
+        if not any(c.isupper() for c in password):
+            return False, "Password must contain at least one uppercase letter."
+        if not any(c.isdigit() for c in password):
+            return False, "Password must contain at least one digit."
+
+        existing_user = execute_query(
+            "SELECT * FROM `restaurantusers` WHERE `username` = %s OR `phone_number` = %s",
+            (username, phone_number),
+            fetchone=True,
+        )
+        if existing_user:
+            return False, "User already exists."
+
+        if email:
+            if not is_valid_email(email):
+                return False, "Invalid email format."
+            existing_email = execute_query(
+                "SELECT * FROM `restaurantusers` WHERE `email` = %s",
+                (email,),
+                fetchone=True,
+            )
+            if existing_email:
+                return False, "Email already in use."
+        else:
+            email = f"{phone_number}@phone.local"
+
+        user_id = generate_random_string(30)
+        hashed_password = hash_password(password)
+        conversation_history = json.dumps([], ensure_ascii=False)
+
+        execute_query(
+            """
+            INSERT INTO `restaurantusers`
+            (`user_ID`, `username`, `password`, `email`, `role`, `phone_number`, `conversation_history`)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (user_id, username, hashed_password, email, role, phone_number, conversation_history),
+            commit=True,
+        )
+
+        return True, "User successfully added."
+
+
     def remove_user(self, user_id):
         found_user = execute_query(
             "SELECT * FROM `restaurantusers` WHERE `user_ID` = %s",

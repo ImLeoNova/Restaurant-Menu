@@ -1,0 +1,94 @@
+<main
+  class="relative w-full min-h-screen overflow-hidden bg-[#0f0f10] flex items-center justify-center px-4"
+  dir="rtl"
+>
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(251,146,60,0.18),_transparent_32%)]"
+    ></div>
+    <div
+      class="absolute inset-0 bg-[linear-gradient(135deg,_#0b0b0c_0%,_#151515_45%,_#101010_100%)]"
+    ></div>
+  </div>
+
+  <div
+    class="relative z-10 w-full max-w-md rounded-[2rem] border border-orange-400/15 bg-[#161616]/85 backdrop-blur-2xl p-6 sm:p-8 text-white"
+    [class.shake]="shake"
+    [class.success-pulse]="success"
+  >
+    <div class="text-center mb-6 yekan">
+      <div
+        class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center"
+      >
+        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="5" y="2" width="14" height="20" rx="3" />
+          <path d="M9 18h6" stroke-linecap="round" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-black">کد تأیید</h1>
+      <p class="text-sm text-white/60 mt-2">
+        کد ۶ رقمی ارسال‌شده به
+        <span class="text-orange-300 font-bold tracking-wider" dir="ltr">{{ phone }}</span>
+        را وارد کنید
+      </p>
+    </div>
+
+    <div
+      class="flex justify-center gap-2 sm:gap-3 mb-6"
+      dir="ltr"
+      (paste)="onPaste($event)"
+    >
+      @for (d of digits; track $index) {
+        <input
+          #otpInput
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          autocomplete="one-time-code"
+          [value]="d"
+          (input)="onInput($index, $event)"
+          (keydown)="onKeydown($index, $event)"
+        />
+      }
+    </div>
+
+    @if (errorMessage) {
+      <p class="text-rose-400 text-sm text-center yekan mb-3">{{ errorMessage }}</p>
+    }
+    @if (success) {
+      <p class="text-emerald-300 text-sm text-center yekan mb-3">تأیید شد!</p>
+    }
+
+    <button
+      type="button"
+      (click)="verify()"
+      [disabled]="code.length !== 6 || loading || success"
+      class="w-full h-14 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold disabled:opacity-50 disabled:cursor-not-allowed yekan"
+    >
+      {{ loading ? 'در حال بررسی...' : 'تأیید کد' }}
+    </button>
+
+    <div class="mt-5 text-center yekan text-sm text-white/60">
+      @if (countdown > 0) {
+        <span>ارسال مجدد تا {{ countdown }} ثانیه</span>
+      } @else {
+        <button
+          type="button"
+          (click)="resend()"
+          class="text-orange-300 font-bold hover:text-orange-200"
+        >
+          ارسال مجدد کد
+        </button>
+      }
+    </div>
+
+    <div class="mt-6 text-center">
+      <a
+        routerLink="/authentication/register"
+        class="text-sm text-white/50 hover:text-white/80 yekan"
+        >تغییر شماره موبایل</a
+      >
+    </div>
+  </div>
+</main>

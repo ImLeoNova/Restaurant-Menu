@@ -8,6 +8,7 @@ from utils.security import hash_password
 from helpers.rate_limit import RateLimiter
 from config.settings import COOKIE_SECURE, COOKIE_SAMESITE, MAX_CONTENT_LENGTH
 from storage.s3_client import s3_client
+from services.otp_service import consume_verification_token, _normalize_phone
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -23,18 +24,44 @@ def register_user():
 
         username = body.get("username")
         password = body.get("password")
-        email = body.get("email")
+        phone = body.get("phone") or body.get("phone_number")
+        verification_token = body.get("verification_token")
+        email = body.get("email")  # optional
 
-        if not username or not password or not email:
-            return error_response("Username, password, and email are required.", 400)
+        if not username or not password or not phone or not verification_token:
+            return error_response("Username, password, phone and verification_token are required.", 400)
+
+        phone = _normalize_phone(phone)
+
+        ok, msg = consume_verification_token(verification_token, phone)
+        if not ok:
+            return error_response(msg, 400)
 
         account = Account()
-        status, message = account.add_user(username, password, email, role="User")
+        status, message = account.add_user_with_phone(
+            username=username,
+            password=password,
+            phone_number=phone,
+            email=email,
+            role="User",
+        )
 
         if not status:
             return error_response(message, 400)
 
-        return success_response(message, status_code=201)
+        # Auto-login after registration
+        token = Account.authenticate_user(username, password)
+        response, status_code = success_response(message, {"token": token} if token else None, 201)
+        if token:
+            response.set_cookie(
+                "access_token",
+                token,
+                httponly=True,
+                samesite=COOKIE_SAMESITE,
+                secure=COOKIE_SECURE,
+                path="/",
+            )
+        return response, status_code
 
     except Exception as e:
         return error_response(f"Internal Server Error: {str(e)}", 500)
@@ -288,7 +315,6 @@ def get_avatar(user_id):
 @user_bp.route("/api/user/logout", methods=["POST"])
 def logout():
     response, status_code = success_response("Logout successful.", None, 200)
-    # Clear the access_token cookie using the same attributes as when it was set
     response.set_cookie(
         "access_token",
         "",

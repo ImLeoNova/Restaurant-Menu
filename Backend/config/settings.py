@@ -73,3 +73,12 @@ OPENAI_BASEURL = get_env("OPENAI_BASEURL", default="https://api.openai.com/v1")
 # Comment anti-spam / rate limiting
 COMMENT_RATE_LIMIT_PER_HOUR = get_env("COMMENT_RATE_LIMIT_PER_HOUR", default=10, cast=int)
 COMMENT_MIN_SECONDS_BETWEEN = get_env("COMMENT_MIN_SECONDS_BETWEEN", default=15, cast=int)
+
+# SMS.ir OTP
+SMSIR_API_KEY = get_env("SMSIR_API_KEY", default=None)
+SMSIR_TEMPLATE_ID = get_env("SMSIR_TEMPLATE_ID", default=None, cast=int)
+OTP_EXPIRY_SECONDS = get_env("OTP_EXPIRY_SECONDS", default=120, cast=int)
+OTP_MAX_ATTEMPTS = get_env("OTP_MAX_ATTEMPTS", default=5, cast=int)
+OTP_SEND_RATE_LIMIT = get_env("OTP_SEND_RATE_LIMIT", default=3, cast=int)
+OTP_SEND_WINDOW_SECONDS = get_env("OTP_SEND_WINDOW_SECONDS", default=600, cast=int)
+OTP_VERIFY_TOKEN_EXPIRY = get_env("OTP_VERIFY_TOKEN_EXPIRY", default=900, cast=int)

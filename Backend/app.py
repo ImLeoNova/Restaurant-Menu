@@ -13,6 +13,7 @@ from routes.product_routes import product_bp
 from routes.token_routes import token_bp
 from routes.comment_routes import comment_bp
 from routes.category_routes import category_bp
+from routes.auth_routes import auth_bp
 
 from helpers.responses import error_response
 
@@ -45,6 +46,12 @@ def create_app():
     app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
     ensure_schema()
+
+    try:
+        from services.otp_service import ensure_otp_table
+        ensure_otp_table()
+    except Exception as e:
+        print(f"[OTP] Table ensure skipped: {e}")
 
     cors.init_app(
         app,
@@ -88,6 +95,7 @@ def create_app():
     app.register_blueprint(token_bp)
     app.register_blueprint(comment_bp)
     app.register_blueprint(category_bp)
+    app.register_blueprint(auth_bp)
 
     register_error_handlers(app)
 
