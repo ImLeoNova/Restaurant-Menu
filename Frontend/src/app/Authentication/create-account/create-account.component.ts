@@ -12,11 +12,12 @@ import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { UserService } from '../../services/user.service';
 import { Store } from '@ngrx/store';
 import { loginSuccess } from '../../state/auth.actions';
+import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
 
 @Component({
   selector: 'app-create-account',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RegistrationStepperComponent],
   templateUrl: './create-account.component.html',
   styleUrl: './create-account.component.css',
 })

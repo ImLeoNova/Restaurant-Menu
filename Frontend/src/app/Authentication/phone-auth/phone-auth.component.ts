@@ -8,11 +8,12 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
 
 @Component({
   selector: 'app-phone-auth',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, RegistrationStepperComponent],
   templateUrl: './phone-auth.component.html',
   styleUrl: './phone-auth.component.css',
 })

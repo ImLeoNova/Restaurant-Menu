@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { LoginAuthComponent } from './Authentication/login-auth/login-auth.component';
-import { RegisterAuthComponent } from './Authentication/register-auth/register-auth.component';
 import { PhoneAuthComponent } from './Authentication/phone-auth/phone-auth.component';
 import { OtpAuthComponent } from './Authentication/otp-auth/otp-auth.component';
 import { CreateAccountComponent } from './Authentication/create-account/create-account.component';
@@ -78,12 +77,6 @@ export const routes: Routes = [
         component: CreateAccountComponent,
         canActivate: [authenticationGuard],
         data: { animation: 'create-account' },
-      },
-      {
-        path: 'register/legacy',
-        component: RegisterAuthComponent,
-        canActivate: [authenticationGuard],
-        data: { animation: 'register-legacy' },
       },
       {
         path: 'complete-profile',

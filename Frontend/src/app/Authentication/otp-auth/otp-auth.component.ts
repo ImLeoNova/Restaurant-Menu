@@ -9,11 +9,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
 
 @Component({
   selector: 'app-otp-auth',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RegistrationStepperComponent],
   templateUrl: './otp-auth.component.html',
   styleUrl: './otp-auth.component.css',
 })
