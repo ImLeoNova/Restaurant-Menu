@@ -104,6 +104,23 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'checkout',
+    loadComponent: () =>
+      import('./pages/checkout/checkout.component').then(
+        (m) => m.CheckoutComponent,
+      ),
+    canActivate: [authGuard, profileCompletedGuard],
+    data: { animation: 'checkout' },
+  },
+  {
+    path: 'payment/result',
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result.component').then(
+        (m) => m.PaymentResultComponent,
+      ),
+    data: { animation: 'payment-result' },
+  },
+  {
     path: '**',
     loadComponent: () =>
       import('./components/not-found/not-found.component').then(

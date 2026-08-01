@@ -1,0 +1,36 @@
+<div class="min-h-screen bg-[#0b1020] text-white flex flex-col">
+  <app-header />
+  <main class="flex-1 flex items-center justify-center px-4 py-12" dir="rtl">
+    <div class="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 sm:p-10 text-center shadow-2xl">
+      <div class="mx-auto mb-5 w-16 h-16 rounded-2xl flex items-center justify-center"
+        [class]="success ? 'bg-emerald-500/20 border border-emerald-400/30' : 'bg-red-500/20 border border-red-400/30'">
+        @if (success) {
+          <svg class="w-8 h-8 text-emerald-300" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        } @else {
+          <svg class="w-8 h-8 text-red-300" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        }
+      </div>
+      <h1 class="yekan text-xl sm:text-2xl font-extrabold mb-2">{{ success ? 'پرداخت موفق' : 'پرداخت ناموفق' }}</h1>
+      <p class="yekan text-white/60 text-sm sm:text-base leading-relaxed mb-4">{{ message }}</p>
+      @if (success && orderId) {
+        <p class="yekan text-sm text-white/50 mb-1">شماره سفارش: <span class="text-amber-300 font-bold">#{{ orderId }}</span></p>
+      }
+      @if (success && refId) {
+        <p class="yekan text-sm text-white/50 mb-4">کد پیگیری: <span class="text-white/80">{{ refId }}</span></p>
+      }
+      <div class="mt-6 flex flex-col gap-3">
+        @if (success) {
+          <a routerLink="/dashboard" [queryParams]="{ page: 'orders' }"
+            class="yekan w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-3.5 font-extrabold text-black shadow-[0_12px_30px_rgba(245,158,11,0.28)]">
+            مشاهده سفارش‌های من
+          </a>
+        }
+        <a routerLink="/restaurant-menu"
+          class="yekan w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-bold text-white hover:bg-white/10 transition">
+          بازگشت به صفحه اصلی
+        </a>
+      </div>
+    </div>
+  </main>
+  <app-footer />
+</div>

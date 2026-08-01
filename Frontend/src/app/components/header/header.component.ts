@@ -196,6 +196,18 @@ export class HeaderComponent implements OnDestroy {
     this.cartService.clearCart();
   }
 
+  onCheckout(): void {
+    if (!this.isLoggedIn) {
+      this.closeCart();
+      this.router.navigate(['/authentication/login'], {
+        queryParams: { returnUrl: '/checkout' },
+      });
+      return;
+    }
+    this.closeCart();
+    this.router.navigate(['/checkout']);
+  }
+
   private syncBodyScroll(): void {
     document.body.style.overflow =
       this.menuOpen || this.cartOpen ? 'hidden' : '';

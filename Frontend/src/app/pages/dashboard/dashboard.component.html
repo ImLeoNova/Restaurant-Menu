@@ -48,6 +48,13 @@
               (deleteUser)="openModal('delete_user', $event)"
             />
           }
+                    @case ("orders") {
+            <app-dashboard-orders
+              [isAdmin]="user.role === 'Admin' || user.role === 'Founder'"
+              [userRole]="user.role"
+            />
+          }
+
           @case ("profile") {
             <app-dashboard-profile />
           }

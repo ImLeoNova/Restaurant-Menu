@@ -148,6 +148,26 @@
         </div>
       }
 
+
+      <div
+        (click)="pageChange.emit('orders')"
+        class="group cursor-pointer rounded-2xl px-4 py-3.5 sm:py-4 flex items-center justify-between transition-all duration-300 border border-transparent hover:border-white/10 hover:bg-white/10"
+        [ngClass]="{
+          'bg-white/10 border-white/10 shadow-lg': nowPage === 'orders',
+        }"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6h15l-1.5 9h-12L6 6Zm0 0L5 3H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="20" r="1.2" fill="currentColor"/>
+              <circle cx="18" cy="20" r="1.2" fill="currentColor"/>
+            </svg>
+          </div>
+          <h1 class="yekan font-semibold truncate">سفارشات</h1>
+        </div>
+      </div>
+
       <div
         (click)="pageChange.emit('profile')"
         class="group cursor-pointer rounded-2xl px-4 py-3.5 sm:py-4 flex items-center justify-between transition-all duration-300 border border-transparent hover:border-white/10 hover:bg-white/10"

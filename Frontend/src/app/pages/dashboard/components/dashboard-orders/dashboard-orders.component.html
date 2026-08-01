@@ -1,0 +1,89 @@
+<div class="space-y-4" dir="rtl">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div>
+      <h2 class="yekan text-xl sm:text-2xl font-extrabold text-white">{{ isAdmin ? 'مدیریت سفارشات' : 'سفارش‌های من' }}</h2>
+      <p class="yekan text-white/50 text-sm mt-1">{{ isAdmin ? 'وضعیت و یادداشت تحویل را مدیریت کنید.' : 'وضعیت سفارش‌های خود را پیگیری کنید.' }}</p>
+    </div>
+    @if (isAdmin) {
+      <select class="yekan rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none"
+        [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+        <option value="">همه وضعیت‌ها</option>
+        @for (s of allStatuses; track s) { <option [value]="s">{{ statusLabels[s] }}</option> }
+      </select>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="rounded-3xl border border-white/10 bg-white/5 p-10 text-center"><p class="yekan text-white/50">در حال بارگذاری...</p></div>
+  } @else if (!orders.length) {
+    <div class="rounded-3xl border border-white/10 bg-white/5 p-10 text-center"><p class="yekan text-white/50">هنوز سفارشی ثبت نشده است.</p></div>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (order of orders; track order.order_ID) {
+        <div class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden shadow-xl">
+          <button type="button" class="w-full p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 text-right" (click)="toggle(order.order_ID)">
+            <div class="flex-1 min-w-0 space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="yekan font-extrabold text-white">سفارش #{{ order.order_ID }}</span>
+                <span class="yekan text-xs px-2.5 py-1 rounded-xl border font-bold" [class]="statusClass(order.status)">
+                  {{ order.status_label || statusLabels[order.status] }}
+                </span>
+              </div>
+              <p class="yekan text-sm text-white/50">{{ formatDate(order.created_at) }}</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <span class="yekan text-amber-300 font-extrabold">{{ order.total_amount }} هزار تومان</span>
+              <svg class="w-5 h-5 text-white/40 transition-transform" [class.rotate-180]="expandedId === order.order_ID" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </button>
+          @if (expandedId === order.order_ID) {
+            <div class="border-t border-white/10 px-4 sm:px-5 pb-5 pt-3 space-y-4">
+              @if (order.admin_note) {
+                <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3">
+                  <p class="yekan text-xs text-amber-200/70 mb-1">یادداشت مدیریت</p>
+                  <p class="yekan text-sm text-amber-100">{{ order.admin_note }}</p>
+                </div>
+              }
+              <div class="space-y-2">
+                @for (item of order.items || []; track item.item_ID) {
+                  <div class="flex items-center gap-3 rounded-2xl border border-white/5 bg-black/20 p-3">
+                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-white/10 shrink-0">
+                      <img [src]="imageUrl(item.image)" [alt]="item.product_title" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="yekan text-sm font-bold text-white truncate">{{ item.product_title }}</p>
+                      <p class="yekan text-xs text-white/50">{{ item.quantity }} × {{ item.product_price }} هزار تومان</p>
+                    </div>
+                    <span class="yekan text-sm text-white/80 shrink-0">{{ item.line_total }} هزار تومان</span>
+                  </div>
+                }
+              </div>
+              @if (isAdmin) {
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4 space-y-3">
+                  <div>
+                    <label class="yekan text-xs text-white/50 mb-1.5 block">وضعیت سفارش</label>
+                    <select class="yekan w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none"
+                      [(ngModel)]="editStatus[order.order_ID]">
+                      @for (s of allStatuses; track s) { <option [value]="s">{{ statusLabels[s] }}</option> }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="yekan text-xs text-white/50 mb-1.5 block">یادداشت تحویل</label>
+                    <textarea rows="2" class="yekan w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none resize-none"
+                      [(ngModel)]="editNote[order.order_ID]" placeholder="مثلاً: ۶۰ دقیقه دیگر به دستتان می‌رسد"></textarea>
+                  </div>
+                  <button type="button" (click)="save(order)" [disabled]="savingId === order.order_ID"
+                    class="yekan w-full sm:w-auto rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-5 py-2.5 font-extrabold text-black disabled:opacity-60">
+                    {{ savingId === order.order_ID ? 'در حال ذخیره...' : 'ذخیره تغییرات' }}
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

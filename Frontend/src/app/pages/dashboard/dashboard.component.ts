@@ -6,7 +6,7 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AuthState } from '../../state/app.state';
 import { logout } from '../../state/auth.actions';
 import { isTokenExpired } from '../../state/auth';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { JwtDecoded } from '../../interfaces/interfaces';
 import { DashboardService } from '../../services/dashboard.service';
@@ -38,6 +38,7 @@ import { AddCategoryModalComponent } from './components/modals/add-category-moda
 import { UpdateCategoryModalComponent } from './components/modals/update-category-modal/update-category-modal.component';
 import { DeleteCategoryModalComponent } from './components/modals/delete-category-modal/delete-category-modal.component';
 import { AddUserModalComponent } from './components/modals/add-user-modal/add-user-modal.component';
+import { DashboardOrdersComponent } from './components/dashboard-orders/dashboard-orders.component';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -63,6 +64,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     UpdateCategoryModalComponent,
     DeleteCategoryModalComponent,
     AddUserModalComponent,
+    DashboardOrdersComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -156,6 +158,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private store: Store<{ auth: AuthState }>,
     public categoryService: CategoryService,
     private router: Router,
+    private route: ActivatedRoute,
     private dashboardService: DashboardService,
     public productService: ProductService,
     public userService: UserService,
@@ -341,6 +344,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const pageParam = this.route.snapshot.queryParamMap.get('page');
+    if (pageParam) {
+      this.nowPage = pageParam;
+    }
+
     this.loadProducts();
   }
 

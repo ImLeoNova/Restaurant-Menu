@@ -21,6 +21,7 @@ export class CartDrawerComponent {
   @Output() decrease = new EventEmitter<CartItem>();
   @Output() remove = new EventEmitter<CartItem>();
   @Output() clear = new EventEmitter<void>();
+  @Output() checkout = new EventEmitter<void>();
 
   trackByItemId(index: number, item: CartItem): string {
     return `${item.product.product_ID}-${index}`;

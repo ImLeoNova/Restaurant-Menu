@@ -82,3 +82,10 @@ OTP_MAX_ATTEMPTS = get_env("OTP_MAX_ATTEMPTS", default=5, cast=int)
 OTP_SEND_RATE_LIMIT = get_env("OTP_SEND_RATE_LIMIT", default=3, cast=int)
 OTP_SEND_WINDOW_SECONDS = get_env("OTP_SEND_WINDOW_SECONDS", default=600, cast=int)
 OTP_VERIFY_TOKEN_EXPIRY = get_env("OTP_VERIFY_TOKEN_EXPIRY", default=900, cast=int)
+
+
+# ZarinPal Payment Gateway
+ZARINPAL_MERCHANT_ID = get_env("ZARINPAL_MERCHANT_ID", default="1d00ae1f-1bf1-4e79-9593-eed875fd457e")
+ZARINPAL_SANDBOX = parse_bool(get_env("ZARINPAL_SANDBOX", default="true"))
+ZARINPAL_CALLBACK_URL = get_env("ZARINPAL_CALLBACK_URL", default="http://localhost:8080/api/orders/verify")
+FRONTEND_URL = get_env("FRONTEND_URL", default="http://localhost:4200")

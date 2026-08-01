@@ -112,6 +112,63 @@ TABLE_DEFINITIONS = [
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
         """,
     ),
+    (
+        "orders",
+        """
+        CREATE TABLE IF NOT EXISTS `orders` (
+          `order_ID` int(11) NOT NULL AUTO_INCREMENT,
+          `user_ID` varchar(350) NOT NULL,
+          `total_amount` decimal(12,2) NOT NULL,
+          `status` varchar(30) NOT NULL DEFAULT 'pending',
+          `authority` varchar(100) NOT NULL,
+          `ref_id` varchar(100) DEFAULT NULL,
+          `admin_note` text DEFAULT NULL,
+          `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (`order_ID`),
+          KEY `idx_orders_user` (`user_ID`),
+          KEY `idx_orders_status` (`status`),
+          KEY `idx_orders_authority` (`authority`),
+          CONSTRAINT `fk_orders_user`
+            FOREIGN KEY (`user_ID`) REFERENCES `restaurantusers` (`user_ID`)
+            ON DELETE RESTRICT
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+        """,
+    ),
+    (
+        "order_items",
+        """
+        CREATE TABLE IF NOT EXISTS `order_items` (
+          `item_ID` int(11) NOT NULL AUTO_INCREMENT,
+          `order_ID` int(11) NOT NULL,
+          `product_ID` int(11) NOT NULL,
+          `product_title` varchar(350) NOT NULL,
+          `product_price` decimal(10,2) NOT NULL,
+          `quantity` int(11) NOT NULL,
+          `image` varchar(350) DEFAULT NULL,
+          PRIMARY KEY (`item_ID`),
+          KEY `idx_order_items_order` (`order_ID`),
+          KEY `idx_order_items_product` (`product_ID`),
+          CONSTRAINT `fk_order_items_order`
+            FOREIGN KEY (`order_ID`) REFERENCES `orders` (`order_ID`)
+            ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+        """,
+    ),
+    (
+        "payment_intents",
+        """
+        CREATE TABLE IF NOT EXISTS `payment_intents` (
+          `authority` varchar(100) NOT NULL,
+          `user_ID` varchar(350) NOT NULL,
+          `items_json` text NOT NULL,
+          `total_amount` decimal(12,2) NOT NULL,
+          `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (`authority`),
+          KEY `idx_payment_intents_user` (`user_ID`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+        """,
+    ),
 ]
 
 DESIRED_SCHEMA = {

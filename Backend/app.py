@@ -14,6 +14,7 @@ from routes.token_routes import token_bp
 from routes.comment_routes import comment_bp
 from routes.category_routes import category_bp
 from routes.auth_routes import auth_bp
+from routes.order_routes import order_bp
 
 from helpers.responses import error_response
 
@@ -96,6 +97,7 @@ def create_app():
     app.register_blueprint(comment_bp)
     app.register_blueprint(category_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(order_bp)
 
     register_error_handlers(app)
 
