@@ -1,17 +1,7 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
-import { LoginAuthComponent } from './Authentication/login-auth/login-auth.component';
-import { PhoneAuthComponent } from './Authentication/phone-auth/phone-auth.component';
-import { OtpAuthComponent } from './Authentication/otp-auth/otp-auth.component';
-import { CreateAccountComponent } from './Authentication/create-account/create-account.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { ProductDetailComponent } from './pages/product-detail/product-detail.component';
-import { ProductsComponent } from './pages/products/products.component';
 import { authGuard } from './guards/auth.guard';
 import { authenticationGuard } from './guards/authentication.guard';
 import { profileCompletedGuard } from './guards/profile-completed.guard';
-import { CompleteProfileComponent } from './Authentication/complete-profile/complete-profile.component';
 import { completeProfileGuard } from './guards/complete-profile.guard';
 
 export const routes: Routes = [
@@ -30,24 +20,36 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        component: HomeComponent,
+        loadComponent: () =>
+          import('./pages/home/home.component').then(
+            (m) => m.HomeComponent,
+          ),
         data: { animation: 'home' },
       },
       {
         path: 'products',
-        component: ProductsComponent,
+        loadComponent: () =>
+          import('./pages/products/products.component').then(
+            (m) => m.ProductsComponent,
+          ),
         data: { animation: 'products' },
       },
       {
         path: 'product/:productId',
-        component: ProductDetailComponent,
+        loadComponent: () =>
+          import('./pages/product-detail/product-detail.component').then(
+            (m) => m.ProductDetailComponent,
+          ),
         data: { animation: 'product-detail' },
       },
     ],
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadComponent: () =>
+      import('./pages/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent,
+      ),
     canActivate: [authGuard, profileCompletedGuard],
     data: { animation: 'dashboard' },
   },
@@ -56,31 +58,46 @@ export const routes: Routes = [
     children: [
       {
         path: 'login',
-        component: LoginAuthComponent,
+        loadComponent: () =>
+          import('./Authentication/login-auth/login-auth.component').then(
+            (m) => m.LoginAuthComponent,
+          ),
         canActivate: [authenticationGuard],
         data: { animation: 'login' },
       },
       {
         path: 'register',
-        component: PhoneAuthComponent,
+        loadComponent: () =>
+          import('./Authentication/phone-auth/phone-auth.component').then(
+            (m) => m.PhoneAuthComponent,
+          ),
         canActivate: [authenticationGuard],
         data: { animation: 'register' },
       },
       {
         path: 'register/otp',
-        component: OtpAuthComponent,
+        loadComponent: () =>
+          import('./Authentication/otp-auth/otp-auth.component').then(
+            (m) => m.OtpAuthComponent,
+          ),
         canActivate: [authenticationGuard],
         data: { animation: 'otp' },
       },
       {
         path: 'register/account',
-        component: CreateAccountComponent,
+        loadComponent: () =>
+          import(
+            './Authentication/create-account/create-account.component'
+          ).then((m) => m.CreateAccountComponent),
         canActivate: [authenticationGuard],
         data: { animation: 'create-account' },
       },
       {
         path: 'complete-profile',
-        component: CompleteProfileComponent,
+        loadComponent: () =>
+          import(
+            './Authentication/complete-profile/complete-profile.component'
+          ).then((m) => m.CompleteProfileComponent),
         canActivate: [authGuard, completeProfileGuard],
         data: { animation: 'complete-profile' },
       },
@@ -88,7 +105,10 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    component: NotFoundComponent,
+    loadComponent: () =>
+      import('./components/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent,
+      ),
     data: { animation: 'not-found' },
   },
 ];

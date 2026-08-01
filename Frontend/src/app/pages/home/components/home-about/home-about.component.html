@@ -55,11 +55,17 @@
         <div
           class="relative w-full h-full rounded-[2rem] bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-white/10 flex items-center justify-center p-8"
         >
-          <img
-            src="assets/web/logo.png"
-            class="w-[12rem] sm:w-[18rem] object-contain opacity-95"
-            alt="logo"
-          />
+          <picture>
+            <source srcset="assets/web/logo.webp" type="image/webp" />
+            <img
+              src="assets/web/logo.png"
+              class="w-[12rem] sm:w-[18rem] object-contain opacity-95"
+              alt="logo"
+              width="288"
+              height="288"
+              loading="lazy"
+            />
+          </picture>
         </div>
       </div>
     </div>

@@ -11,6 +11,8 @@
       [src]="foodItem.image"
       class="relative w-[10rem] sm:w-[12rem] object-contain group-hover:scale-110 transition-all duration-500"
       [alt]="foodItem.title"
+      loading="lazy"
+      decoding="async"
     />
     <div
       class="absolute top-4 right-4 rounded-full px-3 py-1.5 bg-black/30 border border-white/10 backdrop-blur-xl"

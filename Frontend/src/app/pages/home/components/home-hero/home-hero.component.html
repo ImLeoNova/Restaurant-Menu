@@ -130,11 +130,17 @@
             ></div>
 
             <div class="relative flex flex-col items-center">
-              <img
-                class="w-[16rem] sm:w-[24rem] lg:w-[28rem] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
-                src="assets/web/logo.png"
-                alt="logo"
-              />
+              <picture>
+                <source srcset="assets/web/logo.webp" type="image/webp" />
+                <img
+                  class="w-[16rem] sm:w-[24rem] lg:w-[28rem] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
+                  src="assets/web/logo.png"
+                  alt="logo"
+                  width="448"
+                  height="448"
+                  fetchpriority="high"
+                />
+              </picture>
 
               <div class="grid grid-cols-2 gap-3 sm:gap-4 w-full mt-4 sm:mt-6">
                 <div class="rounded-2xl bg-black/20 border border-white/10 p-4">

@@ -15,11 +15,17 @@
           <div
             class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 border border-white/10 flex items-center justify-center shadow-lg overflow-hidden"
           >
-            <img
-              src="assets/web/logo.png"
-              alt="logo"
-              class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition-all duration-500 group-hover:scale-110 group-hover:rotate-[12deg]"
-            />
+            <picture>
+              <source srcset="assets/web/logo.webp" type="image/webp" />
+              <img
+                src="assets/web/logo.png"
+                alt="logo"
+                width="48"
+                height="48"
+                fetchpriority="high"
+                class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition-all duration-500 group-hover:scale-110 group-hover:rotate-[12deg]"
+              />
+            </picture>
           </div>
 
           <div class="hidden sm:flex flex-col leading-tight min-w-0">
