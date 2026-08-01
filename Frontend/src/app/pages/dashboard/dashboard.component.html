@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-[#0b1020] text-white overflow-x-hidden">
   <app-dashboard-background />
 
-  <main class="flex min-h-screen flex-col lg:flex-row-reverse">
+  <main class="flex min-h-screen flex-col lg:flex-row">
     <app-dashboard-sidebar
       [user]="user"
       [nowPage]="nowPage"
@@ -48,7 +48,7 @@
               (deleteUser)="openModal('delete_user', $event)"
             />
           }
-                    @case ("orders") {
+          @case ("orders") {
             <app-dashboard-orders
               [isAdmin]="user.role === 'Admin' || user.role === 'Founder'"
               [userRole]="user.role"
