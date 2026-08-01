@@ -13,6 +13,7 @@ import { UserService } from '../../services/user.service';
 import { Store } from '@ngrx/store';
 import { loginSuccess } from '../../state/auth.actions';
 import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-create-account',
@@ -58,6 +59,7 @@ export class CreateAccountComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private store: Store,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -173,6 +175,7 @@ export class CreateAccountComponent implements OnInit {
           if (token) {
             this.store.dispatch(loginSuccess({ token }));
           }
+          this.toastService.success('حساب کاربری شما با موفقیت ساخته شد.');
           this.router.navigate(['/authentication/complete-profile']);
         },
         error: (err) => {

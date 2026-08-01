@@ -15,6 +15,7 @@ import { loginSuccess } from '../../state/auth.actions';
 import { AuthState } from '../../state/app.state';
 import { LoginResponse } from '../../interfaces/interfaces';
 import { ApiResponse } from '../../models/api-response';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login-auth',
@@ -45,6 +46,7 @@ export class LoginAuthComponent {
     private userService: UserService,
     private router: Router,
     private store: Store<{ auth: AuthState }>,
+    private toastService: ToastService,
   ) {}
 
   submit() {
@@ -67,6 +69,7 @@ export class LoginAuthComponent {
         const tokenDecode = jwtDecode(token);
         this.loading = false;
         this.successMessage = 'با موفقیت وارد شدید.';
+        this.toastService.success('با موفقیت وارد شدید.');
 
         // Add Token To Store
         this.store.dispatch(loginSuccess({ token: token }));
@@ -82,7 +85,8 @@ export class LoginAuthComponent {
         this.errorMessage =
           error.status === 400
             ? 'نام کاربری یا رمز عبور اشتباه است'
-            : error?.error?.message || 'ورود با خطا مواجه شد. دوباره تلاش کنید.';
+            : error?.error?.message ||
+              'ورود با خطا مواجه شد. دوباره تلاش کنید.';
       },
     );
   }

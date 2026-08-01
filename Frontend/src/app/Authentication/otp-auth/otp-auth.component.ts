@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-otp-auth',
@@ -34,6 +35,7 @@ export class OtpAuthComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private userService: UserService,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +127,7 @@ export class OtpAuthComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.loading = false;
         this.success = true;
+        this.toastService.success('شماره موبایل با موفقیت تایید شد.');
         const token = res.data?.verification_token;
         if (token) {
           sessionStorage.setItem('reg_verification_token', token);
@@ -154,6 +157,7 @@ export class OtpAuthComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.loading = false;
         this.countdown = res.data?.expires_in || 120;
+        this.toastService.success('کد تایید مجدداً ارسال شد.');
         sessionStorage.setItem(
           'reg_otp_expires',
           String(Date.now() + this.countdown * 1000),

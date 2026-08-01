@@ -15,6 +15,7 @@ import { AuthState } from '../../state/app.state';
 import { setProfileCompleted } from '../../state/auth.actions';
 import { CompleteProfilePayload } from '../../interfaces/CompleteProfilePayload';
 import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-complete-profile',
@@ -38,6 +39,7 @@ export class CompleteProfileComponent implements OnInit {
     private loaderService: LoaderService,
     private router: Router,
     private store: Store<{ auth: AuthState }>,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -144,11 +146,13 @@ export class CompleteProfileComponent implements OnInit {
               next: () => {
                 this.store.dispatch(setProfileCompleted({ completed: true }));
                 this.successMessage = 'پروفایل شما با موفقیت تکمیل شد.';
+                this.toastService.success(this.successMessage);
                 setTimeout(() => this.router.navigate(['/dashboard']), 700);
               },
               error: () => {
                 this.store.dispatch(setProfileCompleted({ completed: true }));
                 this.successMessage = 'پروفایل شما با موفقیت تکمیل شد.';
+                this.toastService.success(this.successMessage);
                 setTimeout(() => this.router.navigate(['/dashboard']), 700);
               },
             });
@@ -157,6 +161,7 @@ export class CompleteProfileComponent implements OnInit {
 
           this.store.dispatch(setProfileCompleted({ completed: true }));
           this.successMessage = 'پروفایل شما با موفقیت تکمیل شد.';
+          this.toastService.success(this.successMessage);
           setTimeout(() => this.router.navigate(['/dashboard']), 700);
         },
         error: (error) => {
