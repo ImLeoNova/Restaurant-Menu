@@ -1,5 +1,6 @@
 from core.database import execute_query
 from config import settings
+from helpers.dates import to_iso_tehran
 
 
 class Comment:
@@ -281,6 +282,6 @@ class Comment:
             "avatar": row.get("avatar"),
             "content": row["content"],
             "rating": int(row["rating"]),
-            "created_at": created_at.isoformat() if created_at else None,
-            "updated_at": updated_at.isoformat() if updated_at else None,
+            "created_at": to_iso_tehran(created_at),
+            "updated_at": to_iso_tehran(updated_at),
         }

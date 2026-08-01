@@ -5,6 +5,7 @@ from openai import OpenAI
 
 from config import settings
 from core.database import execute_query
+from helpers.dates import to_iso_tehran
 
 
 class CommentSummary:
@@ -124,5 +125,5 @@ class CommentSummary:
             "negatives": _load(row.get("negatives")),
             "comment_count": int(row.get("comment_count") or 0),
             "average_rating": float(row.get("average_rating") or 0),
-            "updated_at": updated_at.isoformat() if updated_at else None,
+            "updated_at": to_iso_tehran(updated_at),
         }

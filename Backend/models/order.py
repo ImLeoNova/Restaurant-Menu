@@ -1,8 +1,8 @@
-
 import json
 from decimal import Decimal
 from core.database import execute_query, get_db_connection
 from mysql.connector import Error
+from helpers.dates import to_iso_tehran
 
 VALID_STATUSES = (
     "pending", "confirmed", "preparing", "ready",
@@ -142,8 +142,8 @@ class Order:
             "authority": order.get("authority"),
             "ref_id": order.get("ref_id"),
             "admin_note": order.get("admin_note"),
-            "created_at": order["created_at"].isoformat() if order.get("created_at") else None,
-            "updated_at": order["updated_at"].isoformat() if order.get("updated_at") else None,
+            "created_at": to_iso_tehran(order.get("created_at")),
+            "updated_at": to_iso_tehran(order.get("updated_at")),
         }
         if include_items:
             items = Order.get_order_items(order["order_ID"])
