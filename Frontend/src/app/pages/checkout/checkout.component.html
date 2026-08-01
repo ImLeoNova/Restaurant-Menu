@@ -45,14 +45,27 @@
         <div class="lg:col-span-1">
           <div class="lg:sticky lg:top-24 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 shadow-2xl">
             <h2 class="yekan text-lg font-extrabold text-white mb-4">خلاصه فاکتور</h2>
-            @if (fullName || phone || address) {
-              <div class="mb-4 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4 space-y-2">
-                <p class="yekan text-xs text-white/50 mb-1">اطلاعات تحویل</p>
-                @if (fullName) { <p class="yekan text-sm text-white/90">{{ fullName }}</p> }
-                @if (phone) { <p class="yekan text-sm text-white/70">{{ phone }}</p> }
-                @if (address) { <p class="yekan text-sm text-white/70 leading-relaxed">{{ address }}</p> }
+            <div class="mb-4 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4 space-y-3">
+              <p class="yekan text-xs text-white/50 mb-1">اطلاعات تحویل</p>
+              <div>
+                <label class="yekan text-xs text-white/50 mb-1 block">نام گیرنده</label>
+                <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="نام و نام خانوادگی"
+                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50" />
               </div>
-            }
+              <div>
+                <label class="yekan text-xs text-white/50 mb-1 block">شماره تماس</label>
+                <input type="tel" [(ngModel)]="phone" name="phone" placeholder="۰۹xxxxxxxxx"
+                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50" />
+              </div>
+              <div>
+                <label class="yekan text-xs text-white/50 mb-1 block">آدرس تحویل</label>
+                <textarea rows="2" [(ngModel)]="address" name="address" placeholder="آدرس کامل"
+                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none resize-none focus:border-amber-400/50"></textarea>
+              </div>
+              @if (!deliveryInfoValid) {
+                <p class="yekan text-xs text-red-300">نام، شماره تماس و آدرس تحویل الزامی است.</p>
+              }
+            </div>
             <div class="space-y-3 text-sm">
               <div class="flex items-center justify-between">
                 <span class="yekan text-white/55">جمع جزء</span>
@@ -67,7 +80,7 @@
                 <span class="yekan text-amber-300 font-extrabold text-lg">{{ subtotal }} هزار تومان</span>
               </div>
             </div>
-            <button type="button" (click)="pay()" [disabled]="paying || !items.length"
+            <button type="button" (click)="pay()" [disabled]="paying || !items.length || !deliveryInfoValid"
               class="yekan mt-5 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-3.5 font-extrabold text-black shadow-[0_12px_30px_rgba(245,158,11,0.28)] disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98] transition">
               {{ paying ? 'در حال انتقال به درگاه...' : 'پرداخت و ثبت سفارش' }}
             </button>

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
@@ -17,7 +18,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterLink, HeaderComponent, FooterComponent],
+  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent, FooterComponent],
   templateUrl: './checkout.component.html',
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
@@ -75,6 +76,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return `${environment.websiteAPI || ''}/${path}`.replace(/([^:]\/)\/+/g, '$1');
   }
 
+  get deliveryInfoValid(): boolean {
+    return !!(this.fullName.trim() && this.phone.trim() && this.address.trim());
+  }
+
   lineTotal(item: CartItem): number {
     const price = Number(item.product.price);
     return Number.isFinite(price) ? price * item.quantity : 0;
@@ -92,9 +97,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   pay(): void {
     if (!this.items.length || this.paying) return;
+    if (!this.deliveryInfoValid) {
+      this.toast.error('لطفاً نام گیرنده، شماره تماس و آدرس تحویل را کامل کنید.');
+      return;
+    }
     this.paying = true;
     this.orderService.createOrder({
       items: this.items.map((i) => ({ product_ID: i.product.product_ID, quantity: i.quantity })),
+      recipient_name: this.fullName.trim(),
+      recipient_phone: this.phone.trim(),
+      delivery_address: this.address.trim(),
     }).subscribe({
       next: (res) => {
         const url = res?.data?.payment_url;

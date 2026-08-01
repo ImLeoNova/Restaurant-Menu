@@ -28,6 +28,11 @@ def create_order():
         if not body:
             return error_response("بدنه درخواست نامعتبر است.", 400)
         items = body.get("items")
+        recipient_name = str(body.get("recipient_name") or "").strip()
+        recipient_phone = str(body.get("recipient_phone") or "").strip()
+        delivery_address = str(body.get("delivery_address") or "").strip()
+        if not recipient_name or not recipient_phone or not delivery_address:
+            return error_response("نام گیرنده، شماره تماس و آدرس تحویل الزامی است.", 400)
         ok, message, resolved, total_tomans = Order.resolve_cart_items(items)
         if not ok:
             return error_response(message, 400)
@@ -51,7 +56,10 @@ def create_order():
             )
         except Exception as e:
             return error_response(f"خطا در ایجاد درخواست پرداخت: {str(e)}", 502)
-        Order.save_payment_intent(authority, user_id, resolved, total_tomans)
+        Order.save_payment_intent(
+            authority, user_id, resolved, total_tomans,
+            recipient_name, recipient_phone, delivery_address,
+        )
         return success_response("درخواست پرداخت ایجاد شد.", {
             "payment_url": payment_url, "authority": authority,
             "total_amount": total_tomans, "amount_rials": amount_rials,
@@ -80,6 +88,9 @@ def verify_order():
         amount_rials = int(round(total_tomans * 10))
         items = __import__("json").loads(intent["items_json"])
         user_id = intent["user_ID"]
+        recipient_name = intent.get("recipient_name") or ""
+        recipient_phone = intent.get("recipient_phone") or ""
+        delivery_address = intent.get("delivery_address") or ""
         zarinpal = _get_zarinpal()
         try:
             verify_data = zarinpal.verify_payment(authority=authority, amount=amount_rials)
@@ -89,6 +100,8 @@ def verify_order():
         order_id = Order.create_from_intent(
             user_id=user_id, authority=authority, ref_id=ref_id,
             items=items, total_amount=total_tomans,
+            recipient_name=recipient_name, recipient_phone=recipient_phone,
+            delivery_address=delivery_address,
         )
         return redirect(f"{frontend_base}/payment/result?success=1&order_id={order_id}&ref_id={ref_id or ''}")
     except Exception:

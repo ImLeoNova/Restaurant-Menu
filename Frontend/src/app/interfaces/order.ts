@@ -21,6 +21,9 @@ export interface Order {
   authority?: string;
   ref_id?: string | null;
   admin_note?: string | null;
+  recipient_name?: string | null;
+  recipient_phone?: string | null;
+  delivery_address?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
   items?: OrderItem[];
@@ -28,6 +31,9 @@ export interface Order {
 
 export interface CreateOrderPayload {
   items: { product_ID: number | string; quantity: number }[];
+  recipient_name: string;
+  recipient_phone: string;
+  delivery_address: string;
 }
 
 export interface CreateOrderResponse {

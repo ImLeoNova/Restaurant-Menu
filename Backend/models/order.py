@@ -60,14 +60,22 @@ class Order:
         return True, "ok", resolved, float(total)
 
     @staticmethod
-    def save_payment_intent(authority, user_id, items, total_amount):
+    def save_payment_intent(authority, user_id, items, total_amount,
+                             recipient_name, recipient_phone, delivery_address):
         execute_query(
-            """INSERT INTO `payment_intents` (`authority`, `user_ID`, `items_json`, `total_amount`)
-               VALUES (%s, %s, %s, %s)
+            """INSERT INTO `payment_intents`
+                 (`authority`, `user_ID`, `items_json`, `total_amount`,
+                  `recipient_name`, `recipient_phone`, `delivery_address`)
+               VALUES (%s, %s, %s, %s, %s, %s, %s)
                ON DUPLICATE KEY UPDATE
                  `user_ID`=VALUES(`user_ID`), `items_json`=VALUES(`items_json`),
-                 `total_amount`=VALUES(`total_amount`), `created_at`=CURRENT_TIMESTAMP""",
-            (authority, user_id, json.dumps(items, ensure_ascii=False), total_amount),
+                 `total_amount`=VALUES(`total_amount`),
+                 `recipient_name`=VALUES(`recipient_name`),
+                 `recipient_phone`=VALUES(`recipient_phone`),
+                 `delivery_address`=VALUES(`delivery_address`),
+                 `created_at`=CURRENT_TIMESTAMP""",
+            (authority, user_id, json.dumps(items, ensure_ascii=False), total_amount,
+             recipient_name, recipient_phone, delivery_address),
             commit=True,
         )
 
@@ -83,7 +91,8 @@ class Order:
         execute_query("DELETE FROM `payment_intents` WHERE `authority` = %s", (authority,), commit=True)
 
     @staticmethod
-    def create_from_intent(user_id, authority, ref_id, items, total_amount):
+    def create_from_intent(user_id, authority, ref_id, items, total_amount,
+                            recipient_name=None, recipient_phone=None, delivery_address=None):
         connection = None
         cursor = None
         try:
@@ -91,9 +100,12 @@ class Order:
             cursor = connection.cursor(dictionary=True)
             connection.start_transaction()
             cursor.execute(
-                """INSERT INTO `orders` (`user_ID`, `total_amount`, `status`, `authority`, `ref_id`)
-                   VALUES (%s, %s, 'pending', %s, %s)""",
-                (user_id, total_amount, authority, str(ref_id) if ref_id is not None else None),
+                """INSERT INTO `orders`
+                     (`user_ID`, `total_amount`, `status`, `authority`, `ref_id`,
+                      `recipient_name`, `recipient_phone`, `delivery_address`)
+                   VALUES (%s, %s, 'pending', %s, %s, %s, %s, %s)""",
+                (user_id, total_amount, authority, str(ref_id) if ref_id is not None else None,
+                 recipient_name or "", recipient_phone or "", delivery_address or ""),
             )
             order_id = cursor.lastrowid
             for item in items:
@@ -107,9 +119,16 @@ class Order:
             cursor.execute("DELETE FROM `payment_intents` WHERE `authority` = %s", (authority,))
             connection.commit()
             return order_id
-        except Error:
+        except Error as e:
             if connection:
                 connection.rollback()
+            # Duplicate authority: a retried/duplicated gateway callback raced us and
+            # already created the order. Return the existing row instead of failing.
+            if getattr(e, "errno", None) == 1062:
+                existing = Order.find_by_authority(authority)
+                if existing:
+                    Order.delete_payment_intent(authority)
+                    return existing["order_ID"]
             raise
         finally:
             if cursor: cursor.close()
@@ -142,6 +161,9 @@ class Order:
             "authority": order.get("authority"),
             "ref_id": order.get("ref_id"),
             "admin_note": order.get("admin_note"),
+            "recipient_name": order.get("recipient_name") or None,
+            "recipient_phone": order.get("recipient_phone") or None,
+            "delivery_address": order.get("delivery_address") or None,
             "created_at": to_iso_tehran(order.get("created_at")),
             "updated_at": to_iso_tehran(order.get("updated_at")),
         }

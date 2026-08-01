@@ -123,12 +123,15 @@ TABLE_DEFINITIONS = [
           `authority` varchar(100) NOT NULL,
           `ref_id` varchar(100) DEFAULT NULL,
           `admin_note` text DEFAULT NULL,
+          `recipient_name` varchar(255) NOT NULL DEFAULT '',
+          `recipient_phone` varchar(20) NOT NULL DEFAULT '',
+          `delivery_address` varchar(1000) NOT NULL DEFAULT '',
           `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
           `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`order_ID`),
           KEY `idx_orders_user` (`user_ID`),
           KEY `idx_orders_status` (`status`),
-          KEY `idx_orders_authority` (`authority`),
+          UNIQUE KEY `uq_orders_authority` (`authority`),
           CONSTRAINT `fk_orders_user`
             FOREIGN KEY (`user_ID`) REFERENCES `restaurantusers` (`user_ID`)
             ON DELETE RESTRICT
@@ -163,6 +166,9 @@ TABLE_DEFINITIONS = [
           `user_ID` varchar(350) NOT NULL,
           `items_json` text NOT NULL,
           `total_amount` decimal(12,2) NOT NULL,
+          `recipient_name` varchar(255) NOT NULL DEFAULT '',
+          `recipient_phone` varchar(20) NOT NULL DEFAULT '',
+          `delivery_address` varchar(1000) NOT NULL DEFAULT '',
           `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (`authority`),
           KEY `idx_payment_intents_user` (`user_ID`)
@@ -471,6 +477,168 @@ DESIRED_SCHEMA = {
         'checks': {
             'chk_product_comments_rating': 'rating BETWEEN 1 AND 5',
         },
+        'table_options': {
+            'engine': 'InnoDB',
+            'charset': 'utf8mb4',
+            'collation': 'utf8mb4_general_ci',
+        },
+    },
+    'orders': {
+        'columns': {
+            'order_ID': {
+                'column_type': 'int(11)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': 'auto_increment',
+            },
+            'user_ID': {
+                'column_type': 'varchar(350)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'total_amount': {
+                'column_type': 'decimal(12,2)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'status': {
+                'column_type': 'varchar(30)',
+                'is_nullable': 'NO',
+                'column_default': 'pending',
+                'extra': '',
+            },
+            'authority': {
+                'column_type': 'varchar(100)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'ref_id': {
+                'column_type': 'varchar(100)',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'admin_note': {
+                'column_type': 'text',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+            'recipient_name': {
+                'column_type': 'varchar(255)',
+                'is_nullable': 'NO',
+                'column_default': '',
+                'extra': '',
+            },
+            'recipient_phone': {
+                'column_type': 'varchar(20)',
+                'is_nullable': 'NO',
+                'column_default': '',
+                'extra': '',
+            },
+            'delivery_address': {
+                'column_type': 'varchar(1000)',
+                'is_nullable': 'NO',
+                'column_default': '',
+                'extra': '',
+            },
+            'created_at': {
+                'column_type': 'datetime',
+                'is_nullable': 'NO',
+                'column_default': 'CURRENT_TIMESTAMP',
+                'extra': '',
+            },
+            'updated_at': {
+                'column_type': 'datetime',
+                'is_nullable': 'YES',
+                'column_default': None,
+                'extra': '',
+            },
+        },
+        'primary_key': ['order_ID'],
+        'unique_keys': {
+            'uq_orders_authority': ['authority'],
+        },
+        'indexes': {
+            'idx_orders_user': ['user_ID'],
+            'idx_orders_status': ['status'],
+        },
+        'foreign_keys': {
+            'fk_orders_user': {
+                'columns': ['user_ID'],
+                'referenced_table': 'restaurantusers',
+                'referenced_columns': ['user_ID'],
+                'on_delete': 'RESTRICT',
+            },
+        },
+        'checks': {},
+        'table_options': {
+            'engine': 'InnoDB',
+            'charset': 'utf8mb4',
+            'collation': 'utf8mb4_general_ci',
+        },
+    },
+    'payment_intents': {
+        'columns': {
+            'authority': {
+                'column_type': 'varchar(100)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'user_ID': {
+                'column_type': 'varchar(350)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'items_json': {
+                'column_type': 'text',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'total_amount': {
+                'column_type': 'decimal(12,2)',
+                'is_nullable': 'NO',
+                'column_default': None,
+                'extra': '',
+            },
+            'recipient_name': {
+                'column_type': 'varchar(255)',
+                'is_nullable': 'NO',
+                'column_default': '',
+                'extra': '',
+            },
+            'recipient_phone': {
+                'column_type': 'varchar(20)',
+                'is_nullable': 'NO',
+                'column_default': '',
+                'extra': '',
+            },
+            'delivery_address': {
+                'column_type': 'varchar(1000)',
+                'is_nullable': 'NO',
+                'column_default': '',
+                'extra': '',
+            },
+            'created_at': {
+                'column_type': 'datetime',
+                'is_nullable': 'NO',
+                'column_default': 'CURRENT_TIMESTAMP',
+                'extra': '',
+            },
+        },
+        'primary_key': ['authority'],
+        'unique_keys': {},
+        'indexes': {
+            'idx_payment_intents_user': ['user_ID'],
+        },
+        'foreign_keys': {},
+        'checks': {},
         'table_options': {
             'engine': 'InnoDB',
             'charset': 'utf8mb4',
