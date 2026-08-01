@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import {
   FormControl,
   FormGroup,
@@ -14,19 +14,12 @@ import { Store } from '@ngrx/store';
 import { loginSuccess } from '../../state/auth.actions';
 import { AuthState } from '../../state/app.state';
 import { LoginResponse } from '../../interfaces/interfaces';
-import { RegisterAuthComponent } from '../register-auth/register-auth.component';
 import { ApiResponse } from '../../models/api-response';
 
 @Component({
   selector: 'app-login-auth',
   standalone: true,
-  imports: [
-    RouterLink,
-    NgIf,
-    ReactiveFormsModule,
-    RegisterAuthComponent,
-    NgClass,
-  ],
+  imports: [RouterLink, ReactiveFormsModule, NgClass],
   templateUrl: './login-auth.component.html',
   styleUrl: './login-auth.component.css',
 })
@@ -35,6 +28,7 @@ export class LoginAuthComponent {
   errorMessage: string | undefined = undefined;
   successMessage: string | undefined = undefined;
   hidePass: boolean = true;
+  loading: boolean = false;
 
   loginForm: FormGroup = new FormGroup({
     username: new FormControl('', [
@@ -54,9 +48,15 @@ export class LoginAuthComponent {
   ) {}
 
   submit() {
+    if (this.loginForm.invalid || this.loading) return;
+
     const username = this.loginForm.controls['username'].value;
     const password = this.loginForm.controls['password'].value;
     const userModel = new User('', username, password, '', '', '[]');
+
+    this.errorMessage = undefined;
+    this.successMessage = undefined;
+    this.loading = true;
 
     this.userService.loginUser(userModel).subscribe(
       (response: ApiResponse<LoginResponse>) => {
@@ -65,7 +65,7 @@ export class LoginAuthComponent {
 
         // Decoding JWT Token
         const tokenDecode = jwtDecode(token);
-        this.errorMessage = undefined;
+        this.loading = false;
         this.successMessage = 'با موفقیت وارد شدید.';
 
         // Add Token To Store
@@ -77,12 +77,12 @@ export class LoginAuthComponent {
         }, 600);
       },
       (error) => {
-        const statusCode = error.status;
-
-        if (statusCode === 400) {
-          this.errorMessage = 'نام کاربری یا رمز عبور اشتباه است';
-          this.successMessage = undefined;
-        }
+        this.loading = false;
+        this.successMessage = undefined;
+        this.errorMessage =
+          error.status === 400
+            ? 'نام کاربری یا رمز عبور اشتباه است'
+            : error?.error?.message || 'ورود با خطا مواجه شد. دوباره تلاش کنید.';
       },
     );
   }
