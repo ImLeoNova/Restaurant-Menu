@@ -1,0 +1,65 @@
+<nav
+  aria-label="مراحل ثبت‌نام"
+  dir="rtl"
+  class="w-full rounded-2xl border border-orange-400/15 bg-white/[0.03] backdrop-blur-2xl px-3 py-4 sm:px-5 yekan"
+>
+  <ol class="flex items-start">
+    @for (s of steps; track s.id; let last = $last) {
+      <li class="flex items-start" [class.flex-1]="!last">
+        <div class="flex flex-col items-center gap-1.5 w-12 sm:w-20 shrink-0">
+          <div
+            class="step-circle relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300"
+            [ngClass]="{
+              'is-done bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-[0_0_0_4px_rgba(251,146,60,0.12)]':
+                s.id < currentStep,
+              'is-active bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-[0_0_0_5px_rgba(251,146,60,0.18)] scale-110':
+                s.id === currentStep,
+              'is-future bg-white/[0.04] border border-white/15 text-white/40':
+                s.id > currentStep
+            }"
+          >
+            @if (s.id < currentStep) {
+              <svg
+                class="check-pop h-4 w-4 sm:h-4.5 sm:w-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            } @else {
+              <span>{{ s.id }}</span>
+            }
+          </div>
+          <span
+            class="text-center text-[10px] sm:text-[11px] leading-tight transition-colors duration-300"
+            [ngClass]="
+              s.id === currentStep
+                ? 'text-white font-bold'
+                : s.id < currentStep
+                  ? 'text-white/60 font-medium'
+                  : 'text-white/35'
+            "
+            >{{ s.label }}</span
+          >
+        </div>
+
+        @if (!last) {
+          <div
+            class="relative mt-4 h-0.5 flex-1 mx-1.5 sm:mx-2 overflow-hidden rounded-full bg-white/10"
+          >
+            <div
+              class="absolute inset-y-0 right-0 rounded-full bg-gradient-to-l from-orange-500 to-amber-400 transition-all duration-500 ease-out"
+              [style.width]="s.id < currentStep ? '100%' : '0%'"
+            ></div>
+          </div>
+        }
+      </li>
+    }
+  </ol>
+</nav>

@@ -1,0 +1,31 @@
+@keyframes checkPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.check-pop {
+  animation: checkPop 0.35s ease-out both;
+}
+
+@keyframes activePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 5px rgba(251, 146, 60, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(251, 146, 60, 0.1);
+  }
+}
+
+.is-active {
+  animation: activePulse 2s ease-in-out infinite;
+}
