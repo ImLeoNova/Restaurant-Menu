@@ -263,5 +263,63 @@
         </div>
       }
     </div>
+
+    @if (isAdmin && totalPages > 1) {
+      <div
+        class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2"
+      >
+        <p class="yekan text-xs text-white/40">
+          صفحه {{ currentPage }} از {{ totalPages }} · {{ totalOrders }} سفارش
+        </p>
+        <div class="flex items-center gap-1.5">
+          <button
+            type="button"
+            (click)="prevPage()"
+            [disabled]="currentPage === 1"
+            class="yekan w-9 h-9 rounded-xl border border-white/10 bg-white/5 text-white/70 disabled:opacity-30 flex items-center justify-center"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 6l-6 6 6 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          @for (p of pageNumbers; track p) {
+            <button
+              type="button"
+              (click)="goToPage(p)"
+              class="yekan w-9 h-9 rounded-xl text-sm font-bold flex items-center justify-center transition-colors"
+              [class]="
+                p === currentPage
+                  ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black'
+                  : 'border border-white/10 bg-white/5 text-white/70'
+              "
+            >
+              {{ p }}
+            </button>
+          }
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            class="yekan w-9 h-9 rounded-xl border border-white/10 bg-white/5 text-white/70 disabled:opacity-30 flex items-center justify-center"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9 6l6 6-6 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
   }
 </div>

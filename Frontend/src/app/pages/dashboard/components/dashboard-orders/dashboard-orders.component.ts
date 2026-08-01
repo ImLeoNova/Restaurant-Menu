@@ -29,6 +29,10 @@ export class DashboardOrdersComponent implements OnChanges {
   loading = false;
   expandedId: number | null = null;
   statusFilter = '';
+  currentPage = 1;
+  perPage = 20;
+  totalOrders = 0;
+  totalPages = 1;
   readonly statusLabels = ORDER_STATUS_LABELS;
   readonly statusColors = ORDER_STATUS_COLORS;
   readonly allStatuses = Object.keys(ORDER_STATUS_LABELS) as OrderStatus[];
@@ -51,12 +55,15 @@ export class DashboardOrdersComponent implements OnChanges {
       this.orderService
         .adminListOrders({
           status: this.statusFilter || undefined,
-          page: 1,
-          per_page: 50,
+          page: this.currentPage,
+          per_page: this.perPage,
         })
         .subscribe({
           next: (res) => {
             this.orders = res?.data?.orders || [];
+            this.totalOrders = res?.data?.total ?? this.orders.length;
+            this.totalPages = res?.data?.total_pages ?? 1;
+            this.currentPage = res?.data?.page ?? this.currentPage;
             this.orders.forEach((o) => {
               this.editStatus[o.order_ID] = o.status;
               this.editNote[o.order_ID] = o.admin_note || '';
@@ -103,8 +110,33 @@ export class DashboardOrdersComponent implements OnChanges {
   }
 
   onFilterChange(): void {
+    this.currentPage = 1;
     this.load();
   }
+
+  get pageNumbers(): number[] {
+    const pages: number[] = [];
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(this.totalPages, start + 4);
+    for (let p = Math.max(1, end - 4); p <= end; p++) pages.push(p);
+    return pages;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) return;
+    this.currentPage = page;
+    this.expandedId = null;
+    this.load();
+  }
+
+  prevPage(): void {
+    this.goToPage(this.currentPage - 1);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.currentPage + 1);
+  }
+
   toggle(id: number): void {
     this.expandedId = this.expandedId === id ? null : id;
   }
