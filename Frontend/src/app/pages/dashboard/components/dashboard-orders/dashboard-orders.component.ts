@@ -30,7 +30,7 @@ export class DashboardOrdersComponent implements OnChanges {
   expandedId: number | null = null;
   statusFilter = '';
   currentPage = 1;
-  perPage = 20;
+  perPage = 10;
   totalOrders = 0;
   totalPages = 1;
   readonly statusLabels = ORDER_STATUS_LABELS;
