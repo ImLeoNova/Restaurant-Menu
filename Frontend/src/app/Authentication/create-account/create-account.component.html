@@ -11,9 +11,14 @@
     ></div>
   </div>
 
-  <div
-    class="relative z-10 w-full max-w-md rounded-[2rem] border border-orange-400/15 bg-[#161616]/85 backdrop-blur-2xl p-6 sm:p-8 text-white yekan"
-  >
+  <div class="relative z-10 w-full flex flex-col items-center gap-5">
+    <div class="w-full max-w-md">
+      <app-registration-stepper [currentStep]="3"></app-registration-stepper>
+    </div>
+
+    <div
+      class="w-full max-w-md rounded-[2rem] border border-orange-400/15 bg-[#161616]/85 backdrop-blur-2xl p-6 sm:p-8 text-white yekan"
+    >
     <div class="text-center mb-6">
       <h1 class="text-2xl font-black">ایجاد حساب کاربری</h1>
       <p class="text-sm text-white/60 mt-2">
@@ -124,10 +129,16 @@
       <button
         type="submit"
         [disabled]="!canSubmit"
-        class="w-full h-14 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full h-14 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
-        {{ loading ? "در حال ثبت..." : "ایجاد حساب" }}
+        @if (loading) {
+          <span
+            class="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+          ></span>
+        }
+        <span>{{ loading ? "در حال ثبت..." : "ایجاد حساب" }}</span>
       </button>
     </form>
+    </div>
   </div>
 </main>
