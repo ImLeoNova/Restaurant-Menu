@@ -36,7 +36,7 @@
           {{ selectedUser.username }}
         </h2>
         <p class="yekan text-white/60 mt-2 text-[0.9rem]">
-          {{ selectedUser.email }}
+          {{ selectedUser | userContact }}
         </p>
         <p class="yekan text-amber-300 mt-3 font-bold">
           {{ selectedUser.role }}

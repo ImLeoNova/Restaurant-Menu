@@ -3,11 +3,12 @@ import { NgClass } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { User } from '../../../../../models/user';
 import { Roles } from '../../../../../enums/enums';
+import { UserContactPipe } from '../../../../../pipes/user-display.pipe';
 
 @Component({
   selector: 'app-edit-user-modal',
   standalone: true,
-  imports: [NgClass, ReactiveFormsModule],
+  imports: [NgClass, ReactiveFormsModule, UserContactPipe],
   templateUrl: './edit-user-modal.component.html',
 })
 export class EditUserModalComponent {

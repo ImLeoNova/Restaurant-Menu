@@ -32,12 +32,22 @@
               user.role === Roles.FOUNDER,
           }"
         >
-          {{
-            ((user.first_name || "") + " " + (user.last_name || ""))
-              .trim()
-              .charAt(0)
-              .toUpperCase() || user.username.charAt(0).toUpperCase()
-          }}
+          @if (user | userAvatar; as avatarUrl) {
+            <img
+              [src]="avatarUrl"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
+          } @else {
+            {{
+              ((user.first_name || "") + " " + (user.last_name || ""))
+                .trim()
+                .charAt(0)
+                .toUpperCase() || user.username.charAt(0).toUpperCase()
+            }}
+          }
         </div>
 
         <div class="min-w-0">
@@ -48,7 +58,7 @@
             }}
           </h2>
           <p class="yekan text-white/40 text-[0.78rem] truncate mt-0.5">
-            {{ user.email }}
+            {{ user | userContact }}
           </p>
         </div>
       </div>
@@ -119,7 +129,7 @@
         </svg>
       </div>
       <span class="yekan text-white/55 text-[0.82rem] truncate">{{
-        user.email
+        user | userContact
       }}</span>
     </div>
 

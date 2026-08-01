@@ -93,8 +93,12 @@ export class CompleteProfileComponent implements OnInit {
       return;
     }
     this.avatarFile = file;
-    this.avatarPreview = URL.createObjectURL(file);
     this.errorMessage = undefined;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.avatarPreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
   skipAvatar(): void {
