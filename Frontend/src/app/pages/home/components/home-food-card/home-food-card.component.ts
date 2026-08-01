@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FoodMODEL } from '../../../../models/food-model';
+import { CartService } from '../../../../services/cart.service';
 
 @Component({
   selector: 'app-home-food-card',
@@ -14,6 +15,8 @@ export class HomeFoodCardComponent {
 
   quantity = 1;
 
+  constructor(private cartService: CartService) {}
+
   increaseQuantity(): void {
     this.quantity += 1;
   }
@@ -23,6 +26,7 @@ export class HomeFoodCardComponent {
   }
 
   emitAddToCart(): void {
+    this.cartService.addToCart(this.foodItem, this.quantity);
     this.addToCart.emit({ quantity: this.quantity });
   }
 }
