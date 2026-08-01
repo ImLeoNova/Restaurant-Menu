@@ -160,7 +160,10 @@ def update_profile():
         email = body.get("email")
         first_name = body.get("first_name")
         last_name = body.get("last_name")
-        phone_number = body.get("phone_number")
+        # Security: phone_number is intentionally NOT accepted here. It is set
+        # exactly once, during OTP-verified registration (add_user_with_phone),
+        # and must never be changeable through this generic profile endpoint.
+        phone_number = None
         address = body.get("address")
         national_id = body.get("national_id")
 
