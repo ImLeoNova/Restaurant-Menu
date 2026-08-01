@@ -14,15 +14,16 @@ import { UserService } from '../../services/user.service';
 import { AuthState } from '../../state/app.state';
 import { setProfileCompleted } from '../../state/auth.actions';
 import { CompleteProfilePayload } from '../../interfaces/CompleteProfilePayload';
+import { RegistrationStepperComponent } from '../registration-stepper/registration-stepper.component';
 
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RegistrationStepperComponent],
   templateUrl: './complete-profile.component.html',
+  styleUrl: './complete-profile.component.css',
 })
 export class CompleteProfileComponent implements OnInit {
-  step = 1;
   avatarPreview: string | null = null;
   avatarFile: File | null = null;
   errorMessage: string | undefined;
@@ -43,10 +44,6 @@ export class CompleteProfileComponent implements OnInit {
     this.form = this.fb.group({
       first_name: ['', [Validators.required, Validators.maxLength(120)]],
       last_name: ['', [Validators.required, Validators.maxLength(120)]],
-      phone_number: [
-        '',
-        [Validators.required, Validators.pattern(/^(0|\+98)9\d{9}$/)],
-      ],
       address: [
         '',
         [
@@ -57,32 +54,6 @@ export class CompleteProfileComponent implements OnInit {
       ],
       national_id: ['', [Validators.maxLength(10)]],
     });
-  }
-
-  get currentStepValid(): boolean {
-    if (this.step === 1) {
-      return true;
-    }
-    if (this.step === 2) {
-      return this.form.valid;
-    }
-    return true;
-  }
-
-  nextStep(): void {
-    if (this.step === 1) {
-      this.step = 2;
-      return;
-    }
-    if (this.step === 2 && this.form.valid) {
-      this.step = 3;
-    }
-  }
-
-  prevStep(): void {
-    if (this.step > 1) {
-      this.step -= 1;
-    }
   }
 
   onFileSelected(event: Event): void {
@@ -146,7 +117,6 @@ export class CompleteProfileComponent implements OnInit {
     const payload: CompleteProfilePayload = {
       first_name: this.form.value.first_name?.trim(),
       last_name: this.form.value.last_name?.trim(),
-      phone_number: this.form.value.phone_number?.trim(),
       address: this.form.value.address?.trim(),
       national_id: this.form.value.national_id?.trim() || undefined,
     };
