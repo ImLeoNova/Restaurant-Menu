@@ -1,4 +1,125 @@
 <div class="space-y-4" dir="rtl">
+  <!-- ================= Journey icon templates (reused by stepper + live badge) ================= -->
+  <ng-template #iconClock>
+    <svg viewBox="0 0 48 48" class="w-full h-full" fill="none">
+      <circle cx="24" cy="24" r="17" stroke="currentColor" stroke-width="3.2" />
+      <path
+        d="M24 15v9.5l6.5 4.5"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </ng-template>
+
+  <ng-template #iconCheck>
+    <svg viewBox="0 0 48 48" class="w-full h-full" fill="none">
+      <circle cx="24" cy="24" r="17" stroke="currentColor" stroke-width="3.2" />
+      <path
+        d="M16 24.5l5.5 5.5L33 17.5"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </ng-template>
+
+  <ng-template #iconBurger>
+    <svg viewBox="0 0 48 48" class="w-full h-full">
+      <path
+        d="M6 23c0-9.4 8.1-17 18-17s18 7.6 18 17H6z"
+        fill="currentColor"
+      />
+      <circle cx="17" cy="14" r="1.5" fill="rgba(0,0,0,0.32)" />
+      <circle cx="24" cy="10.5" r="1.5" fill="rgba(0,0,0,0.32)" />
+      <circle cx="31" cy="14" r="1.5" fill="rgba(0,0,0,0.32)" />
+      <rect
+        x="6"
+        y="25"
+        width="36"
+        height="4.5"
+        rx="2.25"
+        fill="currentColor"
+        opacity="0.5"
+      />
+      <path d="M4 32h40l-2.4 4.2H6.4L4 32z" fill="currentColor" opacity="0.85" />
+      <rect x="4.5" y="37" width="39" height="7" rx="3.5" fill="currentColor" />
+    </svg>
+  </ng-template>
+
+  <ng-template #iconPackage>
+    <svg viewBox="0 0 48 48" class="w-full h-full" fill="none">
+      <rect
+        x="8"
+        y="17"
+        width="32"
+        height="23"
+        rx="3"
+        stroke="currentColor"
+        stroke-width="3.2"
+      />
+      <path d="M8 25h32M24 17v23" stroke="currentColor" stroke-width="3.2" />
+      <path
+        d="M16 17c0-4.4 3.6-8 8-8s8 3.6 8 8"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+      />
+    </svg>
+  </ng-template>
+
+  <ng-template #iconScooter let-spin="spin">
+    <svg viewBox="0 0 48 48" class="w-full h-full" fill="none">
+      <path
+        d="M5 34h4.5l3-9h9l4.5 6.5h6a6.5 6.5 0 016.5 6.5v2"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M21.5 24.5h8l4-7.5"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M29 23.5c4-1 8.5 0 9.8 3.3"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+      />
+      <g
+        [class.wheel-spin]="spin"
+        style="transform-box: fill-box; transform-origin: center"
+      >
+        <circle cx="35" cy="36" r="6" stroke="currentColor" stroke-width="3.2" />
+        <line x1="35" y1="31" x2="35" y2="41" stroke="currentColor" stroke-width="2" />
+      </g>
+      <g
+        [class.wheel-spin]="spin"
+        style="transform-box: fill-box; transform-origin: center"
+      >
+        <circle cx="12" cy="36" r="6" stroke="currentColor" stroke-width="3.2" />
+        <line x1="12" y1="31" x2="12" y2="41" stroke="currentColor" stroke-width="2" />
+      </g>
+    </svg>
+  </ng-template>
+
+  <ng-template #iconFlag>
+    <svg viewBox="0 0 48 48" class="w-full h-full" fill="none">
+      <path d="M13 42V8" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+      <path
+        d="M13 10c4-2.6 8-2.6 12 0s8 2.6 12 0v15c-4 2.6-8 2.6-12 0s-8-2.6-12 0V10z"
+        fill="currentColor"
+        opacity="0.85"
+      />
+    </svg>
+  </ng-template>
+
   <!-- Personal mini-dashboard (user side) -->
   @if (!isAdmin) {
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -118,6 +239,17 @@
               <p class="yekan text-sm text-white/50">
                 {{ formatDate(order.created_at) }}
               </p>
+              @if (order.status !== "cancelled") {
+                <div
+                  class="relative h-1.5 w-full max-w-[14rem] rounded-full bg-white/10 overflow-hidden mt-1"
+                >
+                  <div
+                    class="journey-fill absolute inset-y-0 right-0 rounded-full transition-all duration-700 ease-out"
+                    [class]="journeyBarGradientClass(order)"
+                    [style.width.%]="journeyPercent(order)"
+                  ></div>
+                </div>
+              }
               @if (isAdmin) {
                 <p class="yekan text-sm text-white/70 truncate">
                   {{ order.recipient_name || "ثبت نشده" }} ·
@@ -162,39 +294,227 @@
                   </p>
                 </div>
               } @else {
-                <div
-                  class="flex items-center justify-between gap-1 overflow-x-auto py-2"
-                >
-                  @for (step of timelineSteps; track step; let i = $index) {
+                <div class="relative py-2">
+                  <!-- connecting track -->
+                  <div
+                    class="absolute top-[1.15rem] right-[6%] left-[6%] h-1 rounded-full bg-white/10 overflow-hidden"
+                  >
                     <div
-                      class="flex flex-col items-center min-w-[3.2rem] flex-1"
+                      class="journey-fill absolute inset-y-0 right-0 rounded-full transition-all duration-700 ease-out"
+                      [class]="journeyBarGradientClass(order)"
+                      [style.width.%]="journeyPercent(order)"
+                    ></div>
+                  </div>
+                  <div class="relative flex items-center justify-between gap-1">
+                    @for (step of timelineSteps; track step; let i = $index) {
+                      <div
+                        class="flex flex-col items-center min-w-[3.2rem] flex-1"
+                      >
+                        <div
+                          class="relative w-8 h-8 rounded-full flex items-center justify-center p-[6px] border-2 transition-colors bg-[#171717]"
+                          [class]="
+                            isStepCurrent(order, step)
+                              ? 'text-black bg-amber-400 border-amber-300'
+                              : isStepDone(order, step)
+                                ? 'text-green-300 bg-green-500/20 border-green-400/40'
+                                : 'text-white/30 bg-white/5 border-white/10'
+                          "
+                        >
+                          @if (isStepCurrent(order, step)) {
+                            <span class="riding-glow text-amber-400"></span>
+                          }
+                          @switch (stepIconKey(step)) {
+                            @case ("clock") {
+                              <ng-container
+                                *ngTemplateOutlet="iconClock"
+                              ></ng-container>
+                            }
+                            @case ("check") {
+                              <ng-container
+                                *ngTemplateOutlet="iconCheck"
+                              ></ng-container>
+                            }
+                            @case ("burger") {
+                              <ng-container
+                                *ngTemplateOutlet="iconBurger"
+                              ></ng-container>
+                            }
+                            @case ("package") {
+                              <ng-container
+                                *ngTemplateOutlet="iconPackage"
+                              ></ng-container>
+                            }
+                            @case ("scooter") {
+                              <ng-container
+                                *ngTemplateOutlet="
+                                  iconScooter;
+                                  context: { spin: false }
+                                "
+                              ></ng-container>
+                            }
+                            @case ("flag") {
+                              <ng-container
+                                *ngTemplateOutlet="iconFlag"
+                              ></ng-container>
+                            }
+                          }
+                        </div>
+                        <span
+                          class="yekan text-[0.6rem] sm:text-[0.65rem] mt-1.5 text-center leading-tight"
+                          [class]="
+                            isStepCurrent(order, step)
+                              ? 'text-amber-300 font-bold'
+                              : isStepDone(order, step)
+                                ? 'text-green-300/80'
+                                : 'text-white/35'
+                          "
+                        >
+                          {{ statusLabels[step] }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Live tracking card (user side only) -->
+              @if (!isAdmin && hasLiveTracking(order)) {
+                <div
+                  class="relative overflow-hidden rounded-[1.75rem] border p-4 sm:p-5"
+                  [class]="journeyCardClass(order)"
+                >
+                  <div class="flex items-center justify-between gap-2 mb-4">
+                    <h4
+                      class="yekan text-sm sm:text-base font-extrabold text-white"
+                    >
+                      {{ trackingTitle(order) }}
+                    </h4>
+                    <span
+                      class="flex items-center gap-1.5 yekan text-[0.65rem] text-white/50 shrink-0"
+                    >
+                      <span
+                        class="live-dot w-1.5 h-1.5 rounded-full bg-emerald-400"
+                      ></span>
+                      زنده
+                    </span>
+                  </div>
+
+                  <div class="relative mt-1 mb-8">
+                    <div
+                      class="relative h-2.5 rounded-full overflow-hidden bg-white/10"
+                      [class.journey-road]="order.status === 'delivering'"
                     >
                       <div
-                        class="w-7 h-7 rounded-full flex items-center justify-center text-[0.65rem] font-bold border transition-colors"
-                        [class]="
-                          isStepCurrent(order, step)
-                            ? 'bg-amber-400 text-black border-amber-300'
-                            : isStepDone(order, step)
-                              ? 'bg-green-500/30 text-green-300 border-green-400/40'
-                              : 'bg-white/5 text-white/30 border-white/10'
-                        "
-                      >
-                        {{ toPersian(i + 1) }}
-                      </div>
-                      <span
-                        class="yekan text-[0.6rem] sm:text-[0.65rem] mt-1 text-center leading-tight"
-                        [class]="
-                          isStepCurrent(order, step)
-                            ? 'text-amber-300'
-                            : isStepDone(order, step)
-                              ? 'text-green-300/80'
-                              : 'text-white/35'
-                        "
-                      >
-                        {{ statusLabels[step] }}
-                      </span>
+                        class="journey-fill absolute inset-y-0 right-0 rounded-full transition-all duration-700 ease-out"
+                        [class]="journeyBarGradientClass(order)"
+                        [style.width.%]="journeyPercent(order)"
+                      ></div>
                     </div>
-                  }
+
+                    <!-- riding badge: burger while preparing, scooter while ready/delivering -->
+                    <div
+                      class="absolute w-12 h-12 transition-all duration-700 ease-out"
+                      [style.left.%]="ridingLeftPercent(order)"
+                      style="top: 50%; margin-top: -1.5rem; transform: translateX(-50%)"
+                    >
+                      <div class="riding-badge relative w-full h-full">
+                        <span
+                          class="riding-glow"
+                          [class]="journeyGlowClass(order)"
+                        ></span>
+                        <div
+                          class="relative w-full h-full rounded-2xl border p-2 backdrop-blur-xl shadow-xl flex items-center justify-center"
+                          [class]="journeyBadgeClass(order)"
+                        >
+                          @if (order.status === "preparing") {
+                            <div class="riding-burger relative w-full h-full">
+                              <ng-container
+                                *ngTemplateOutlet="iconBurger"
+                              ></ng-container>
+                            </div>
+                            <span class="steam-line steam-line--1"></span>
+                            <span class="steam-line steam-line--2"></span>
+                            <span class="steam-line steam-line--3"></span>
+                          } @else if (order.status === "ready") {
+                            <div class="scooter-idle w-full h-full">
+                              <ng-container
+                                *ngTemplateOutlet="
+                                  iconScooter;
+                                  context: { spin: false }
+                                "
+                              ></ng-container>
+                            </div>
+                          } @else {
+                            <div class="w-full h-full">
+                              <ng-container
+                                *ngTemplateOutlet="
+                                  iconScooter;
+                                  context: { spin: true }
+                                "
+                              ></ng-container>
+                            </div>
+                            <div class="motion-trail text-violet-300">
+                              <span></span><span></span><span></span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p
+                    class="yekan text-[0.92rem] sm:text-base font-extrabold text-center leading-relaxed"
+                    [class]="journeyTextClass(order)"
+                  >
+                    {{ countdownLabel(order) }}
+                  </p>
+                </div>
+              }
+
+              <!-- Delivered success banner (user side only) -->
+              @if (!isAdmin && order.status === "delivered") {
+                <div
+                  class="relative overflow-hidden rounded-2xl border border-green-400/25 bg-green-500/10 px-4 py-4 text-center"
+                >
+                  <span
+                    class="confetti-piece"
+                    style="left: 20%; width: 6px; height: 10px; background: #fbbf24"
+                  ></span>
+                  <span
+                    class="confetti-piece"
+                    style="
+                      left: 45%;
+                      width: 5px;
+                      height: 9px;
+                      background: #34d399;
+                      animation-delay: 0.15s;
+                    "
+                  ></span>
+                  <span
+                    class="confetti-piece"
+                    style="
+                      left: 65%;
+                      width: 6px;
+                      height: 10px;
+                      background: #60a5fa;
+                      animation-delay: 0.3s;
+                    "
+                  ></span>
+                  <span
+                    class="confetti-piece"
+                    style="
+                      left: 80%;
+                      width: 5px;
+                      height: 9px;
+                      background: #f472b6;
+                      animation-delay: 0.1s;
+                    "
+                  ></span>
+                  <p
+                    class="yekan relative text-green-300 font-extrabold text-sm"
+                  >
+                    🎉 سفارش با موفقیت تحویل داده شد. نوش جان!
+                  </p>
                 </div>
               }
 

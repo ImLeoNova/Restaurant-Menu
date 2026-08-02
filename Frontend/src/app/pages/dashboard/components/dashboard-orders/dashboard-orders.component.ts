@@ -1,4 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../../services/order.service';
@@ -46,8 +53,9 @@ const TIMELINE_STEPS: OrderStatus[] = [
     ThousandTomanPipe,
   ],
   templateUrl: './dashboard-orders.component.html',
+  styleUrl: './dashboard-orders.component.css',
 })
-export class DashboardOrdersComponent implements OnChanges {
+export class DashboardOrdersComponent implements OnChanges, OnInit, OnDestroy {
   @Input({ required: true }) isAdmin = false;
   @Input() userRole = 'User';
 
@@ -69,6 +77,20 @@ export class DashboardOrdersComponent implements OnChanges {
   reorderingId: number | null = null;
   receiptId: number | null = null;
 
+  // ---- Live order-journey tracking ----
+  // Ticking clock (updated every second) used to drive live countdowns
+  // and the riding-icon progress bar without needing extra backend fields.
+  now: number = Date.now();
+  private tickHandle: ReturnType<typeof setInterval> | null = null;
+
+  // Estimated duration (seconds) of each trackable phase, counted from the
+  // moment the order entered that phase (order.updated_at).
+  private readonly PHASE_ETA_SECONDS: Partial<Record<OrderStatus, number>> = {
+    preparing: 18 * 60,
+    delivering: 22 * 60,
+  };
+  private readonly READY_WAIT_SECONDS = 8 * 60;
+
   // Personal mini-dashboard (user side, computed client-side)
   personalStats = {
     totalOrders: 0,
@@ -85,6 +107,17 @@ export class DashboardOrdersComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isAdmin'] || changes['userRole']) this.load();
+  }
+
+  ngOnInit(): void {
+    // Drives every live countdown + the riding-icon position on screen.
+    this.tickHandle = setInterval(() => {
+      this.now = Date.now();
+    }, 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.tickHandle) clearInterval(this.tickHandle);
   }
 
   load(): void {
@@ -291,6 +324,228 @@ export class DashboardOrdersComponent implements OnChanges {
 
   isStepCurrent(order: Order, step: OrderStatus): boolean {
     return order.status === step;
+  }
+
+  /** Fixed icon shown on each of the six lifecycle stops in the stepper. */
+  stepIconKey(
+    step: OrderStatus,
+  ): 'clock' | 'check' | 'burger' | 'package' | 'scooter' | 'flag' {
+    switch (step) {
+      case 'pending':
+        return 'clock';
+      case 'confirmed':
+        return 'check';
+      case 'preparing':
+        return 'burger';
+      case 'ready':
+        return 'package';
+      case 'delivering':
+        return 'scooter';
+      default:
+        return 'flag';
+    }
+  }
+
+  journeyBarGradientClass(order: Order): string {
+    switch (order.status) {
+      case 'pending':
+        return 'bg-gradient-to-l from-amber-400 to-amber-500';
+      case 'confirmed':
+        return 'bg-gradient-to-l from-sky-400 to-sky-500';
+      case 'preparing':
+        return 'bg-gradient-to-l from-amber-400 to-orange-500';
+      case 'ready':
+        return 'bg-gradient-to-l from-emerald-400 to-teal-500';
+      case 'delivering':
+        return 'bg-gradient-to-l from-violet-400 to-fuchsia-500';
+      case 'delivered':
+        return 'bg-gradient-to-l from-green-400 to-emerald-500';
+      default:
+        return 'bg-white/20';
+    }
+  }
+
+  journeyCardClass(order: Order): string {
+    switch (order.status) {
+      case 'preparing':
+        return 'border-orange-400/25 bg-gradient-to-br from-orange-500/10 via-white/5 to-transparent';
+      case 'ready':
+        return 'border-emerald-400/25 bg-gradient-to-br from-emerald-500/10 via-white/5 to-transparent';
+      case 'delivering':
+        return 'border-violet-400/25 bg-gradient-to-br from-violet-500/10 via-white/5 to-transparent';
+      default:
+        return 'border-white/10 bg-white/5';
+    }
+  }
+
+  journeyBadgeClass(order: Order): string {
+    switch (order.status) {
+      case 'preparing':
+        return 'bg-orange-500/20 border-orange-300/40 text-orange-200';
+      case 'ready':
+        return 'bg-emerald-500/20 border-emerald-300/40 text-emerald-200';
+      case 'delivering':
+        return 'bg-violet-500/20 border-violet-300/40 text-violet-200';
+      default:
+        return 'bg-amber-500/20 border-amber-300/40 text-amber-200';
+    }
+  }
+
+  journeyGlowClass(order: Order): string {
+    switch (order.status) {
+      case 'preparing':
+        return 'text-orange-400';
+      case 'ready':
+        return 'text-emerald-400';
+      case 'delivering':
+        return 'text-violet-400';
+      default:
+        return 'text-amber-400';
+    }
+  }
+
+  journeyTextClass(order: Order): string {
+    switch (order.status) {
+      case 'preparing':
+        return 'text-orange-200';
+      case 'ready':
+        return 'text-emerald-200';
+      case 'delivering':
+        return 'text-violet-200';
+      default:
+        return 'text-white';
+    }
+  }
+
+  // ---- Live journey / riding-icon progress bar ----
+
+  /** Icon that rides along the progress bar for the order's current status. */
+  ridingIcon(
+    order: Order,
+  ): 'clock' | 'check' | 'burger' | 'scooter-idle' | 'scooter-move' | 'flag' {
+    switch (order.status) {
+      case 'pending':
+        return 'clock';
+      case 'confirmed':
+        return 'check';
+      case 'preparing':
+        return 'burger';
+      case 'ready':
+        return 'scooter-idle';
+      case 'delivering':
+        return 'scooter-move';
+      default:
+        return 'flag';
+    }
+  }
+
+  /** Whether this order currently has a live, ticking countdown to show. */
+  hasLiveTracking(order: Order): boolean {
+    return (
+      order.status === 'preparing' ||
+      order.status === 'ready' ||
+      order.status === 'delivering'
+    );
+  }
+
+  private statusStartMs(order: Order): number {
+    const raw = order.updated_at || order.created_at;
+    const t = raw ? new Date(raw).getTime() : this.now;
+    return isNaN(t) ? this.now : t;
+  }
+
+  private phaseElapsedSeconds(order: Order): number {
+    return Math.max(0, Math.floor((this.now - this.statusStartMs(order)) / 1000));
+  }
+
+  private phaseRemainingSeconds(order: Order): number {
+    const duration = this.PHASE_ETA_SECONDS[order.status];
+    if (!duration) return 0;
+    return Math.max(0, duration - this.phaseElapsedSeconds(order));
+  }
+
+  /** 0..1 progress within the current phase (used for the riding icon + bar fill). */
+  private phaseFraction(order: Order): number {
+    const duration = this.PHASE_ETA_SECONDS[order.status];
+    if (!duration) return 0.5;
+    return Math.min(1, this.phaseElapsedSeconds(order) / duration);
+  }
+
+  /** Overall order-journey progress (0..100) across all six lifecycle steps. */
+  journeyPercent(order: Order): number {
+    if (order.status === 'cancelled') return 0;
+    if (order.status === 'delivered') return 100;
+    const idx = this.stepIndex(order.status);
+    const segments = this.timelineSteps.length - 1;
+    if (segments <= 0) return 0;
+    const segmentWidth = 100 / segments;
+    const pct = idx * segmentWidth + this.phaseFraction(order) * segmentWidth;
+    return Math.min(100, Math.max(2, pct));
+  }
+
+  /** Clamped offset (in %) used to position the riding-icon badge on the bar. */
+  ridingLeftPercent(order: Order): number {
+    const pct = Math.min(94, Math.max(6, this.journeyPercent(order)));
+    return 100 - pct;
+  }
+
+  private formatCountdown(totalSeconds: number): string {
+    const s = Math.max(0, Math.round(totalSeconds));
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(sec).padStart(2, '0');
+    return toPersianDigits(`${mm}:${ss}`);
+  }
+
+  /** Estimated time remaining (seconds) until the order reaches the customer. */
+  private deliveryEtaSeconds(order: Order): number {
+    if (order.status === 'ready') {
+      const waited = this.phaseElapsedSeconds(order);
+      const waitLeft = Math.max(0, this.READY_WAIT_SECONDS - waited);
+      return waitLeft + (this.PHASE_ETA_SECONDS['delivering'] || 0);
+    }
+    if (order.status === 'delivering') {
+      return this.phaseRemainingSeconds(order);
+    }
+    return 0;
+  }
+
+  /** Short headline for the live-tracking card. */
+  trackingTitle(order: Order): string {
+    switch (order.status) {
+      case 'preparing':
+        return 'در حال آماده‌سازی سفارش شما';
+      case 'ready':
+        return 'سفارش شما آماده تحویل است';
+      case 'delivering':
+        return 'پیک در راه است 🛵';
+      default:
+        return '';
+    }
+  }
+
+  /** Main live countdown sentence, ticking every second. */
+  countdownLabel(order: Order): string {
+    if (order.status === 'preparing') {
+      const rem = this.phaseRemainingSeconds(order);
+      if (rem <= 0) {
+        return 'کمی بیشتر از حد معمول طول می‌کشد؛ آشپز با دقت مشغول آماده‌سازی است 🍳';
+      }
+      return `غذای شما تا ${this.formatCountdown(rem)} دیگر آماده می‌شود`;
+    }
+    if (order.status === 'delivering') {
+      const rem = this.phaseRemainingSeconds(order);
+      if (rem <= 0) {
+        return 'پیک تا لحظاتی دیگر به آدرس شما می‌رسد';
+      }
+      return `سفارش شما تا ${this.formatCountdown(rem)} دیگر به دستتان می‌رسد`;
+    }
+    if (order.status === 'ready') {
+      const rem = this.deliveryEtaSeconds(order);
+      return `سفارش شما تا ${this.formatCountdown(rem)} دیگر به دستتان می‌رسد`;
+    }
+    return '';
   }
 
   // ---- Receipt ----

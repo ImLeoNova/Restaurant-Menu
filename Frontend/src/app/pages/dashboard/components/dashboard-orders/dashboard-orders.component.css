@@ -1,0 +1,272 @@
+/* ==========================================================================
+   Live order-journey widget animations
+   ========================================================================== */
+
+/* Riding badge: gentle up/down bob so the icon feels alive on the bar */
+.riding-badge {
+  animation: ridingBob 1.8s ease-in-out infinite;
+}
+
+@keyframes ridingBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Burger: light wobble to sell "sizzling" without being distracting */
+.riding-burger {
+  animation: burgerWobble 1.4s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+
+@keyframes burgerWobble {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+/* Rising steam above the burger badge */
+.steam-line {
+  position: absolute;
+  bottom: 100%;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0)
+  );
+  opacity: 0;
+  animation: steamRise 2.2s ease-in infinite;
+}
+
+.steam-line--1 {
+  left: 30%;
+  height: 14px;
+  animation-delay: 0s;
+}
+.steam-line--2 {
+  left: 50%;
+  height: 18px;
+  animation-delay: 0.5s;
+}
+.steam-line--3 {
+  left: 68%;
+  height: 14px;
+  animation-delay: 1s;
+}
+
+@keyframes steamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scaleY(0.6);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) scaleY(1.1);
+  }
+}
+
+/* Scooter wheels spinning while actively delivering */
+.wheel-spin {
+  animation: wheelSpin 0.7s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes wheelSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Idle scooter (status = ready): small waiting bounce, no wheel spin */
+.scooter-idle {
+  animation: scooterIdle 1.6s ease-in-out infinite;
+}
+
+@keyframes scooterIdle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Motion trail behind a moving scooter */
+.motion-trail {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0.6;
+}
+
+.motion-trail span {
+  width: 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: trailFade 0.9s ease-in-out infinite;
+}
+
+.motion-trail span:nth-child(1) {
+  animation-delay: 0s;
+}
+.motion-trail span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.motion-trail span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes trailFade {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scaleX(0.7);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+}
+
+/* Soft glow pulse behind the riding badge, tinted per phase via currentColor */
+.riding-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.22;
+  filter: blur(8px);
+  animation: glowPulse 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.32;
+    transform: scale(1.08);
+  }
+}
+
+/* Shimmering highlight sweeping across the active progress fill */
+.journey-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.journey-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.35) 45%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: shimmerSweep 2.4s ease-in-out infinite;
+}
+
+@keyframes shimmerSweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Dashed "road" under the riding badge in the big tracking card */
+.journey-road {
+  background-image: repeating-linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.35) 0,
+    rgba(255, 255, 255, 0.35) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  background-size: 200% 100%;
+  animation: roadScroll 1.2s linear infinite;
+}
+
+@keyframes roadScroll {
+  to {
+    background-position: -32px 0;
+  }
+}
+
+/* Live badge pulsing dot */
+.live-dot {
+  animation: liveDotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes liveDotPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.4);
+  }
+}
+
+/* Confetti burst for delivered success banner */
+.confetti-piece {
+  position: absolute;
+  top: -10%;
+  border-radius: 2px;
+  animation: confettiFall 1.8s ease-in forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(70px) rotate(220deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .riding-badge,
+  .riding-burger,
+  .steam-line,
+  .wheel-spin,
+  .scooter-idle,
+  .motion-trail span,
+  .riding-glow,
+  .journey-fill::after,
+  .journey-road,
+  .live-dot,
+  .confetti-piece {
+    animation: none !important;
+  }
+}
