@@ -2,17 +2,29 @@
   <!-- Personal mini-dashboard (user side) -->
   @if (!isAdmin) {
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-lg">
+      <div
+        class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-lg"
+      >
         <p class="yekan text-white/55 text-[0.8rem]">کل سفارش‌ها</p>
-        <h3 class="yekan text-xl font-extrabold text-white mt-1">{{ personalStats.totalOrders | persianNumber }}</h3>
+        <h3 class="yekan text-xl font-extrabold text-white mt-1">
+          {{ personalStats.totalOrders | persianNumber }}
+        </h3>
       </div>
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-lg">
+      <div
+        class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-lg"
+      >
         <p class="yekan text-white/55 text-[0.8rem]">مجموع خرید</p>
-        <h3 class="yekan text-lg font-extrabold text-amber-300 mt-1">{{ personalStats.totalSpent | toman }}</h3>
+        <h3 class="yekan text-lg font-extrabold text-amber-300 mt-1">
+          {{ personalStats.totalSpent | toman }}
+        </h3>
       </div>
-      <div class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-lg">
+      <div
+        class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl shadow-lg"
+      >
         <p class="yekan text-white/55 text-[0.8rem]">دسته‌ی محبوب</p>
-        <h3 class="yekan text-lg font-extrabold text-cyan-300 mt-1 truncate">{{ personalStats.favoriteCategory }}</h3>
+        <h3 class="yekan text-lg font-extrabold text-cyan-300 mt-1 truncate">
+          {{ personalStats.favoriteCategory }}
+        </h3>
       </div>
     </div>
   }
@@ -117,9 +129,9 @@
               }
             </div>
             <div class="flex items-center gap-3 shrink-0">
-              <span class="yekan text-amber-300 font-extrabold"
-                >{{ order.total_amount }} هزار تومان</span
-              >
+              <span class="yekan text-amber-300 font-extrabold">{{
+                order.total_amount | thousandToman
+              }}</span>
               <svg
                 class="w-5 h-5 text-white/40 transition-transform"
                 [class.rotate-180]="expandedId === order.order_ID"
@@ -141,27 +153,43 @@
               class="border-t border-white/10 px-4 sm:px-5 pb-5 pt-3 space-y-4"
             >
               <!-- Status timeline -->
-              @if (order.status === 'cancelled') {
-                <div class="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-center">
-                  <p class="yekan text-red-300 font-bold text-sm">این سفارش لغو شده است</p>
+              @if (order.status === "cancelled") {
+                <div
+                  class="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-center"
+                >
+                  <p class="yekan text-red-300 font-bold text-sm">
+                    این سفارش لغو شده است
+                  </p>
                 </div>
               } @else {
-                <div class="flex items-center justify-between gap-1 overflow-x-auto py-2">
+                <div
+                  class="flex items-center justify-between gap-1 overflow-x-auto py-2"
+                >
                   @for (step of timelineSteps; track step; let i = $index) {
-                    <div class="flex flex-col items-center min-w-[3.2rem] flex-1">
+                    <div
+                      class="flex flex-col items-center min-w-[3.2rem] flex-1"
+                    >
                       <div
                         class="w-7 h-7 rounded-full flex items-center justify-center text-[0.65rem] font-bold border transition-colors"
-                        [class]="isStepCurrent(order, step)
-                          ? 'bg-amber-400 text-black border-amber-300'
-                          : isStepDone(order, step)
-                            ? 'bg-green-500/30 text-green-300 border-green-400/40'
-                            : 'bg-white/5 text-white/30 border-white/10'"
+                        [class]="
+                          isStepCurrent(order, step)
+                            ? 'bg-amber-400 text-black border-amber-300'
+                            : isStepDone(order, step)
+                              ? 'bg-green-500/30 text-green-300 border-green-400/40'
+                              : 'bg-white/5 text-white/30 border-white/10'
+                        "
                       >
                         {{ toPersian(i + 1) }}
                       </div>
                       <span
                         class="yekan text-[0.6rem] sm:text-[0.65rem] mt-1 text-center leading-tight"
-                        [class]="isStepCurrent(order, step) ? 'text-amber-300' : isStepDone(order, step) ? 'text-green-300/80' : 'text-white/35'"
+                        [class]="
+                          isStepCurrent(order, step)
+                            ? 'text-amber-300'
+                            : isStepDone(order, step)
+                              ? 'text-green-300/80'
+                              : 'text-white/35'
+                        "
                       >
                         {{ statusLabels[step] }}
                       </span>
@@ -222,13 +250,13 @@
                         {{ item.product_title }}
                       </p>
                       <p class="yekan text-xs text-white/50">
-                        {{ item.quantity }} × {{ item.product_price }} هزار
-                        تومان
+                        {{ item.quantity }} ×
+                        {{ item.product_price | thousandToman }}
                       </p>
                     </div>
-                    <span class="yekan text-sm text-white/80 shrink-0"
-                      >{{ item.line_total }} هزار تومان</span
-                    >
+                    <span class="yekan text-sm text-white/80 shrink-0">{{
+                      item.line_total | thousandToman
+                    }}</span>
                   </div>
                 }
               </div>
@@ -241,7 +269,9 @@
                     (click)="toggleReceipt(order.order_ID)"
                     class="yekan text-[0.8rem] px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white/80 hover:bg-white/10"
                   >
-                    {{ receiptId === order.order_ID ? 'بستن رسید' : 'مشاهده رسید' }}
+                    {{
+                      receiptId === order.order_ID ? "بستن رسید" : "مشاهده رسید"
+                    }}
                   </button>
                   <button
                     type="button"
@@ -249,29 +279,46 @@
                     [disabled]="reorderingId === order.order_ID"
                     class="yekan text-[0.8rem] px-3 py-2 rounded-xl border border-amber-400/30 bg-amber-500/15 text-amber-200 hover:bg-amber-500/25 disabled:opacity-50"
                   >
-                    {{ reorderingId === order.order_ID ? 'در حال افزودن...' : 'سفارش مجدد' }}
+                    {{
+                      reorderingId === order.order_ID
+                        ? "در حال افزودن..."
+                        : "سفارش مجدد"
+                    }}
                   </button>
                 </div>
 
                 @if (receiptId === order.order_ID) {
-                  <div class="rounded-2xl border border-white/15 bg-black/30 p-4 space-y-3">
-                    <h4 class="yekan text-white font-bold text-sm">رسید سفارش #{{ order.order_ID | persianNumber }}</h4>
+                  <div
+                    class="rounded-2xl border border-white/15 bg-black/30 p-4 space-y-3"
+                  >
+                    <h4 class="yekan text-white font-bold text-sm">
+                      رسید سفارش #{{ order.order_ID | persianNumber }}
+                    </h4>
                     <div class="space-y-1.5">
                       @for (item of order.items || []; track item.item_ID) {
-                        <div class="flex justify-between yekan text-[0.8rem] text-white/75">
-                          <span>{{ item.product_title }} × {{ item.quantity | persianNumber }}</span>
+                        <div
+                          class="flex justify-between yekan text-[0.8rem] text-white/75"
+                        >
+                          <span
+                            >{{ item.product_title }} ×
+                            {{ item.quantity | persianNumber }}</span
+                          >
                           <span>{{ item.line_total | toman }}</span>
                         </div>
                       }
                     </div>
-                    <div class="border-t border-white/10 pt-2 flex justify-between yekan text-sm font-bold text-white">
+                    <div
+                      class="border-t border-white/10 pt-2 flex justify-between yekan text-sm font-bold text-white"
+                    >
                       <span>جمع کل</span>
-                      <span class="text-amber-300">{{ order.total_amount | toman }}</span>
+                      <span class="text-amber-300">{{
+                        order.total_amount | toman
+                      }}</span>
                     </div>
                     <div class="yekan text-[0.75rem] text-white/45 space-y-0.5">
-                      <p>گیرنده: {{ order.recipient_name || '—' }}</p>
-                      <p>تماس: {{ order.recipient_phone || '—' }}</p>
-                      <p>آدرس: {{ order.delivery_address || '—' }}</p>
+                      <p>گیرنده: {{ order.recipient_name || "—" }}</p>
+                      <p>تماس: {{ order.recipient_phone || "—" }}</p>
+                      <p>آدرس: {{ order.delivery_address || "—" }}</p>
                       <p>تاریخ: {{ formatDate(order.created_at) }}</p>
                     </div>
                   </div>

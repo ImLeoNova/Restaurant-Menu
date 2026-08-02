@@ -139,8 +139,7 @@
                 <p
                   class="yekan text-transparent bg-clip-text bg-gradient-to-l from-amber-300 via-amber-400 to-orange-500 text-[1.8rem] sm:text-[2.2rem] font-extrabold"
                 >
-                  {{ product.price }}
-                  <span class="text-[1rem] text-amber-300/80">هزار تومان</span>
+                  {{ product.price | thousandToman }}
                 </p>
               </div>
 
@@ -340,7 +339,7 @@
                       {{ item.title }}
                     </h3>
                     <p class="yekan text-amber-400 font-bold">
-                      {{ item.price }} هزار تومان
+                      {{ item.price | thousandToman }}
                     </p>
                   </div>
                 </a>

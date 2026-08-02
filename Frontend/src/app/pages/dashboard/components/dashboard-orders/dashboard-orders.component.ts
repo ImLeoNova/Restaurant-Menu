@@ -16,17 +16,35 @@ import {
   DropDownListDirective,
   DropDownOptionSelected,
 } from '../../../../directives/drop-down-list.directive';
-import { PersianNumberPipe, TomanPipe, toPersianDigits, formatToman } from '../../../../pipes/persian-number.pipe';
+import {
+  PersianNumberPipe,
+  TomanPipe,
+  ThousandTomanPipe,
+  toPersianDigits,
+  formatToman,
+} from '../../../../pipes/persian-number.pipe';
 import { FoodMODEL } from '../../../../models/food-model';
 
 const TIMELINE_STEPS: OrderStatus[] = [
-  'pending', 'confirmed', 'preparing', 'ready', 'delivering', 'delivered',
+  'pending',
+  'confirmed',
+  'preparing',
+  'ready',
+  'delivering',
+  'delivered',
 ];
 
 @Component({
   selector: 'app-dashboard-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropDownListDirective, PersianNumberPipe, TomanPipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    DropDownListDirective,
+    PersianNumberPipe,
+    TomanPipe,
+    ThousandTomanPipe,
+  ],
   templateUrl: './dashboard-orders.component.html',
 })
 export class DashboardOrdersComponent implements OnChanges {
@@ -147,7 +165,9 @@ export class DashboardOrdersComponent implements OnChanges {
     if (!this.statusFilter) {
       this.orders = [...this.allUserOrders];
     } else {
-      this.orders = this.allUserOrders.filter((o) => o.status === this.statusFilter);
+      this.orders = this.allUserOrders.filter(
+        (o) => o.status === this.statusFilter,
+      );
     }
   }
 
@@ -293,8 +313,11 @@ export class DashboardOrdersComponent implements OnChanges {
     this.productService.getProducts?.() // may vary by API
       ? this.productService.getProducts().subscribe({
           next: (res: any) => {
-            const list: FoodMODEL[] = res?.data?.products || res?.data || res?.products || [];
-            const byId = new Map(list.map((p: any) => [Number(p.product_ID), p]));
+            const list: FoodMODEL[] =
+              res?.data?.products || res?.data || res?.products || [];
+            const byId = new Map(
+              list.map((p: any) => [Number(p.product_ID), p]),
+            );
             let added = 0;
             for (const item of order.items!) {
               const live = byId.get(Number(item.product_ID));
@@ -316,7 +339,9 @@ export class DashboardOrdersComponent implements OnChanges {
               }
             }
             this.reorderingId = null;
-            this.toast.success(`${toPersianDigits(added)} قلم به سبد خرید اضافه شد.`);
+            this.toast.success(
+              `${toPersianDigits(added)} قلم به سبد خرید اضافه شد.`,
+            );
           },
           error: () => {
             // Fallback without live fetch

@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartItem } from '../../models/cart-item';
+import { ThousandTomanPipe } from '../../pipes/persian-number.pipe';
 
 @Component({
   selector: 'app-cart-drawer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ThousandTomanPipe],
   templateUrl: './cart-drawer.component.html',
 })
 export class CartDrawerComponent {

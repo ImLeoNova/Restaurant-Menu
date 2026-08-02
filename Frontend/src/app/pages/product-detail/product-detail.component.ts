@@ -22,6 +22,7 @@ import { AuthState } from '../../state/app.state';
 import { isTokenExpired } from '../../state/auth';
 import { JwtDecoded } from '../../interfaces/interfaces';
 import { environment } from '../../../environments/environment';
+import { ThousandTomanPipe } from '../../pipes/persian-number.pipe';
 
 @Component({
   selector: 'app-product-detail',
@@ -32,6 +33,7 @@ import { environment } from '../../../environments/environment';
     RouterLink,
     HeaderComponent,
     FooterComponent,
+    ThousandTomanPipe,
   ],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',

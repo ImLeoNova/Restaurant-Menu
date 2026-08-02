@@ -1,16 +1,31 @@
 <div class="min-h-screen bg-[#0b1020] text-white flex flex-col">
   <app-header />
-  <main class="flex-1 w-full max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-10" dir="rtl">
+  <main
+    class="flex-1 w-full max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-10"
+    dir="rtl"
+  >
     <div class="mb-6 sm:mb-8">
-      <h1 class="yekan text-2xl sm:text-3xl font-extrabold text-white">بررسی نهایی سفارش</h1>
-      <p class="yekan mt-2 text-white/55 text-sm sm:text-base">فاکتور خود را مرور کنید و پس از تأیید، پرداخت را انجام دهید.</p>
+      <h1 class="yekan text-2xl sm:text-3xl font-extrabold text-white">
+        بررسی نهایی سفارش
+      </h1>
+      <p class="yekan mt-2 text-white/55 text-sm sm:text-base">
+        فاکتور خود را مرور کنید و پس از تأیید، پرداخت را انجام دهید.
+      </p>
     </div>
     @if (!items.length) {
-      <div class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 sm:p-12 text-center shadow-2xl">
-        <h2 class="yekan text-lg font-bold text-white mb-2">سبد خرید خالی است</h2>
-        <p class="yekan text-white/55 mb-6">برای ثبت سفارش ابتدا محصولی اضافه کنید.</p>
-        <a routerLink="/restaurant-menu/products"
-          class="yekan inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 font-extrabold text-black shadow-[0_12px_30px_rgba(245,158,11,0.28)]">
+      <div
+        class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 sm:p-12 text-center shadow-2xl"
+      >
+        <h2 class="yekan text-lg font-bold text-white mb-2">
+          سبد خرید خالی است
+        </h2>
+        <p class="yekan text-white/55 mb-6">
+          برای ثبت سفارش ابتدا محصولی اضافه کنید.
+        </p>
+        <a
+          routerLink="/restaurant-menu/products"
+          class="yekan inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 font-extrabold text-black shadow-[0_12px_30px_rgba(245,158,11,0.28)]"
+        >
           مشاهده محصولات
         </a>
       </div>
@@ -18,24 +33,64 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
         <div class="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
           @for (item of items; track item.product.product_ID) {
-            <div class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5 shadow-xl flex gap-3 sm:gap-4">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white/10 border border-white/10 shrink-0">
-                <img [src]="imageUrl(item.product.image)" [alt]="item.product.title" class="w-full h-full object-cover" />
+            <div
+              class="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5 shadow-xl flex gap-3 sm:gap-4"
+            >
+              <div
+                class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white/10 border border-white/10 shrink-0"
+              >
+                <img
+                  [src]="imageUrl(item.product.image)"
+                  [alt]="item.product.title"
+                  class="w-full h-full object-cover"
+                />
               </div>
               <div class="flex-1 min-w-0 flex flex-col justify-between">
                 <div>
-                  <h3 class="yekan font-bold text-white truncate text-[0.95rem] sm:text-base">{{ item.product.title }}</h3>
-                  <p class="yekan text-white/55 text-sm mt-1">{{ item.product.price }} هزار تومان</p>
+                  <h3
+                    class="yekan font-bold text-white truncate text-[0.95rem] sm:text-base"
+                  >
+                    {{ item.product.title }}
+                  </h3>
+                  <p class="yekan text-white/55 text-sm mt-1">
+                    {{ item.product.price | thousandToman }}
+                  </p>
                 </div>
-                <div class="mt-3 flex items-center justify-between gap-2 flex-wrap">
+                <div
+                  class="mt-3 flex items-center justify-between gap-2 flex-wrap"
+                >
                   <div class="flex items-center gap-2">
-                    <button type="button" class="h-8 w-8 rounded-xl bg-white/10 text-white" (click)="decrease(item)">−</button>
-                    <span class="yekan min-w-8 text-center text-white font-bold">{{ item.quantity }}</span>
-                    <button type="button" class="h-8 w-8 rounded-xl bg-white/10 text-white" (click)="increase(item)">＋</button>
+                    <button
+                      type="button"
+                      class="h-8 w-8 rounded-xl bg-white/10 text-white"
+                      (click)="decrease(item)"
+                    >
+                      −
+                    </button>
+                    <span
+                      class="yekan min-w-8 text-center text-white font-bold"
+                      >{{ item.quantity }}</span
+                    >
+                    <button
+                      type="button"
+                      class="h-8 w-8 rounded-xl bg-white/10 text-white"
+                      (click)="increase(item)"
+                    >
+                      ＋
+                    </button>
                   </div>
                   <div class="flex items-center gap-3">
-                    <span class="yekan text-amber-300 font-extrabold text-sm sm:text-base">{{ lineTotal(item) }} هزار تومان</span>
-                    <button type="button" class="yekan text-sm text-red-300" (click)="remove(item)">حذف</button>
+                    <span
+                      class="yekan text-amber-300 font-extrabold text-sm sm:text-base"
+                      >{{ lineTotal(item) | thousandToman }}</span
+                    >
+                    <button
+                      type="button"
+                      class="yekan text-sm text-red-300"
+                      (click)="remove(item)"
+                    >
+                      حذف
+                    </button>
                   </div>
                 </div>
               </div>
@@ -43,49 +98,92 @@
           }
         </div>
         <div class="lg:col-span-1">
-          <div class="lg:sticky lg:top-24 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 shadow-2xl">
-            <h2 class="yekan text-lg font-extrabold text-white mb-4">خلاصه فاکتور</h2>
-            <div class="mb-4 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4 space-y-3">
+          <div
+            class="lg:sticky lg:top-24 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 shadow-2xl"
+          >
+            <h2 class="yekan text-lg font-extrabold text-white mb-4">
+              خلاصه فاکتور
+            </h2>
+            <div
+              class="mb-4 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4 space-y-3"
+            >
               <p class="yekan text-xs text-white/50 mb-1">اطلاعات تحویل</p>
               <div>
-                <label class="yekan text-xs text-white/50 mb-1 block">نام گیرنده</label>
-                <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="نام و نام خانوادگی"
-                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50" />
+                <label class="yekan text-xs text-white/50 mb-1 block"
+                  >نام گیرنده</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="fullName"
+                  name="fullName"
+                  placeholder="نام و نام خانوادگی"
+                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50"
+                />
               </div>
               <div>
-                <label class="yekan text-xs text-white/50 mb-1 block">شماره تماس</label>
-                <input type="tel" [(ngModel)]="phone" name="phone" placeholder="۰۹xxxxxxxxx"
-                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50" />
+                <label class="yekan text-xs text-white/50 mb-1 block"
+                  >شماره تماس</label
+                >
+                <input
+                  type="tel"
+                  [(ngModel)]="phone"
+                  name="phone"
+                  placeholder="۰۹xxxxxxxxx"
+                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50"
+                />
               </div>
               <div>
-                <label class="yekan text-xs text-white/50 mb-1 block">آدرس تحویل</label>
-                <textarea rows="2" [(ngModel)]="address" name="address" placeholder="آدرس کامل"
-                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none resize-none focus:border-amber-400/50"></textarea>
+                <label class="yekan text-xs text-white/50 mb-1 block"
+                  >آدرس تحویل</label
+                >
+                <textarea
+                  rows="2"
+                  [(ngModel)]="address"
+                  name="address"
+                  placeholder="آدرس کامل"
+                  class="yekan w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none resize-none focus:border-amber-400/50"
+                ></textarea>
               </div>
               @if (!deliveryInfoValid) {
-                <p class="yekan text-xs text-red-300">نام، شماره تماس و آدرس تحویل الزامی است.</p>
+                <p class="yekan text-xs text-red-300">
+                  نام، شماره تماس و آدرس تحویل الزامی است.
+                </p>
               }
             </div>
             <div class="space-y-3 text-sm">
               <div class="flex items-center justify-between">
                 <span class="yekan text-white/55">جمع جزء</span>
-                <span class="yekan text-white">{{ subtotal }} هزار تومان</span>
+                <span class="yekan text-white">{{
+                  subtotal | thousandToman
+                }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="yekan text-white/55">هزینه ارسال</span>
-                <span class="yekan text-white">۰ هزار تومان</span>
+                <span class="yekan text-white">{{ 0 | thousandToman }}</span>
               </div>
-              <div class="flex items-center justify-between border-t border-white/10 pt-3">
-                <span class="yekan text-white font-extrabold">مبلغ قابل پرداخت</span>
-                <span class="yekan text-amber-300 font-extrabold text-lg">{{ subtotal }} هزار تومان</span>
+              <div
+                class="flex items-center justify-between border-t border-white/10 pt-3"
+              >
+                <span class="yekan text-white font-extrabold"
+                  >مبلغ قابل پرداخت</span
+                >
+                <span class="yekan text-amber-300 font-extrabold text-lg">{{
+                  subtotal | thousandToman
+                }}</span>
               </div>
             </div>
-            <button type="button" (click)="pay()" [disabled]="paying || !items.length || !deliveryInfoValid"
-              class="yekan mt-5 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-3.5 font-extrabold text-black shadow-[0_12px_30px_rgba(245,158,11,0.28)] disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98] transition">
-              {{ paying ? 'در حال انتقال به درگاه...' : 'پرداخت و ثبت سفارش' }}
+            <button
+              type="button"
+              (click)="pay()"
+              [disabled]="paying || !items.length || !deliveryInfoValid"
+              class="yekan mt-5 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-3.5 font-extrabold text-black shadow-[0_12px_30px_rgba(245,158,11,0.28)] disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98] transition"
+            >
+              {{ paying ? "در حال انتقال به درگاه..." : "پرداخت و ثبت سفارش" }}
             </button>
-            <a routerLink="/restaurant-menu/products"
-              class="yekan mt-3 block w-full text-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-bold text-white hover:bg-white/10 transition">
+            <a
+              routerLink="/restaurant-menu/products"
+              class="yekan mt-3 block w-full text-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-bold text-white hover:bg-white/10 transition"
+            >
               بازگشت به سبد خرید
             </a>
           </div>

@@ -13,6 +13,27 @@ export function formatToman(value: number | null | undefined): string {
   return toPersianDigits(withSep);
 }
 
+export function formatThousandToman(
+  value: string | number | null | undefined,
+): string {
+  if (value == null || isNaN(Number(value))) return '۰ هزار تومان';
+
+  const n = Math.round(Number(value));
+  if (n < 1000) {
+    return `${toPersianDigits(n)} هزار تومان`;
+  }
+
+  const millions = Math.floor(n / 1000);
+  const thousands = n % 1000;
+  const millionText = `${toPersianDigits(millions)} میلیون`;
+
+  if (thousands === 0) {
+    return `${millionText} تومان`;
+  }
+
+  return `${millionText} و ${toPersianDigits(thousands)} هزار تومان`;
+}
+
 @Pipe({ name: 'persianNumber', standalone: true })
 export class PersianNumberPipe implements PipeTransform {
   transform(value: string | number | null | undefined): string {
@@ -26,5 +47,12 @@ export class TomanPipe implements PipeTransform {
   transform(value: number | null | undefined, suffix = true): string {
     const formatted = formatToman(value);
     return suffix ? `${formatted} تومان` : formatted;
+  }
+}
+
+@Pipe({ name: 'thousandToman', standalone: true })
+export class ThousandTomanPipe implements PipeTransform {
+  transform(value: string | number | null | undefined): string {
+    return formatThousandToman(value);
   }
 }

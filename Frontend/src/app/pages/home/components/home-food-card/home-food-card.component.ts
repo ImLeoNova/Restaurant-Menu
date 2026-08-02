@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FoodMODEL } from '../../../../models/food-model';
 import { CartService } from '../../../../services/cart.service';
+import { ThousandTomanPipe } from '../../../../pipes/persian-number.pipe';
 
 @Component({
   selector: 'app-home-food-card',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ThousandTomanPipe],
   templateUrl: './home-food-card.component.html',
 })
 export class HomeFoodCardComponent {

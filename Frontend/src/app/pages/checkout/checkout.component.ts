@@ -14,11 +14,19 @@ import { isTokenExpired } from '../../state/auth';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { environment } from '../../../environments/environment';
+import { ThousandTomanPipe } from '../../pipes/persian-number.pipe';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent, FooterComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    HeaderComponent,
+    FooterComponent,
+    ThousandTomanPipe,
+  ],
   templateUrl: './checkout.component.html',
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
@@ -41,21 +49,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subs.push(this.cartService.items$.subscribe(() => {
-      this.items = this.cartService.getItems();
-      this.subtotal = this.cartService.getSubtotal();
-    }));
-    this.subs.push(this.store.select((s) => s.auth).subscribe((auth) => {
-      this.token = auth.token;
-      if (!(this.token && !isTokenExpired(this.token))) {
-        this.router.navigate(['/authentication/login'], { queryParams: { returnUrl: '/checkout' } });
-        return;
-      }
-      this.loadProfile();
-    }));
+    this.subs.push(
+      this.cartService.items$.subscribe(() => {
+        this.items = this.cartService.getItems();
+        this.subtotal = this.cartService.getSubtotal();
+      }),
+    );
+    this.subs.push(
+      this.store
+        .select((s) => s.auth)
+        .subscribe((auth) => {
+          this.token = auth.token;
+          if (!(this.token && !isTokenExpired(this.token))) {
+            this.router.navigate(['/authentication/login'], {
+              queryParams: { returnUrl: '/checkout' },
+            });
+            return;
+          }
+          this.loadProfile();
+        }),
+    );
   }
 
-  ngOnDestroy(): void { this.subs.forEach((s) => s.unsubscribe()); }
+  ngOnDestroy(): void {
+    this.subs.forEach((s) => s.unsubscribe());
+  }
 
   private loadProfile(): void {
     this.userService.getMyProfile(this.token).subscribe({
@@ -64,7 +82,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         if (!data) return;
         this.address = data.address || '';
         this.phone = data.phone_number || '';
-        this.fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.username || '';
+        this.fullName =
+          `${data.first_name || ''} ${data.last_name || ''}`.trim() ||
+          data.username ||
+          '';
       },
       error: () => {},
     });
@@ -73,7 +94,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   imageUrl(path?: string): string {
     if (!path) return 'assets/web/logo.png';
     if (path.startsWith('http')) return path;
-    return `${environment.websiteAPI || ''}/${path}`.replace(/([^:]\/)\/+/g, '$1');
+    return `${environment.websiteAPI || ''}/${path}`.replace(
+      /([^:]\/)\/+/g,
+      '$1',
+    );
   }
 
   get deliveryInfoValid(): boolean {
@@ -98,25 +122,38 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   pay(): void {
     if (!this.items.length || this.paying) return;
     if (!this.deliveryInfoValid) {
-      this.toast.error('لطفاً نام گیرنده، شماره تماس و آدرس تحویل را کامل کنید.');
+      this.toast.error(
+        'لطفاً نام گیرنده، شماره تماس و آدرس تحویل را کامل کنید.',
+      );
       return;
     }
     this.paying = true;
-    this.orderService.createOrder({
-      items: this.items.map((i) => ({ product_ID: i.product.product_ID, quantity: i.quantity })),
-      recipient_name: this.fullName.trim(),
-      recipient_phone: this.phone.trim(),
-      delivery_address: this.address.trim(),
-    }).subscribe({
-      next: (res) => {
-        const url = res?.data?.payment_url;
-        if (!url) { this.paying = false; this.toast.error('آدرس درگاه پرداخت دریافت نشد.'); return; }
-        window.location.href = url;
-      },
-      error: (err) => {
-        this.paying = false;
-        this.toast.error(err?.error?.message || 'خطا در ایجاد درخواست پرداخت.');
-      },
-    });
+    this.orderService
+      .createOrder({
+        items: this.items.map((i) => ({
+          product_ID: i.product.product_ID,
+          quantity: i.quantity,
+        })),
+        recipient_name: this.fullName.trim(),
+        recipient_phone: this.phone.trim(),
+        delivery_address: this.address.trim(),
+      })
+      .subscribe({
+        next: (res) => {
+          const url = res?.data?.payment_url;
+          if (!url) {
+            this.paying = false;
+            this.toast.error('آدرس درگاه پرداخت دریافت نشد.');
+            return;
+          }
+          window.location.href = url;
+        },
+        error: (err) => {
+          this.paying = false;
+          this.toast.error(
+            err?.error?.message || 'خطا در ایجاد درخواست پرداخت.',
+          );
+        },
+      });
   }
 }
