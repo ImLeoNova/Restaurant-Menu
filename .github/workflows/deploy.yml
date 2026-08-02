@@ -38,6 +38,8 @@ jobs:
 
             echo "=== Updating repository ==="
 
+            git config --global --add safe.directory "$DEPLOY_PATH"
+            
             git fetch origin main
 
             git reset --hard origin/main
