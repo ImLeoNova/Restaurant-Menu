@@ -121,6 +121,7 @@ export class DashboardReportsComponent implements OnInit {
       next: (res) => {
         this.operational = res?.data || null;
         this.loading = false;
+        this.rebuildCharts();
       },
       error: () => {
         this.loading = false;
@@ -133,6 +134,7 @@ export class DashboardReportsComponent implements OnInit {
       this.reportService.getFinancial(this.range, start, end).subscribe({
         next: (res) => {
           this.financial = res?.data || null;
+          this.rebuildCharts();
         },
         error: () => {
           this.toast.error('دریافت گزارش مالی ناموفق بود.');
@@ -196,9 +198,42 @@ export class DashboardReportsComponent implements OnInit {
     return toPersianDigits(`${sign}${d}٪`);
   }
 
-  // ---------- Chart data builders ----------
+  // ---------- Chart data ----------
+  // These are plain stored properties, NOT getters. They are computed once,
+  // by rebuildCharts(), whenever operational/financial data actually changes
+  // (see loadAll()/loadWeekly()). Template bindings like [data]="chartX" must
+  // receive a stable object reference between change-detection cycles -
+  // otherwise BaseChartComponent's ngOnChanges fires on every CD tick (any
+  // click, timer, or hover anywhere in the app) and destroys/recreates every
+  // Chart.js instance in a tight loop, which is why charts never finished
+  // rendering and the rest of the Admin Panel became unresponsive.
+  ordersByStatusChart: any = { labels: [], datasets: [] };
+  topProductsChart: any = { labels: [], datasets: [] };
+  categoryChart: any = { labels: [], datasets: [] };
+  newUsersChart: any = { labels: [], datasets: [] };
+  ratingChart: any = { labels: [], datasets: [] };
+  revenueChart: any = { labels: [], datasets: [] };
+  repeatChart: any = { labels: [], datasets: [] };
+  funnelChart: any = { labels: [], datasets: [] };
 
-  get ordersByStatusChart() {
+  get categoryChartTitle(): string {
+    return this.isFounder
+      ? 'درآمد بر اساس دسته‌بندی'
+      : 'فروش بر اساس دسته‌بندی (تعداد)';
+  }
+
+  private rebuildCharts(): void {
+    this.ordersByStatusChart = this.buildOrdersByStatusChart();
+    this.topProductsChart = this.buildTopProductsChart();
+    this.categoryChart = this.buildCategoryChart();
+    this.newUsersChart = this.buildNewUsersChart();
+    this.ratingChart = this.buildRatingChart();
+    this.revenueChart = this.buildRevenueChart();
+    this.repeatChart = this.buildRepeatChart();
+    this.funnelChart = this.buildFunnelChart();
+  }
+
+  private buildOrdersByStatusChart() {
     const items = this.operational?.orders_by_status || [];
     const colors = [
       CHART_COLORS.amber,
@@ -221,7 +256,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get topProductsChart() {
+  private buildTopProductsChart() {
     const items = [
       ...(this.operational?.top_products_by_quantity || []),
     ].reverse();
@@ -238,7 +273,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get categoryChart() {
+  private buildCategoryChart() {
     if (this.isFounder && this.financial) {
       const items = this.financial.revenue_by_category || [];
       return {
@@ -267,13 +302,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get categoryChartTitle(): string {
-    return this.isFounder
-      ? 'درآمد بر اساس دسته‌بندی'
-      : 'فروش بر اساس دسته‌بندی (تعداد)';
-  }
-
-  get newUsersChart() {
+  private buildNewUsersChart() {
     const items = this.operational?.new_users_trend || [];
     return {
       labels: items.map((i) => i.date),
@@ -290,7 +319,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get ratingChart() {
+  private buildRatingChart() {
     const items = this.operational?.rating_trend || [];
     return {
       labels: items.map((i) => i.week_start),
@@ -307,7 +336,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get revenueChart() {
+  private buildRevenueChart() {
     const items = this.financial?.revenue_trend || [];
     return {
       labels: items.map((i) => i.date),
@@ -324,7 +353,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get repeatChart() {
+  private buildRepeatChart() {
     const r = this.financial?.repeat_vs_new;
     if (!r) return { labels: [], datasets: [] };
     return {
@@ -339,7 +368,7 @@ export class DashboardReportsComponent implements OnInit {
     };
   }
 
-  get funnelChart() {
+  private buildFunnelChart() {
     const f = this.financial?.payment_funnel;
     if (!f) return { labels: [], datasets: [] };
     return {

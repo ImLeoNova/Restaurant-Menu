@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   Input,
+  NgZone,
   OnChanges,
   OnDestroy,
   SimpleChanges,
@@ -10,8 +11,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Chart.js is loaded dynamically so the app still builds if the package
-// hasn't been installed yet. Run: npm install chart.js
 declare const Chart: any;
 
 @Component({
@@ -25,7 +24,8 @@ declare const Chart: any;
   `,
 })
 export class BaseChartComponent implements AfterViewInit, OnChanges, OnDestroy {
-  @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true })
+  canvasRef!: ElementRef<HTMLCanvasElement>;
   @Input() type: 'line' | 'bar' | 'doughnut' | 'pie' = 'line';
   @Input() data: any = { labels: [], datasets: [] };
   @Input() options: any = {};
@@ -34,13 +34,18 @@ export class BaseChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   private chart: any = null;
   private viewReady = false;
 
+  constructor(private ngZone: NgZone) {}
+
   ngAfterViewInit(): void {
     this.viewReady = true;
     this.render();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.viewReady && (changes['data'] || changes['type'] || changes['options'])) {
+    if (
+      this.viewReady &&
+      (changes['data'] || changes['type'] || changes['options'])
+    ) {
       this.render();
     }
   }
@@ -59,8 +64,6 @@ export class BaseChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   private async ensureChartJs(): Promise<boolean> {
     if (typeof (window as any).Chart !== 'undefined') return true;
     try {
-      // Resolved after `npm install chart.js`
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mod: any = await import('chart.js');
       const ChartLib = mod.Chart || mod.default || mod;
       if (mod.registerables) {
@@ -99,14 +102,17 @@ export class BaseChartComponent implements AfterViewInit, OnChanges, OnDestroy {
     const mergedOptions = this.deepMerge(rtlDefaults, this.options || {});
 
     const ChartCtor = (window as any).Chart;
-    this.chart = new ChartCtor(this.canvasRef.nativeElement, {
-      type: this.type,
-      data: this.data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        ...mergedOptions,
-      },
+
+    this.ngZone.runOutsideAngular(() => {
+      this.chart = new ChartCtor(this.canvasRef.nativeElement, {
+        type: this.type,
+        data: this.data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          ...mergedOptions,
+        },
+      });
     });
   }
 
