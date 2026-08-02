@@ -14,6 +14,7 @@ import {
   PersianNumberPipe,
   TomanPipe,
   toPersianDigits,
+  ThousandTomanPipe,
   formatToman,
 } from '../../../../pipes/persian-number.pipe';
 import {
@@ -43,6 +44,7 @@ const CHART_COLORS = {
     BaseChartComponent,
     PersianNumberPipe,
     TomanPipe,
+    ThousandTomanPipe,
   ],
   templateUrl: './dashboard-reports.component.html',
 })
