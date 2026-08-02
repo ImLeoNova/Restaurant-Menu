@@ -1,0 +1,568 @@
+<div dir="rtl" class="space-y-5 sm:space-y-6">
+  <!-- Weekly AI Summary Banner -->
+  <div
+    class="relative overflow-hidden rounded-[1.5rem] sm:rounded-[1.8rem] border border-fuchsia-400/20 bg-gradient-to-l from-fuchsia-500/10 via-violet-500/10 to-cyan-500/10 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+  >
+    <div class="flex items-start gap-3 sm:gap-4">
+      <div
+        class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-fuchsia-500/25 flex items-center justify-center shrink-0"
+      >
+        <svg class="w-6 h-6 text-fuchsia-300" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          ></path>
+          <path
+            d="M18 14l.8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8L18 14z"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <h3 class="yekan text-white font-bold text-[0.95rem] sm:text-base">
+            خلاصه هفتگی هوش مصنوعی
+          </h3>
+          <span
+            *ngIf="weekly?.available && weekly?.week_start"
+            class="yekan text-[0.75rem] text-white/50"
+          >
+            {{ toPersian(weekly!.week_start!) }} تا
+            {{ toPersian(weekly!.week_end!) }}
+          </span>
+        </div>
+
+        <ng-container *ngIf="weeklyLoading">
+          <div class="space-y-2 animate-pulse">
+            <div class="h-3 bg-white/10 rounded" style="width: 100%"></div>
+            <div class="h-3 bg-white/10 rounded" style="width: 80%"></div>
+            <div class="h-3 bg-white/10 rounded" style="width: 60%"></div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!weeklyLoading && weekly?.available">
+          <p
+            class="yekan text-white/85 text-[0.9rem] sm:text-[0.95rem] leading-7"
+          >
+            {{ weekly!.summary }}
+          </p>
+        </ng-container>
+
+        <ng-container *ngIf="!weeklyLoading && !weekly?.available">
+          <p class="yekan text-white/55 text-[0.9rem]">
+            گزارش هفتگی هنوز آماده نشده است.
+          </p>
+          <button
+            *ngIf="isFounder"
+            type="button"
+            (click)="generateWeekly()"
+            class="yekan mt-2 text-[0.85rem] text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-4"
+          >
+            تولید دستی خلاصه
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date range selector -->
+  <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+    <button
+      *ngFor="let opt of rangeOptions"
+      type="button"
+      (click)="setRange(opt.key)"
+      class="yekan px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[0.8rem] sm:text-[0.85rem] border transition-colors"
+      [ngClass]="
+        range === opt.key
+          ? 'bg-white/15 border-white/25 text-white'
+          : 'bg-white/5 border-white/10 text-white/60'
+      "
+    >
+      {{ opt.label }}
+    </button>
+    <div *ngIf="range === 'custom'" class="flex flex-wrap items-center gap-2">
+      <input
+        type="date"
+        [(ngModel)]="customStart"
+        class="yekan bg-white/5 border border-white/15 rounded-lg px-2 py-1.5 text-[0.8rem] text-white"
+      />
+      <span class="text-white/40 text-sm">تا</span>
+      <input
+        type="date"
+        [(ngModel)]="customEnd"
+        class="yekan bg-white/5 border border-white/15 rounded-lg px-2 py-1.5 text-[0.8rem] text-white"
+      />
+      <button
+        type="button"
+        (click)="applyCustomRange()"
+        class="yekan px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-[0.8rem]"
+      >
+        اعمال
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div
+    *ngIf="loading"
+    class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4"
+  >
+    <div
+      *ngFor="let i of [1, 2, 3, 4]"
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 h-28 animate-pulse"
+    ></div>
+  </div>
+
+  <!-- Error -->
+  <div
+    *ngIf="error && !loading"
+    class="rounded-[1.5rem] border border-rose-400/30 bg-rose-500/10 p-4 flex items-center justify-between gap-3"
+  >
+    <p class="yekan text-rose-200 text-sm">{{ error }}</p>
+    <button
+      type="button"
+      (click)="loadAll()"
+      class="yekan text-sm text-rose-200 underline"
+    >
+      تلاش مجدد
+    </button>
+  </div>
+
+  <!-- KPI row -->
+  <div
+    *ngIf="!loading && operational"
+    class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-5"
+  >
+    <!-- Orders total -->
+    <div
+      class="rounded-[1.5rem] sm:rounded-[1.8rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg min-w-0"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="yekan text-white/60 text-[0.85rem]">تعداد سفارش‌ها</p>
+          <h2
+            class="yekan text-[1.6rem] sm:text-[2rem] font-extrabold mt-1 truncate"
+          >
+            {{ operational.kpis.orders_total | persianNumber }}
+          </h2>
+          <p
+            class="yekan text-[0.8rem] mt-1"
+            [class]="
+              deltaClass(
+                operational.kpis.orders_total,
+                operational.kpis.orders_total_prev
+              )
+            "
+          >
+            {{
+              formatDelta(
+                operational.kpis.orders_total,
+                operational.kpis.orders_total_prev
+              )
+            }}
+            نسبت به دوره قبل
+          </p>
+        </div>
+        <div
+          class="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center shrink-0"
+        >
+          <svg class="w-6 h-6 text-amber-300" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 7h16M4 12h16M4 17h10"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- New users -->
+    <div
+      class="rounded-[1.5rem] sm:rounded-[1.8rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg min-w-0"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="yekan text-white/60 text-[0.85rem]">کاربران جدید</p>
+          <h2
+            class="yekan text-[1.6rem] sm:text-[2rem] font-extrabold mt-1 truncate"
+          >
+            {{ operational.kpis.new_users | persianNumber }}
+          </h2>
+          <p
+            class="yekan text-[0.8rem] mt-1"
+            [class]="
+              deltaClass(
+                operational.kpis.new_users,
+                operational.kpis.new_users_prev
+              )
+            "
+          >
+            {{
+              formatDelta(
+                operational.kpis.new_users,
+                operational.kpis.new_users_prev
+              )
+            }}
+            نسبت به دوره قبل
+          </p>
+        </div>
+        <div
+          class="w-12 h-12 rounded-2xl bg-green-500/20 flex items-center justify-center shrink-0"
+        >
+          <svg class="w-6 h-6 text-green-300" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+            ></path>
+            <path
+              d="M4 20a8 8 0 0 1 16 0"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avg rating -->
+    <div
+      class="rounded-[1.5rem] sm:rounded-[1.8rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg min-w-0"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="yekan text-white/60 text-[0.85rem]">میانگین امتیاز</p>
+          <h2
+            class="yekan text-[1.6rem] sm:text-[2rem] font-extrabold mt-1 truncate"
+          >
+            {{ operational.kpis.avg_rating | persianNumber }}
+          </h2>
+          <p class="yekan text-[0.8rem] mt-1 text-white/45">
+            زمان آماده‌سازی:
+            {{ toPersian(operational.avg_fulfillment_minutes) }} دقیقه
+          </p>
+        </div>
+        <div
+          class="w-12 h-12 rounded-2xl bg-cyan-500/20 flex items-center justify-center shrink-0"
+        >
+          <svg class="w-6 h-6 text-cyan-300" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 3l2.5 6.5L21 11l-5 4.5L17.5 22 12 18.5 6.5 22 8 15.5 3 11l6.5-1.5L12 3z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue (Founder only) -->
+    <div
+      *ngIf="isFounder && financial"
+      class="rounded-[1.5rem] sm:rounded-[1.8rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg min-w-0"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="yekan text-white/60 text-[0.85rem]">درآمد کل</p>
+          <h2
+            class="yekan text-[1.25rem] sm:text-[1.5rem] font-extrabold mt-1 truncate"
+          >
+            {{ financial.kpis.revenue_total | toman }}
+          </h2>
+          <p
+            class="yekan text-[0.8rem] mt-1"
+            [class]="
+              deltaClass(
+                financial.kpis.revenue_total,
+                financial.kpis.revenue_total_prev
+              )
+            "
+          >
+            {{
+              formatDelta(
+                financial.kpis.revenue_total,
+                financial.kpis.revenue_total_prev
+              )
+            }}
+            · AOV {{ financial.kpis.average_order_value | toman }}
+          </p>
+        </div>
+        <div
+          class="w-12 h-12 rounded-2xl bg-fuchsia-500/20 flex items-center justify-center shrink-0"
+        >
+          <svg class="w-6 h-6 text-fuchsia-300" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 3v18M7 8h7a3 3 0 0 1 0 6H7m0 0h8a3 3 0 0 1 0 6H7"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts grid -->
+  <div
+    *ngIf="!loading && operational"
+    class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5"
+  >
+    <!-- Revenue trend (Founder) -->
+    <div
+      *ngIf="isFounder && financial"
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        روند درآمد
+      </h3>
+      <app-base-chart
+        type="line"
+        [data]="revenueChart"
+        [options]="lineOptions"
+        height="240px"
+      ></app-base-chart>
+    </div>
+
+    <!-- Orders by status -->
+    <div
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        سفارش‌ها بر اساس وضعیت
+      </h3>
+      <app-base-chart
+        type="doughnut"
+        [data]="ordersByStatusChart"
+        [options]="doughnutOptions"
+        height="240px"
+      ></app-base-chart>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button
+          *ngFor="let s of operational.orders_by_status"
+          type="button"
+          (click)="onStatusClick(s.status)"
+          class="yekan text-[0.75rem] px-2.5 py-1 rounded-lg border transition-colors hover:bg-white/10"
+          [class]="statusBadgeClass(s.status)"
+        >
+          {{ s.label }} ({{ s.count | persianNumber }})
+        </button>
+      </div>
+    </div>
+
+    <!-- Top products -->
+    <div
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        پرفروش‌ترین محصولات (تعداد)
+      </h3>
+      <app-base-chart
+        type="bar"
+        [data]="topProductsChart"
+        [options]="barOptions"
+        height="260px"
+      ></app-base-chart>
+    </div>
+
+    <!-- Category -->
+    <div
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        {{ categoryChartTitle }}
+      </h3>
+      <app-base-chart
+        type="bar"
+        [data]="categoryChart"
+        [options]="verticalBarOptions"
+        height="240px"
+      ></app-base-chart>
+    </div>
+
+    <!-- New users trend -->
+    <div
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        روند کاربران جدید
+      </h3>
+      <app-base-chart
+        type="line"
+        [data]="newUsersChart"
+        [options]="lineOptions"
+        height="220px"
+      ></app-base-chart>
+    </div>
+
+    <!-- Rating trend -->
+    <div
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        روند امتیاز محصولات
+      </h3>
+      <app-base-chart
+        type="line"
+        [data]="ratingChart"
+        [options]="lineOptions"
+        height="220px"
+      ></app-base-chart>
+    </div>
+
+    <!-- Repeat vs new (Founder) -->
+    <div
+      *ngIf="isFounder && financial"
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        مشتری تکراری در برابر جدید
+      </h3>
+      <app-base-chart
+        type="doughnut"
+        [data]="repeatChart"
+        [options]="doughnutOptions"
+        height="220px"
+      ></app-base-chart>
+      <p
+        *ngIf="financial.repeat_vs_new"
+        class="yekan text-white/50 text-[0.8rem] mt-2 text-center"
+      >
+        سهم درآمد مشتریان تکراری:
+        {{
+          toPersian(
+            (financial.repeat_vs_new.repeat_revenue_share * 100).toFixed(1)
+          )
+        }}٪
+      </p>
+    </div>
+
+    <!-- Payment funnel (Founder) -->
+    <div
+      *ngIf="isFounder && financial"
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        قیف پرداخت / نرخ رهاسازی
+      </h3>
+      <app-base-chart
+        type="bar"
+        [data]="funnelChart"
+        [options]="verticalBarOptions"
+        height="220px"
+      ></app-base-chart>
+      <p
+        *ngIf="financial.payment_funnel"
+        class="yekan text-white/50 text-[0.8rem] mt-2 text-center"
+      >
+        نرخ رهاسازی:
+        {{
+          toPersian(
+            (financial.payment_funnel.abandonment_rate * 100).toFixed(1)
+          )
+        }}٪
+      </p>
+    </div>
+  </div>
+
+  <!-- Tables -->
+  <div
+    *ngIf="!loading && operational"
+    class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5"
+  >
+    <!-- Top customers (Founder) -->
+    <div
+      *ngIf="isFounder && financial"
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg overflow-x-auto"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        برترین مشتریان (هزینه)
+      </h3>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-white/50 yekan text-[0.8rem]">
+            <th class="text-right py-2 font-medium">کاربر</th>
+            <th class="text-right py-2 font-medium">مجموع خرید</th>
+            <th class="text-right py-2 font-medium">تعداد سفارش</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let c of financial.top_customers"
+            class="border-t border-white/5"
+          >
+            <td class="yekan py-2.5 text-white/85">{{ c.username }}</td>
+            <td class="yekan py-2.5 text-white/75">
+              {{ c.total_spent | toman }}
+            </td>
+            <td class="yekan py-2.5 text-white/75">
+              {{ c.orders_count | persianNumber }}
+            </td>
+          </tr>
+          <tr *ngIf="!financial.top_customers?.length">
+            <td colspan="3" class="yekan py-4 text-center text-white/40">
+              داده‌ای نیست
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Stuck orders -->
+    <div
+      class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-lg overflow-x-auto"
+    >
+      <h3 class="yekan text-white/80 font-bold mb-3 text-[0.95rem]">
+        سفارش‌های متوقف‌شده
+      </h3>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-white/50 yekan text-[0.8rem]">
+            <th class="text-right py-2 font-medium">شناسه</th>
+            <th class="text-right py-2 font-medium">وضعیت</th>
+            <th class="text-right py-2 font-medium">ساعت متوقف</th>
+            <th class="text-right py-2 font-medium">گیرنده</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let s of operational.stuck_orders"
+            class="border-t border-white/5 cursor-pointer hover:bg-white/5 transition-colors"
+            (click)="onStuckClick(s.order_ID)"
+          >
+            <td class="yekan py-2.5 text-cyan-300">
+              #{{ s.order_ID | persianNumber }}
+            </td>
+            <td class="py-2.5">
+              <span
+                class="yekan text-[0.75rem] px-2 py-0.5 rounded-md border"
+                [class]="statusBadgeClass(s.status)"
+              >
+                {{ statusLabel(s.status) }}
+              </span>
+            </td>
+            <td class="yekan py-2.5 text-amber-300">
+              {{ toPersian(s.hours_stuck) }} س
+            </td>
+            <td class="yekan py-2.5 text-white/70">
+              {{ s.recipient_name || "—" }}
+            </td>
+          </tr>
+          <tr *ngIf="!operational.stuck_orders?.length">
+            <td colspan="4" class="yekan py-4 text-center text-white/40">
+              سفارش متوقف‌شده‌ای نیست 🎉
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

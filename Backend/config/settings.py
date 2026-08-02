@@ -89,3 +89,8 @@ ZARINPAL_MERCHANT_ID = get_env("ZARINPAL_MERCHANT_ID", default="1d00ae1f-1bf1-4e
 ZARINPAL_SANDBOX = parse_bool(get_env("ZARINPAL_SANDBOX", default="true"))
 ZARINPAL_CALLBACK_URL = get_env("ZARINPAL_CALLBACK_URL", default="http://localhost:8080/api/orders/verify")
 FRONTEND_URL = get_env("FRONTEND_URL", default="http://localhost:4200")
+
+# Reports / Analytics
+STUCK_ORDER_PENDING_HOURS = get_env("STUCK_ORDER_PENDING_HOURS", default=2, cast=float)
+STUCK_ORDER_OTHER_HOURS = get_env("STUCK_ORDER_OTHER_HOURS", default=4, cast=float)
+PAYMENT_ABANDON_MINUTES = get_env("PAYMENT_ABANDON_MINUTES", default=30, cast=int)

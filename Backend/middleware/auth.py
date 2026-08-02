@@ -53,3 +53,20 @@ def admin_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def founder_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_data = getattr(request, "user", None)
+        if not user_data:
+            return error_response("Authentication required.", 401)
+
+        role = str(user_data.get("role", "")).lower()
+
+        if role != "founder":
+            return error_response("Founder access required.", 403)
+
+        return f(*args, **kwargs)
+
+    return decorated_function

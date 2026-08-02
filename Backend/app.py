@@ -15,6 +15,7 @@ from routes.comment_routes import comment_bp
 from routes.category_routes import category_bp
 from routes.auth_routes import auth_bp
 from routes.order_routes import order_bp
+from routes.report_routes import report_bp
 
 from helpers.responses import error_response
 
@@ -98,10 +99,35 @@ def create_app():
     app.register_blueprint(category_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(order_bp)
+    app.register_blueprint(report_bp)
+
+    _init_scheduler(app)
 
     register_error_handlers(app)
 
     return app
+
+
+def _init_scheduler(app):
+    """Background APScheduler job for weekly AI report summary (Fri 23:59 Tehran)."""
+    try:
+        from apscheduler.schedulers.background import BackgroundScheduler
+        from apscheduler.triggers.cron import CronTrigger
+        from services.report_ai_service import run_scheduled_weekly_summary
+
+        scheduler = BackgroundScheduler(timezone="Asia/Tehran")
+        scheduler.add_job(
+            func=run_scheduled_weekly_summary,
+            trigger=CronTrigger(day_of_week="fri", hour=23, minute=59, timezone="Asia/Tehran"),
+            id="weekly_report_summary",
+            replace_existing=True,
+            max_instances=1,
+        )
+        scheduler.start()
+        app.scheduler = scheduler
+        print("[Scheduler] Weekly report summary job registered (Fri 23:59 Asia/Tehran)")
+    except Exception as e:
+        print(f"[Scheduler] Failed to start APScheduler: {e}")
 
 def register_error_handlers(app):
     @app.errorhandler(404)

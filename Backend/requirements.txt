@@ -12,3 +12,4 @@ standard-imghdr
 boto3
 smsir-sdk
 requests
+APScheduler
